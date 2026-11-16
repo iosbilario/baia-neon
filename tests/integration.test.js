@@ -20,7 +20,7 @@ const scope={console:{log:console.log,warn(){},error(e){fatalError=e;}},document
 scope.window=scope;vm.createContext(scope);
 vm.runInContext(fs.readFileSync(path.join(root,'vendor/three.min.js'),'utf8'),scope);
 scope.THREE.WebGLRenderer=class{constructor(){this.shadowMap={};this.info={render:{calls:0,triangles:0}};}setPixelRatio(){}setSize(){}render(scene,camera){assert.ok(Number.isFinite(camera.position.x));scene.updateMatrixWorld();}};
-for(const file of ['config','world','audio','police','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
+for(const file of ['config','build-info','save','navigation','campaign','world','audio','police','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
 assert.equal(fatalError,null,'initialization error');
 assert.ok(scope.BN.debug,'test helpers available');
 const d=scope.BN.debug;
@@ -38,7 +38,7 @@ test('a pedestrian collision reports an actual offense',()=>{d.teleport(4,14);co
 test('night lights and rain state update without a network service',()=>{d.setHour(22);d.setRain(1);step(.1);assert.ok(d.getState().night>.95);assert.ok(d.world.materials.windowLit.emissiveIntensity>1);assert.ok(d.world.materials.asphalt.roughness<.5);assert.equal(d.getState().rainTarget,1);});
 test('contracts need a pickup, pay by cargo condition and save progress',()=>{
   d.clearPolice();d.setRain(0);const c=d.cars[0];if(!d.player.car){d.teleport(c.x,c.z+3);tap('KeyE');}assert.ok(d.player.car);
-  const start=d.getState().balance,list=scope.BN.CONFIG.deliveries;
+  const start=d.getState().balance,list=scope.BN.CONFIG.deliveries.slice(0,3);
   list.forEach((m,i)=>{
     tap('Digit'+(i+1));assert.equal(d.getState().job.stage,'pickup');
     d.teleport(m.x,m.z);step(2);assert.equal(d.getState().job.stage,'pickup','no delivery without the cargo');
@@ -49,10 +49,10 @@ test('contracts need a pickup, pay by cargo condition and save progress',()=>{
   const earned=d.getState().balance-start,max=list.reduce((a,m)=>a+m.reward,0);
   assert.ok(earned>max*.6&&earned<=max,'pay follows the cargo: '+earned);
   assert.ok(/garantido/.test(d.getResult()));
-  assert.ok(JSON.parse(store.get('baia-neon-save')).completed>=3);
+  assert.ok(JSON.parse(store.get(scope.BN.Save.KEY)).completed>=3);
 });
 test('a fragile cargo loses pay in a crash and a wrecked cargo ends the contract',()=>{
-  tap('Digit2');const m=scope.BN.CONFIG.deliveries[1];d.teleport(m.px,m.pz);step(2);assert.equal(d.getState().job.stage,'deliver');
+  d.setReputation(0);tap('Digit2');const m=scope.BN.CONFIG.deliveries[1];d.teleport(m.px,m.pz);step(2);assert.equal(d.getState().job.stage,'deliver');
   d.teleport(0,-40);d.player.car.heading=Math.PI/2;d.player.car.speed=22;down('KeyW');step(3);up('KeyW');
   assert.ok(d.getState().job===null||d.getState().job.cargo<100,'crash damaged the cargo');
   if(d.getState().job){d.getJob().cargo=0;step(.2);}
@@ -64,8 +64,14 @@ test('the garage sells an upgrade once and money buys a different car',()=>{
   assert.ok(d.garageBuy(find('Freios')));assert.equal(d.upgrades.brakes,true);assert.equal(d.getState().balance,1700);
   assert.equal(d.garageBuy(find('Freios')),false);
   assert.ok(d.garageBuy(find('ESPORTIVO')));assert.equal(d.cars[0].type,'sport');
-  assert.ok(JSON.parse(store.get('baia-neon-save')).owned.includes('sport'));
+  assert.ok(JSON.parse(store.get(scope.BN.Save.KEY)).owned.includes('sport'));
   element('closeGarage').onclick();assert.equal(d.getState().mode,'play');
+});
+test('time trials require ordered checkpoints and save a record per vehicle',()=>{
+  assert.ok(d.player.car);d.startRace();const race=scope.BN.CONFIG.races[0];
+  d.teleport(race.points[1][0],race.points[1][1]);d.updateRace(.1);assert.equal(d.getState().race.checkpoint,0,'later checkpoint cannot be skipped');
+  race.points.forEach(point=>{d.teleport(point[0],point[1]);d.updateRace(.25);});
+  assert.equal(d.getState().race,null);assert.ok(d.progressData().raceRecords['volta-centro:'+d.player.car.type]>0);
 });
 test('cars slide sideways in a hard turn and the handbrake lets the rear go',()=>{
   const c=d.player.car;d.teleport(0,-230);c.heading=0;c.lat=0;c.speed=24;down('KeyW');down('KeyD');step(.5);const grip=Math.abs(c.lat);up('KeyD');up('KeyW');
@@ -90,7 +96,8 @@ test('alleys take only the narrow car, parks take only people, props are solid',
   assert.ok(w.isBlocked(p.x,p.z,.5),'the fountain is solid');
   for(const c of d.cars)assert.ok(!w.isBlocked(c.x,c.z,1),'no car starts inside something');
   for(const q of d.peds)if(!q.dead)assert.ok(!w.isBlocked(q.x,q.z,.5),'no pedestrian starts inside something');
-  for(const m of scope.BN.CONFIG.deliveries){assert.ok(!w.isBlocked(m.x,m.z,1.6));assert.ok(!w.isBlocked(m.px,m.pz,1.6));}
+  for(const m of scope.BN.CONFIG.deliveries){assert.ok(!w.isBlocked(m.x,m.z,1.6),'destination blocked: '+m.id);assert.ok(!w.isBlocked(m.px,m.pz,1.6),'pickup blocked: '+m.id);}
+  for(const landmark of Object.values(scope.BN.CONFIG.landmarks))assert.ok(!w.isBlocked(landmark.x,landmark.z,1.1),'landmark blocked: '+landmark.id);
   assert.ok(!w.isBlocked(scope.BN.CONFIG.garage.x,scope.BN.CONFIG.garage.z,1.6));assert.ok(!w.isBlocked(w.spawn.x,w.spawn.z,.5));
 });
 test('focus loss pauses motion and resume restores input',()=>{down('KeyW');listeners.blur();const state=d.getState();step(.5);assert.equal(d.getState().mode,'pause');assert.equal(d.player.x,state.player.x);assert.equal(d.player.z,state.player.z);element('resume').onclick();assert.equal(d.getState().mode,'play');});
