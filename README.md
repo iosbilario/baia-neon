@@ -9,13 +9,14 @@
   <a href="#a-cidade">A cidade</a> ·
   <a href="#polícia">Polícia</a> ·
   <a href="#por-dentro">Por dentro</a> ·
-  <a href="https://iosbilario.github.io/baia-neon/JOGAR_OFFLINE.html">Versão offline</a>
+  <a href="https://github.com/iosbilario/baia-neon/releases/latest/download/baia-neon-0.3.0-offline.html">Versão offline</a>
 </p>
 
 Baía Neon é um jogo 3D de mundo aberto que roda direto no navegador. Você
-dirige por uma cidade litorânea inventada, aceita serviços de entrega com
-regras próprias, gasta o que ganha na oficina e foge da polícia quando o
-atalho dá errado. Sem instalação, sem cadastro, sem anúncios.
+ajuda a Rádio Caju a fazer sua última transmissão em uma campanha curta,
+dirige por uma cidade litorânea inventada, aceita serviços variados, disputa
+contrarrelógios e foge da polícia quando o atalho dá errado. Sem instalação,
+sem cadastro e sem anúncios.
 
 **Jogue em [iosbilario.github.io/baia-neon](https://iosbilario.github.io/baia-neon/).**
 Precisa de computador com teclado e mouse e de um navegador com WebGL.
@@ -30,15 +31,12 @@ Precisa de computador com teclado e mouse e de um navegador com WebGL.
 Dirigir bem, conhecer a cidade e improvisar uma fuga rendem dinheiro. O
 dinheiro muda a próxima partida.
 
-- **Escolha um serviço.** O quadro oferece três contratos. Aceite com `1`,
-  `2` ou `3`, retire a carga de carro e leve até o destino.
-- **Cuide da carga.** Cada contrato tem uma regra, e o pagamento explica o
-  que você perdeu no caminho.
-- **Gaste na oficina.** Reparo, melhorias com contrapartida, munição e
-  outros carros. O progresso fica salvo no navegador.
-- **Fuja com a cabeça.** A polícia procura o carro em que você foi visto.
-  Trocar de veículo, entrar numa viela ou atravessar um parque a pé são
-  saídas diferentes.
+- **Jogue Última Frequência.** Cinco missões encadeadas levam Dora Dendê e Nando Hertz pela mudança da Rádio Caju.
+- **Escolha um serviço.** O quadro oferece entregas, passageiros e recuperação de veículos conforme sua reputação.
+- **Conheça as ruas.** `M` abre o mapa, permite marcar um ponto e traça uma rota pelas ruas e pontes.
+- **Dispute tempo.** `L` inicia um de três percursos com medalhas e recorde local por veículo.
+- **Gaste na oficina.** Reparo, melhorias com contrapartida, munição e outros carros. O progresso fica salvo no navegador.
+- **Fuja com a cabeça.** A polícia procura o carro em que você foi visto. Trocar de veículo, entrar numa viela ou atravessar um parque a pé são saídas diferentes.
 
 ### Contratos
 
@@ -85,8 +83,13 @@ Fica no marcador laranja do mapa e abre com `Enter`.
 | `Shift` | Correr |
 | `E` | Entrar ou sair de um carro próximo |
 | `Espaço` | Freio de mão |
-| `1` `2` `3` | Aceitar um serviço do quadro |
-| `Enter` | Abrir a oficina no marcador laranja |
+| `1` `2` `3` | Aceitar uma oferta do quadro |
+| `Enter` | Ação contextual ou oficina |
+| `M` | Abrir mapa, marcar destino e acompanhar a rota |
+| `L` | Iniciar o próximo percurso contra o relógio |
+| `P` | Abrir o modo foto |
+| `Y` | Repetir uma missão após falhar |
+| `X` | Escolher a retirada arriscada na missão do carro |
 | Clique ou `F` | Atirar a pé. No carro, `F` buzina |
 | `R` | Recarregar a pistola |
 | `G` | Arremessar granada |
@@ -152,13 +155,12 @@ flowchart LR
 | Caminho | Conteúdo |
 | --- | --- |
 | `index.html`, `styles.css` | Interface, menu e HUD |
-| `src/` | Código do jogo |
+| `src/` | Código do jogo, campanha, save, navegação e metadados de build |
 | `vendor/` | Three.js r160, versão fixa |
-| `assets/` | Texturas, modelos, sons e catálogo com a origem de cada recurso |
-| `tests/` | 29 cenários de lógica policial e de integração |
-| `tools/` | Empacotador, auditoria offline, gerador e validador de recursos |
-| `docs/` | Direção criativa, critérios de aceite e registro de verificação |
-| `licenses/` | Licenças e procedência |
+| `assets/` | Texturas, modelos, sons, capturas e catálogo de procedência |
+| `tests/` | Cenários policiais, integração, campanha, migração e empacotamento |
+| `tools/` | Empacotador offline, gerador reproduzível de releases e auditorias |
+| `.github/workflows/` | Validação, publicação e recuperação do GitHub Pages |
 
 ### Rodar e testar
 
@@ -168,38 +170,37 @@ estático. Os testes usam só o Node, sem instalar pacotes.
 ```sh
 node tests/police.test.js
 node tests/integration.test.js
+node tests/v03.test.js
 python3 tools/audit_offline.py
+python3 tests/release.test.py
 ```
 
 ### Publicação
 
-O site é o GitHub Pages da branch `main`, pasta raiz. Todo push republica em
-cerca de um minuto. Depois de editar os fontes, recrie a versão de arquivo
-único antes do commit:
-
-```sh
-python3 tools/package.py
-```
+Pull requests e `main` passam pelo workflow de validação. Releases são acionadas
+manualmente com versão e SHA completo, geradas uma única vez e publicadas primeiro
+como rascunho. O GitHub Pages recebe exatamente o ZIP web da release estável.
+Consulte [docs/RELEASING.md](docs/RELEASING.md) para publicação e recuperação.
 
 ### Jogar sem internet
 
-O site precisa de conexão para carregar. Para jogar offline, baixe
-[JOGAR_OFFLINE.html](https://iosbilario.github.io/baia-neon/JOGAR_OFFLINE.html)
-e abra o arquivo no navegador. Ele reúne motor, jogo, interface e ícone.
+O site precisa de conexão para carregar. Para jogar offline, baixe o
+[HTML autocontido da última release](https://github.com/iosbilario/baia-neon/releases/latest/download/baia-neon-0.3.0-offline.html)
+e abra o arquivo no navegador. O ZIP offline também inclui instruções, licenças,
+metadados de versão e hashes.
 
 ## Limites atuais
 
 Este é um protótipo compacto, com colisões por volumes e direção arcade.
 
-- Alvo é computador com teclado e mouse. Não há controles de toque nem
-  suporte a controle.
-- Não há interiores, bloqueios de rua, ruas de sentido único, troca de
-  armas, tiro de dentro do carro, capotamento, multiplayer ou campanha.
+- Não há interiores, bloqueios de rua, ruas de sentido único, troca de armas,
+  tiro de dentro do carro, capotamento, multiplayer, controles de toque ou suporte a controle físico.
 - Pedestres não bloqueiam a passagem. Postes e semáforos não têm colisão.
-- O desempenho não foi medido. Se a taxa de quadros cair, o jogo reduz a
-  resolução e desliga as sombras sozinho.
-- O que já foi conferido e o que falta está em
-  [docs/VERIFICACAO.md](docs/VERIFICACAO.md).
+- O jogo reduz resolução e desliga sombras quando a média medida cai abaixo de 28 FPS.
+- A campanha foi desenhada para 20 a 30 minutos; o tempo varia com exploração,
+  rotas, polícia e experiência de direção.
+- O que foi conferido e o que falta está em
+  [docs/VERIFICACAO_V03.md](docs/VERIFICACAO_V03.md).
 
 ## Licença e autoria
 

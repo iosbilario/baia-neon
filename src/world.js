@@ -219,6 +219,18 @@
         for(let wz=z-d/2+2;wz<z+d/2-1;wz+=3.6)for(const s of [-1,1])box(rand()<.67?windowLit:windowDark,x+s*(w/2+.025),y,wz,.05,1.8,1.5);
       }
       box(windowDark,x,1.4,z+d/2+.04,1.6,2.6,.09);
+      // Modular street-level silhouette: entrance, awning and occasional balconies.
+      const accent=material(style===1?0xf18b70:style===2?0x62b8ae:0xe5b657);
+      box(accent,x,2.95,z+d/2+.65,4.8,.22,1.25);
+      for(const s of [-1,1])box(cream,x+s*2.15,1.65,z+d/2+.32,.18,3.2,.45);
+      if(style===2&&h>12)for(let by=6;by<h-2;by+=7){
+        box(cream,x,by,z+d/2+.58,Math.min(w*.66,11),.22,1.1);
+        box(accent,x,by+.62,z+d/2+1.04,Math.min(w*.66,11),.08,.08);
+      }
+      if(style===1&&w>18){
+        box(windowDark,x-w*.28,1.7,z+d/2+.13,w*.28,2.5,.08);
+        box(windowDark,x+w*.28,1.7,z+d/2+.13,w*.28,2.5,.08);
+      }
       if(h>27){
         box(material(0x8eaaa7),x+w*.24,h+.85,z-d*.18,2.5,1.2,3.6);
         inst(k.cylinder,material(0xd2b8a2),x-w*.2,h+2,z+d*.18,1.4,3,1.4);
@@ -328,11 +340,47 @@
     facadeSign('CAFÉ ONDA',-198,5.5,-172.8,11,'#425956');
     facadeSign('HOTEL MARÉ',-53,8.0,-91.6,11,'#ad6671');
     facadeSign('RÁDIO CAJU',40,8.8,-23.7,13,'#3f6d79');
+    // Four activity landmarks use distinct silhouettes that stay readable at street height.
+    const radio={x:40,z:-24};
+    box(material(0xf18b70),radio.x,3.4,radio.z+8.8,15,.35,2);
+    box(material(0x274e5d),radio.x,1.8,radio.z+9.9,5.2,3.4,.18);
+    inst(k.cylinder,material(0x314f58),radio.x,22,radio.z,0.18,36,0.18);
+    for(let y=8;y<38;y+=6)box(material(0xd8c6a1),radio.x,y,radio.z,4,.12,.12,Math.PI/4);
+    inst(k.cone,material(0xff8a68),radio.x,40,radio.z,1.1,3.5,1.1);
+    const market={x:253,z:145};
+    box(material(0x73c7b6),market.x,2.2,market.z,13,4.4,10);
+    box(cream,market.x,4.7,market.z,15,.6,12);
+    for(let x=market.x-5;x<=market.x+5;x+=5)box(windowDark,x,2.2,market.z+5.1,3.5,2.6,.1);
+    sign('MERCADO MARÉ ALTA',market.x,6.2,market.z+6.1,16,Math.PI,'#286260');
+    const workshop={x:-74.3,z:40};
+    box(material(0x254d55),workshop.x,3,workshop.z,18,6,12);
+    box(material(0xff9b67),workshop.x,5.8,workshop.z+6.3,20,.45,1.2);
+    box(windowDark,workshop.x,2.7,workshop.z+6.1,10,4.4,.12);
+    sign('OFICINA DO CANAL',workshop.x,7.2,workshop.z+6.5,17,0,'#a84f3f');
+    const pier={x:286,z:-160};
+    box(trunk,pier.x,.65,pier.z,24,1.1,8);
+    for(const x of [pier.x-10,pier.x, pier.x+10])for(const z of [pier.z-3,pier.z+3])box(trunk,x,-1.2,z,.45,4,.45);
+    box(material(0xf0dfbf),pier.x+7,5.2,pier.z,5,9.5,5);
+    box(material(0xf18b70),pier.x+7,10.4,pier.z,7,1,7);
+    inst(k.cylinder,material(0x314f58),pier.x+7,15.5,pier.z,.13,10,.13);
+    sign('PÍER FAROL',pier.x-3,3.8,pier.z+4.2,10,0,'#3f6d79');
+    const finale=new T.Group();finale.position.set(pier.x,0,pier.z);finale.visible=false;scene.add(finale);
+    for(let i=0;i<8;i++){const a=i*Math.PI/4,r=5+i%2*1.5;part(T,k.sphere,new T.MeshStandardMaterial({color:i%2?0xff805b:0x8de3cf,emissive:i%2?0xff805b:0x8de3cf,emissiveIntensity:2}),Math.sin(a)*r,4+Math.sin(a*2),Math.cos(a)*r,.22,.22,.22,finale);}
     const beachSign=sign('PRAIA AURORA',266,4.1,10,13,Math.PI/2,'#386d6d');
     beachSign.userData.mount='posts';
     for(const z of [5,15])box(trunk,265.9,2.1,z,.20,4.2,.20);
     facadeSign('ALUGA SOL',-212,6,65.4,10,'#a77465');
     facadeSign('CALOR & CAOS',200,7,145.5,14,'#755a71');
+    const puddleMaterial=new T.MeshStandardMaterial({color:0x6caab0,roughness:.18,metalness:.35,transparent:true,opacity:0,depthWrite:false});
+    const puddles=[];
+    [[-80,-205,5,2.2],[0,115,4,1.8],[80,-45,6,2.1],[160,205,5,2.4],[240,-110,7,2.2],[-240,35,4,1.7]].forEach(([x,z,sx,sz])=>{
+      const mesh=new T.Mesh(new T.CircleGeometry(1,20),puddleMaterial);mesh.rotation.x=-Math.PI/2;mesh.position.set(x,.205,z);mesh.scale.set(sx,sz,1);scene.add(mesh);puddles.push(mesh);
+    });
+    // Bus shelters and planters create recognizable corners without blocking the roadway.
+    [[-229,-149],[91,171],[171,-69],[251,91]].forEach(([x,z],i)=>{
+      prop(x,z,1.2);box(material(0x34515b),x,1.5,z,4,.18,2.2,i%2?Math.PI/2:0);box(windowDark,x,2.3,z,4,2.2,.10,i%2?Math.PI/2:0);box(cream,x,3.5,z,4.5,.25,2.6,i%2?Math.PI/2:0);
+    });
+    [[-213,-67],[13,93],[173,13],[253,-227]].forEach(([x,z])=>{prop(x,z,.7);inst(k.cylinder,material(0xc9896b),x,.55,z,.75,1.1,.75);bush(x,z,1.05);});
     for(const b of batches.values()){
       const mesh=new T.InstancedMesh(b.geo,b.mat,b.items.length),tmp=new T.Object3D();
       b.items.forEach((o,i)=>{tmp.position.set(o.x,o.y,o.z);tmp.rotation.set(o.rx,o.ry,o.rz);tmp.scale.set(o.sx,o.sy,o.sz);tmp.updateMatrix();mesh.setMatrixAt(i,tmp.matrix);});
@@ -377,6 +425,8 @@
       trafficHorizontal.emissive.copy(trafficHorizontal.color);
       trafficVertical.emissiveIntensity=trafficHorizontal.emissiveIntensity=.8+night;
       asphalt.roughness=.96-rain*.64;
+      puddleMaterial.opacity=rain*.48;
+      puddles.forEach((mesh,i)=>{mesh.visible=rain>.06;mesh.scale.z=1+Math.sin(time*.8+i)*.03;});
       signs.forEach(m=>m.emissiveIntensity=.32+night*1.6);
       waterMat.color.setHex(night>.65?0x153f59:0x2ba7af);
       for(const a of animals){
@@ -394,6 +444,7 @@
         }
       }
       fireMat.opacity=Math.max(0,night-.35)*1.3*(1-rain*.8);
+      if(finale.visible)finale.rotation.y=time*.28;
       if((frame++%3)===0){
         fireBase.forEach((p,i)=>{firePos[i*3]=p.x+Math.sin(time+p.phase)*.6;firePos[i*3+1]=p.y+Math.sin(time*1.7+p.phase)*.4;firePos[i*3+2]=p.z+Math.cos(time*.8+p.phase)*.6;});
         fireGeo.attributes.position.needsUpdate=true;
@@ -403,6 +454,6 @@
       }
     }
     function getDistrict(x,z){return x>250?'Praia Aurora':x>85&&x<150?'Canal das Garças':x<70&&z<0?'Centro Solar':z>60&&x<0?'Jardim Maré':'Costa Coral';}
-    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,parks,alleys,lots,counts:{buildings:buildings.length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
+    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,parks,alleys,lots,counts:{buildings:buildings.length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
   };
 })();

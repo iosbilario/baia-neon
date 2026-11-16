@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#101d26">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'sha256-QOCV7FZ6UsCB3p05v5odTrUH0P3g/IeqtP54rUIBrPo=' 'sha256-x0HgVV7ZmHyik76VQRFy8tUc88ru8M2wC145s4N/+TY=' 'sha256-TyTBzyUnp1BUNJZytO/VaQMghmfBh/guGIo9mQw2A04=' 'sha256-EVUnTEWH4ElRsP1vUnyg4sVBczStLSuuixWpRIina6I=' 'sha256-aogUOImSoureDwfYrY4Damr3DWulkva8YzRw7MIZ/Vg=' 'sha256-AZeVEe6wDxVEcyu+rWUr3ISz0ulK3TKhW8aaPDT/BxQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'sha256-QOCV7FZ6UsCB3p05v5odTrUH0P3g/IeqtP54rUIBrPo=' 'sha256-ipvomwEfm+FlyL+EZyb/MgxhdG59RqImjn0oxniLiHU=' 'sha256-tlQw8h7PJ8zXsVsFO7ZkU02eEjVQygErFno2TXZAKlA=' 'sha256-xd1Bgdgg09lYIBNxJ/MhCPfeqgUI4WeAMubQXTEHLqc=' 'sha256-MTmro2rD8wq8QxmOQhbSVmJ3Z7Es/2WVCt49vRF9Oio=' 'sha256-ZJVt0fMf+AO2CjuCJ89TU5nAdaZjtCxHX8nCl7zrBME=' 'sha256-p1gGxu5UB0+RQq/OdgPQliF250BFRRJRS05JNliSeHs=' 'sha256-6mqGqBopmyjZ3GHRas0v/xhgFRlJLVl8aF7pDx5WAiM=' 'sha256-aogUOImSoureDwfYrY4Damr3DWulkva8YzRw7MIZ/Vg=' 'sha256-/FYcjux+qNJZxoJI+7wSp/NDYT97t+s4Ncc61jl6yek='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'">
   <title>Baía Neon</title>
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE0IiBmaWxsPSIjMTMyNzM0Ii8+CjxjaXJjbGUgY3g9IjM0IiBjeT0iMzAiIHI9IjE3IiBmaWxsPSIjZjBhMTdmIi8+CjxwYXRoIGQ9Ik04IDM4aDQ4djE3SDh6IiBmaWxsPSIjMmM3ODdhIi8+CjxwYXRoIGQ9Ik0xMyA0M2gzOE0xOSA0OGgyNyIgc3Ryb2tlPSIjNzNiYmIwIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwIDU0YzQtMTIgNS0yMiAzLTMxIiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjI5MzQiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNMjMgMjNDMTQgMTIgOCAyMCA4IDI2YzUtNSAxMC01IDE1LTMgMS0xMyAxMS0xMyAxOC04LTggMC0xMyA0LTE4IDggMTEtNSAxOSAyIDE5IDgtOC02LTEyLTctMTktOC00IDYtOSA4LTE0IDggMy00IDctNyAxNC04eiIgZmlsbD0iIzEyMjkzNCIvPgo8L3N2Zz4K" type="image/svg+xml">
   <style>
@@ -39,6 +39,10 @@
 .menu-ext{display:flex;flex-wrap:wrap;gap:8px 18px;padding:2px 2px 0}.menu-ext a{font-size:9px;letter-spacing:.14em;color:#f4e8d4be;text-decoration:none;border-bottom:1px solid #fff4;padding-bottom:4px}.menu-ext a:hover{color:var(--mint);border-color:var(--mint)}
 @media (max-width:980px),(max-height:640px){.menu-info{display:none}}
 
+/* v0.3 — mapa, campanha, foto e acessibilidade em jogo */
+.map-panel{max-width:820px}.map-panel h2{margin-bottom:14px}.map-panel canvas{display:block;width:100%;height:auto;max-height:58vh;background:#173a45;border:1px solid #ffffff25;border-radius:5px;cursor:crosshair}.dialogue{position:fixed;z-index:18;left:50%;bottom:8%;transform:translateX(-50%);width:min(620px,88vw);padding:16px 20px;background:rgba(10,24,30,.92);border-left:3px solid var(--coral);border-radius:4px;box-shadow:0 12px 50px #0008;pointer-events:none}.dialogue span{font-size:9px;letter-spacing:.18em;color:var(--mint);font-weight:800}.dialogue p{font-size:15px;line-height:1.45;margin:7px 0 0}.photo-ui{position:fixed;z-index:25;left:28px;right:28px;top:24px;display:flex;align-items:center;gap:18px;padding:12px 15px;background:rgba(10,24,30,.82);border:1px solid #ffffff20;border-radius:4px}.photo-ui>b{font-size:9px;font-weight:400;color:#fff9;flex:1}.photo-ui div{display:flex;gap:8px}.photo-ui button{font-size:9px;padding:9px 11px;border:1px solid #ffffff33;border-radius:3px;background:#ffffff0b}.photo-ui button:hover{border-color:var(--mint);color:var(--mint)}body.photo-clean #photoMode{opacity:0}body.photo-clean #vignette{display:none}.campaign-badge{color:var(--coral)!important}.route-note{color:var(--mint)}
+@media(max-width:700px){.photo-ui{left:10px;right:10px;flex-wrap:wrap}.photo-ui>b{display:none}.map-panel{padding:18px}.dialogue{bottom:18%;font-size:12px}}
+
 </style>
 </head>
 <body>
@@ -66,7 +70,7 @@
       <div class="info-block menu-keys"><span><kbd>W A S D</kbd> mover</span><span><kbd>E</kbd> carro</span><span><kbd>ESPAÇO</kbd> freio de mão</span><span><kbd>1 2 3</kbd> serviço</span><span><kbd>ENTER</kbd> oficina</span><span><kbd>CLIQUE</kbd> atirar</span></div>
       <div class="menu-ext"><a href="https://github.com/iosbilario/baia-neon" target="_blank" rel="noopener noreferrer">CÓDIGO NO GITHUB ↗</a><a href="JOGAR_OFFLINE.html" download>BAIXAR PARA JOGAR OFFLINE ↓</a></div>
     </aside>
-    <div class="menu-footer"><span>CAPÍTULO 01<br><b>FIM DE TARDE, COMEÇO DO CAOS</b></span><span>PROTÓTIPO 3D · v0.2<br><b>RODA NO NAVEGADOR · CÓDIGO ABERTO</b></span></div>
+    <div class="menu-footer"><span>CAPÍTULO 02<br><b>ÚLTIMA FREQUÊNCIA</b></span><span>BAÍA NEON · <b id="menuVersion">v0.3.0</b><br><b>RODA NO NAVEGADOR · CÓDIGO ABERTO</b></span></div>
   </main>
   <div id="audioToggle"><button id="sound" aria-label="Ativar ou desativar som">SOM DESLIGADO</button></div>
   <section id="hud" class="hidden" aria-label="Informações do jogo">
@@ -78,8 +82,11 @@
   </section>
   <section id="wasted" class="hidden" aria-label="Fim da linha"><div class="letterbox top"></div><div class="letterbox bottom"></div><div id="wastedText" class="wasted-text"><h2 id="wastedTitle">SE FUDEU</h2><p id="wastedCause"></p></div></section>
   <section id="garage" class="overlay hidden"><div class="panel help-panel"><span class="eyebrow">OFICINA DO CANAL</span><h2>O que vai ser?</h2><p id="garageMoney"></p><div id="garageList" class="shop"></div><button id="closeGarage" class="primary">VOLTAR À RUA <span>↗</span></button></div></section>
-  <section id="pause" class="overlay hidden"><div class="panel"><span class="eyebrow">DÊ UM RESPIRO</span><h2>A cidade espera.</h2><button id="resume" class="primary">CONTINUAR <span>↗</span></button><button id="pauseHelp" class="secondary">CONTROLES E OBJETIVO</button><button id="backMenu" class="secondary">VOLTAR AO MENU</button></div></section>
-  <section id="help" class="overlay hidden"><div class="panel help-panel"><span class="eyebrow">MANUAL DA BAÍA</span><h2>Escolha seu atalho.</h2><div class="control-grid"><kbd>W A S D</kbd><span>Caminhar ou dirigir</span><kbd>SHIFT</kbd><span>Correr a pé</span><kbd>E</kbd><span>Entrar ou sair do carro</span><kbd>ESPAÇO</kbd><span>Freio de mão no carro</span><kbd>CLIQUE / F</kbd><span>Atirar a pé. No carro, F buzina</span><kbd>G</kbd><span>Arremessar granada</span><kbd>MOUSE</kbd><span>Arrastar para girar a câmera</span><kbd>1 2 3</kbd><span>Aceitar um serviço do quadro</span><kbd>ENTER</kbd><span>Abrir a oficina no marcador laranja</span><kbd>R</kbd><span>Recarregar a pistola</span><kbd>T</kbd><span>Alternar chuva</span><kbd>N</kbd><span>Alternar dia e noite</span><kbd>ESC</kbd><span>Pausar ou pular abertura</span></div><p>Aceite um serviço, retire a carga de carro e entregue: cada carga tem sua regra e o pagamento explica o que você perdeu. Gaste na oficina. Freio de mão solta a traseira. As vielas com marcos amarelos só deixam passar o compacto, e nos parques só se entra a pé: viaturas não seguem por nenhum dos dois. A polícia só vem se uma testemunha ou um policial vir o crime. Quem está com o marcador amarelo está ao telefone. Os policiais descem da viatura para prender e atiram a partir de duas estrelas. Fora de vista as estrelas piscam: fique longe dos cones azuis do minimapa até o alerta acabar. Carros danificados soltam fumaça, pegam fogo e explodem. Quebre o contato visual e saia da área em que você foi visto.</p><button id="closeHelp" class="primary">ENTENDI <span>↗</span></button></div></section>
+  <section id="pause" class="overlay hidden"><div class="panel"><span class="eyebrow">DÊ UM RESPIRO · <b id="pauseVersion">v0.3.0</b></span><h2>A cidade espera.</h2><button id="resume" class="primary">CONTINUAR <span>↗</span></button><button id="pauseHelp" class="secondary">CONTROLES E OBJETIVO</button><button id="openMapPause" class="secondary">MAPA DA CIDADE</button><button id="photoFromPause" class="secondary">MODO FOTO</button><button id="toggleCameraMotion" class="secondary">MOVIMENTO DE CÂMERA: LIGADO</button><button id="exportSave" class="secondary">EXPORTAR PROGRESSO</button><button id="importSave" class="secondary">IMPORTAR PROGRESSO</button><input id="importSaveFile" class="hidden" type="file" accept="application/json,.json"><button id="backMenu" class="secondary">VOLTAR AO MENU</button></div></section>
+  <section id="cityMap" class="overlay hidden" aria-label="Mapa ampliado"><div class="panel map-panel"><span class="eyebrow">MAPA DE BAÍA NEON</span><h2>Escolha seu caminho.</h2><canvas id="largeMap" width="720" height="560" aria-label="Mapa ampliado da cidade"></canvas><p>Clique numa rua para marcar um destino. A rota acompanha ruas e pontes.</p><button id="closeMap" class="primary">VOLTAR À RUA <span>M</span></button></div></section>
+  <section id="dialogue" class="dialogue hidden" aria-live="polite"><span id="dialogueSpeaker">RÁDIO CAJU</span><p id="dialogueText"></p></section>
+  <section id="photoMode" class="photo-ui hidden"><span class="eyebrow">MODO FOTO</span><b>Arraste para girar · setas aproximam</b><div><button id="capturePhoto">SALVAR FOTO</button><button id="togglePhotoHud">OCULTAR INTERFACE</button><button id="closePhoto">VOLTAR <kbd>P</kbd></button></div></section>
+  <section id="help" class="overlay hidden"><div class="panel help-panel"><span class="eyebrow">MANUAL DA BAÍA</span><h2>Escolha seu atalho.</h2><div class="control-grid"><kbd>W A S D</kbd><span>Caminhar ou dirigir</span><kbd>SHIFT</kbd><span>Correr a pé</span><kbd>E</kbd><span>Entrar ou sair do carro</span><kbd>ESPAÇO</kbd><span>Freio de mão no carro</span><kbd>CLIQUE / F</kbd><span>Atirar a pé. No carro, F buzina</span><kbd>G</kbd><span>Arremessar granada</span><kbd>MOUSE</kbd><span>Arrastar para girar a câmera</span><kbd>1 2 3</kbd><span>Aceitar uma oferta do quadro</span><kbd>ENTER</kbd><span>Ação contextual e oficina</span><kbd>M</kbd><span>Mapa ampliado e seleção de rota</span><kbd>L</kbd><span>Iniciar o próximo contrarrelógio</span><kbd>P</kbd><span>Modo foto</span><kbd>Y</kbd><span>Repetir missão após falha</span><kbd>X</kbd><span>Escolher retirada arriscada</span><kbd>R</kbd><span>Recarregar a pistola</span><kbd>T</kbd><span>Alternar chuva</span><kbd>N</kbd><span>Alternar dia e noite</span><kbd>ESC</kbd><span>Pausar ou pular abertura</span></div><p>A campanha Última Frequência acompanha a mudança da Rádio Caju em cinco missões. O marcador coral indica a campanha; o turquesa indica contratos e corridas. Abra o mapa para seguir uma rota pelas ruas. A polícia só vem se uma testemunha ou policial perceber um crime. Fora de vista, fique longe dos cones azuis até o alerta acabar.</p><button id="closeHelp" class="primary">ENTENDI <span>↗</span></button></div></section>
   <div id="fatal" class="overlay hidden"><div class="panel"><h2>A cidade não abriu.</h2><p id="fatalMessage"></p><p>Use um navegador com WebGL. Consulte LEIA_PRIMEIRO.md para executar a pasta localmente.</p></div></div>
   <script>
 console.warn('Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation'),
@@ -95,21 +102,303 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 /* SPDX-License-Identifier: MIT */
 window.BN = window.BN || {};
 BN.CONFIG = Object.freeze({
-  title: 'Baía Neon', seed: 5216, version: '0.2.0',
+  title: 'Baía Neon', seed: 5216, version: '0.3.0',
   citySize: 600, dayLength: 720, introDuration: 18,
   startHour: 17.4, walkSpeed: 5.2, runSpeed: 8.7,
   carSpeed: 32, carReverse: 10, carAcceleration: 14,
   population: 64, traffic: 14, maxPolice: 5,
   policeSight: 60, policeLoseSight: 3, policeSearchTime: 16,
   targetFPS: 60, pixelRatioCap: 1.5,
-  // Each contract has a pickup, a destination and its own cargo rule.
-  deliveries: [
-    { name: 'Sorvete em risco', kind: 'perishable', px: 0, pz: -200, x: 240, z: 225, reward: 260, text: 'Caixa térmica furada. Cada segundo derrete o pagamento.' },
-    { name: 'Reunião dos flamingos', kind: 'fragile', px: 80, pz: -120, x: -240, z: 175, reward: 300, text: 'Figurino enorme de plumas. Cada batida arranca um pedaço.' },
-    { name: 'Café depois das seis', kind: 'smooth', px: 160, pz: 120, x: -160, z: -225, reward: 240, text: 'Xícaras cheias. Freada brusca e derrapagem derramam o bônus.' }
-  ],
-  garage: { x: -74.3, z: 40 }
+  landmarks: Object.freeze({
+    radio: {id:'radio', name:'Rádio Caju', x:40, z:0},
+    market: {id:'market', name:'Mercado Maré Alta', x:240, z:145},
+    garage: {id:'garage', name:'Oficina do Canal', x:-74.3, z:40},
+    pier: {id:'pier', name:'Píer Farol', x:286, z:-160},
+    presenter: {id:'presenter', name:'Dora Dendê', x:240, z:-120},
+    technician: {id:'technician', name:'Nando Hertz', x:-160, z:80},
+    antenna: {id:'antenna', name:'Antena da Caju', x:80, z:-240},
+    archiveNorth: {id:'archive-north', name:'Arquivo do Centro', x:-160, z:-80},
+    archiveBeach: {id:'archive-beach', name:'Depósito da Orla', x:240, z:225},
+    regularLot: {id:'regular-lot', name:'Estacionamento Solar', x:-9, z:84}
+  }),
+  // The contract board rotates catalogue entries in groups of three.
+  deliveries: Object.freeze([
+    {id:'sorvete', family:'delivery', name:'Sorvete em risco', kind:'perishable', px:0, pz:-200, x:240, z:225, reward:260, rep:0, text:'Caixa térmica furada. Cada segundo derrete o pagamento.'},
+    {id:'flamingos', family:'delivery', name:'Reunião dos flamingos', kind:'fragile', px:80, pz:-120, x:-240, z:175, reward:300, rep:0, text:'Figurino enorme de plumas. Cada batida arranca um pedaço.'},
+    {id:'cafe', family:'delivery', name:'Café depois das seis', kind:'smooth', px:160, pz:120, x:-160, z:-225, reward:240, rep:0, text:'Xícaras cheias. Freada brusca e derrapagem derramam o bônus.'},
+    {id:'passageira-orla', family:'passenger', name:'Carona para a Aurora', kind:'smooth', px:-80, pz:160, x:240, z:80, reward:290, rep:2, text:'Passageira a bordo. Condução suave preserva a gorjeta.'},
+    {id:'turista-radio', family:'passenger', name:'Ouvinte perdido', kind:'smooth', px:240, pz:-80, x:40, z:0, reward:320, rep:3, text:'O passageiro quer chegar à Rádio Caju sem virar notícia.'},
+    {id:'recupera-seda', family:'recovery', name:'Sedã fora de hora', kind:'fragile', px:-9, pz:84, x:-74.3, z:40, reward:360, rep:4, text:'Leve o sedã recuperado à oficina com o mínimo de dano.'},
+    {id:'recupera-brisa', family:'recovery', name:'Brisa desaparecido', kind:'fragile', px:244, pz:14, x:-74.3, z:40, reward:430, rep:6, text:'Recupere o esportivo e entregue inteiro. A polícia reage se alguém perceber.'}
+  ]),
+  races: Object.freeze([
+    {id:'volta-centro', name:'Volta do Centro', medals:[58,72,92], points:[[-80,-240],[0,-240],[80,-160],[80,-80],[0,0],[-80,-80],[-80,-240]]},
+    {id:'pontes-caju', name:'Circuito das Pontes', medals:[70,88,112], points:[[80,160],[160,160],[240,80],[160,0],[80,-80],[0,0],[80,160]]},
+    {id:'aurora', name:'Reta da Aurora', medals:[48,62,82], points:[[240,-240],[240,-160],[240,-80],[240,0],[240,80],[240,160],[240,240]]}
+  ]),
+  campaign: Object.freeze([
+    {id:'voz-atrasada', number:1, title:'A voz chegou atrasada', reward:320, reputation:3, outro:'Dora chegou a tempo de reclamar do trânsito no ar.', steps:[
+      {target:'presenter', text:'Busque Dora Dendê perto da Praia Aurora.', requiresCar:true, checkpoint:true, done:'Dora embarcou. “Se esse banco ranger, eu narro ao vivo.”'},
+      {target:'radio', text:'Leve Dora à Rádio Caju. Dirija com suavidade.', requiresCar:true}
+    ]},
+    {id:'carro-radio', number:2, title:'O carro da rádio', reward:380, reputation:4, outro:'O carro voltou para a Caju. A história do documento fica para outro programa.', steps:[
+      {target:'regular-lot', text:'Vá ao Estacionamento Solar. A retirada regular custa R$ 120 ou pressione X para assumir o risco.', requiresCar:false, cost:120, checkpoint:true},
+      {target:'radio', text:'Leve o carro identificado até a Rádio Caju.', requiresCar:true}
+    ]},
+    {id:'acervo-ambulante', number:3, title:'Acervo ambulante', reward:460, reputation:5, outro:'Fitas, antenas e uma cafeteira chegaram quase na mesma ordem.', steps:[
+      {targets:['archive-north','archive-beach'], text:'Recolha os equipamentos em dois pontos, na ordem que preferir.', requiresCar:true, checkpoint:true},
+      {target:'radio', text:'Entregue o acervo na Rádio Caju.', requiresCar:true}
+    ]},
+    {id:'sinal-por-um-fio', number:4, title:'Sinal por um fio', reward:520, reputation:6, outro:'Nando salvou o sinal com um cabo, fita coral e opinião demais.', steps:[
+      {target:'technician', text:'Busque Nando Hertz no Jardim Maré.', requiresCar:true, checkpoint:true},
+      {target:'antenna', text:'Leve Nando à antena antes do prazo. Escolha bem a rota.', requiresCar:true, deadline:95}
+    ]},
+    {id:'ultima-frequencia', number:5, title:'Última frequência', reward:700, reputation:8, outro:'A última transmissão virou a primeira do novo estúdio no Píer Farol.', steps:[
+      {target:'radio', text:'Encontre Dora e Nando na Rádio Caju.', requiresCar:true, checkpoint:true},
+      {target:'market', text:'Recolha a última caixa no Mercado Maré Alta.', requiresCar:true},
+      {target:'pier', text:'Conclua a mudança no estúdio provisório do Píer Farol.', requiresCar:true}
+    ]}
+  ]),
+  garage: {x:-74.3, z:40}
 });
+
+</script>
+  <script>
+/* SPDX-License-Identifier: MIT */
+window.BN = window.BN || {};
+BN.BUILD_INFO = Object.freeze({
+  version: BN.CONFIG ? BN.CONFIG.version : '0.3.0',
+  tag: 'development',
+  sha: 'development',
+  channel: 'development'
+});
+
+</script>
+  <script>
+/* SPDX-License-Identifier: MIT */
+(function () {
+  'use strict';
+  const BN = window.BN = window.BN || {};
+  const SCHEMA_VERSION = 2;
+  const KEY = 'baia-neon-save-v2';
+  const LEGACY_KEY = 'baia-neon-save';
+  const BACKUP_KEY = 'baia-neon-save-backup-v1';
+  const finite = (value, fallback, min, max) => {
+    const number = Number(value);
+    return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback;
+  };
+  const cleanStrings = (value, allowed) => Array.isArray(value) ? [...new Set(value.filter(item => allowed.includes(item)))] : [];
+  function normalize(raw, catalogues) {
+    const source = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+    const vehicles = catalogues.vehicles || ['compact'];
+    const upgrades = catalogues.upgrades || [];
+    const campaignIds = catalogues.campaignIds || [];
+    const owned = cleanStrings(source.owned, vehicles);
+    if (!owned.includes('compact')) owned.unshift('compact');
+    const selected = vehicles.includes(source.car) && owned.includes(source.car) ? source.car : 'compact';
+    const upgradeState = {};
+    upgrades.forEach(key => { upgradeState[key] = Boolean(source.upgrades && source.upgrades[key]); });
+    const campaign = source.campaign && typeof source.campaign === 'object' ? source.campaign : {};
+    return {
+      schemaVersion: SCHEMA_VERSION,
+      balance: finite(source.balance, 0, 0, 10000000),
+      completed: finite(source.completed, 0, 0, 1000000),
+      upgrades: upgradeState,
+      owned,
+      car: selected,
+      ammo: finite(source.ammo, 12, 0, 12),
+      reserve: finite(source.reserve, 36, 0, 240),
+      grenades: finite(source.grenades, 2, 0, 9),
+      health: finite(source.health, 100, 25, 100),
+      reputation: finite(source.reputation, 0, 0, 999),
+      campaign: {
+        active: campaignIds.includes(campaign.active) ? campaign.active : (campaignIds[0] || null),
+        step: finite(campaign.step, 0, 0, 99),
+        checkpoint: finite(campaign.checkpoint, 0, 0, 99),
+        status: ['active', 'failed', 'complete', 'finished'].includes(campaign.status) ? campaign.status : 'active',
+        completed: cleanStrings(campaign.completed, campaignIds),
+        rewarded: cleanStrings(campaign.rewarded, campaignIds),
+        collected: Array.isArray(campaign.collected) ? [...new Set(campaign.collected.filter(v => typeof v === 'string'))] : [],
+        elapsed: finite(campaign.elapsed, 0, 0, 86400),
+        comfort: finite(campaign.comfort, 100, 0, 100),
+        damage: finite(campaign.damage, 0, 0, 1000),
+        delays: finite(campaign.delays, 0, 0, 99)
+      },
+      raceRecords: source.raceRecords && typeof source.raceRecords === 'object' ? source.raceRecords : {},
+      tutorialSeen: Boolean(source.tutorialSeen),
+      cameraMotion: source.cameraMotion !== false,
+      audioVolume: finite(source.audioVolume, 0.3, 0, 1),
+      savedAt: typeof source.savedAt === 'string' ? source.savedAt : null
+    };
+  }
+  function load(storage, catalogues) {
+    let source = null, migrated = false;
+    try {
+      const current = storage.getItem(KEY);
+      if (current) source = JSON.parse(current);
+      if (!source) {
+        const legacy = storage.getItem(LEGACY_KEY);
+        if (legacy) {
+          if (!storage.getItem(BACKUP_KEY)) storage.setItem(BACKUP_KEY, legacy);
+          source = JSON.parse(legacy);
+          migrated = true;
+        }
+      }
+    } catch (_) { source = null; }
+    const data = normalize(source, catalogues);
+    if (migrated) persist(storage, data);
+    return {data, migrated};
+  }
+  function persist(storage, data) {
+    const next = {...data, schemaVersion: SCHEMA_VERSION, savedAt: new Date().toISOString()};
+    storage.setItem(KEY, JSON.stringify(next));
+    return next;
+  }
+  function exportProgress(data, build) {
+    return JSON.stringify({format: 'baia-neon-progress', schemaVersion: SCHEMA_VERSION, build, progress: normalize(data, {
+      vehicles: ['compact', 'sedan', 'sport'], upgrades: ['brakes', 'tires', 'cargo'],
+      campaignIds: ['voz-atrasada', 'carro-radio', 'acervo-ambulante', 'sinal-por-um-fio', 'ultima-frequencia']
+    })}, null, 2);
+  }
+  function importProgress(text, catalogues) {
+    let parsed;
+    try { parsed = JSON.parse(text); } catch (_) { throw new Error('O arquivo não contém JSON válido.'); }
+    if (!parsed || parsed.format !== 'baia-neon-progress' || !parsed.progress) throw new Error('Este arquivo não é um progresso do Baía Neon.');
+    if (Number(parsed.schemaVersion) > SCHEMA_VERSION) throw new Error('Este progresso foi criado por uma versão mais nova do jogo.');
+    return normalize(parsed.progress, catalogues);
+  }
+  BN.Save = Object.freeze({SCHEMA_VERSION, KEY, LEGACY_KEY, BACKUP_KEY, normalize, load, persist, exportProgress, importProgress});
+})();
+
+</script>
+  <script>
+/* SPDX-License-Identifier: MIT */
+(function () {
+  'use strict';
+  const BN = window.BN = window.BN || {};
+  const distance = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
+  function nearestNode(point, roads) {
+    let best = null;
+    for (const x of roads) for (const z of roads) {
+      const candidate = {x, z}, score = distance(point, candidate);
+      if (!best || score < best.score) best = {...candidate, score};
+    }
+    return {x: best.x, z: best.z};
+  }
+  function snapToRoad(point, roads) {
+    const nearestX = roads.reduce((best, value) => Math.abs(value - point.x) < Math.abs(best - point.x) ? value : best, roads[0]);
+    const nearestZ = roads.reduce((best, value) => Math.abs(value - point.z) < Math.abs(best - point.z) ? value : best, roads[0]);
+    return Math.abs(nearestX - point.x) <= Math.abs(nearestZ - point.z) ? {x: nearestX, z: point.z} : {x: point.x, z: nearestZ};
+  }
+  function route(start, destination, roads) {
+    if (!start || !destination || !Array.isArray(roads) || !roads.length) return [];
+    const roadStart = snapToRoad(start, roads), roadEnd = snapToRoad(destination, roads);
+    const first = nearestNode(roadStart, roads), last = nearestNode(roadEnd, roads);
+    const nodes = roads.flatMap((x, ix) => roads.map((z, iz) => ({x, z, ix, iz, key: ix + ':' + iz})));
+    const byKey = new Map(nodes.map(node => [node.key, node]));
+    const open = new Set(nodes.map(node => node.key)), costs = new Map(), previous = new Map();
+    nodes.forEach(node => costs.set(node.key, Infinity));
+    const startNode = nodes.find(node => node.x === first.x && node.z === first.z);
+    const endNode = nodes.find(node => node.x === last.x && node.z === last.z);
+    costs.set(startNode.key, 0);
+    while (open.size) {
+      let current = null;
+      for (const key of open) if (!current || costs.get(key) < costs.get(current)) current = key;
+      if (current === endNode.key || costs.get(current) === Infinity) break;
+      open.delete(current);
+      const node = byKey.get(current);
+      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const neighbour = byKey.get((node.ix + dx) + ':' + (node.iz + dz));
+        if (!neighbour || !open.has(neighbour.key)) continue;
+        const score = costs.get(current) + distance(node, neighbour);
+        if (score < costs.get(neighbour.key)) { costs.set(neighbour.key, score); previous.set(neighbour.key, current); }
+      }
+    }
+    const path = [];
+    let cursor = endNode.key;
+    while (cursor) { path.unshift(byKey.get(cursor)); if (cursor === startNode.key) break; cursor = previous.get(cursor); }
+    const points = [roadStart, ...path.map(({x, z}) => ({x, z})), roadEnd];
+    return points.filter((point, index) => index === 0 || distance(point, points[index - 1]) > 0.1);
+  }
+  BN.Navigation = Object.freeze({nearestNode, snapToRoad, route});
+})();
+
+</script>
+  <script>
+/* SPDX-License-Identifier: MIT */
+(function () {
+  'use strict';
+  const BN = window.BN = window.BN || {};
+  class Campaign {
+    constructor(definitions, saved) {
+      this.definitions = definitions;
+      this.state = saved;
+      this.lastEvent = null;
+      if (!this.state.active && definitions.length) this.state.active = definitions[0].id;
+    }
+    definition() { return this.definitions.find(item => item.id === this.state.active) || null; }
+    step() { const mission = this.definition(); return mission && mission.steps[this.state.step] || null; }
+    objective() {
+      const mission = this.definition(), step = this.step();
+      if (!mission || this.state.status === 'finished') return null;
+      if (this.state.status === 'failed') return {mission, failed: true, text: 'A missão falhou. Pressione Y para tentar de novo.'};
+      return {mission, step, text: step.text, targets: step.targets || [step.target]};
+    }
+    tick(dt, context) {
+      if (this.state.status !== 'active') return null;
+      this.state.elapsed += dt;
+      const step = this.step();
+      if (context && context.roughness) this.state.comfort = Math.max(0, this.state.comfort - context.roughness * dt);
+      if (context && context.damage) this.state.damage = Math.max(this.state.damage, context.damage);
+      if (step && step.deadline && this.state.elapsed > step.deadline) return this.fail('o prazo acabou');
+      return null;
+    }
+    arrive(targetId, context) {
+      if (this.state.status !== 'active') return null;
+      const mission = this.definition(), step = this.step();
+      if (!mission || !step) return null;
+      const targets = (step.targets || [step.target]).filter(Boolean);
+      if (!targets.includes(targetId)) return null;
+      if (step.requiresCar && !(context && context.hasCar)) return {type: 'blocked', message: 'Você precisa de um carro para continuar.'};
+      if (step.cost && !(context && context.ignoreCost) && (!context || context.balance < step.cost)) return {type: 'blocked', message: 'Faltam R$ ' + (step.cost - (context ? context.balance : 0)) + ' para a retirada regular.'};
+      if (step.targets) {
+        if (!this.state.collected.includes(targetId)) this.state.collected.push(targetId);
+        if (step.targets.some(id => !this.state.collected.includes(id))) return this.event('progress', 'Ponto recolhido. Falta mais um.', {targetId});
+        this.state.collected = [];
+      }
+      if (step.checkpoint) this.state.checkpoint = Math.min(this.state.step + 1, mission.steps.length - 1);
+      const spent = context && context.ignoreCost ? 0 : (step.cost || 0);
+      this.state.step += 1;
+      this.state.elapsed = 0;
+      if (this.state.step < mission.steps.length) return this.event('step', step.done || 'Etapa concluída.', {spent, targetId});
+      return this.completeMission(mission, context || {});
+    }
+    completeMission(mission, context) {
+      const firstCompletion = !this.state.rewarded.includes(mission.id);
+      const quality = Math.max(0.55, this.state.comfort / 100) * Math.max(0.6, 1 - this.state.damage / 250);
+      const reward = firstCompletion ? Math.round(mission.reward * quality) : 0;
+      if (!this.state.completed.includes(mission.id)) this.state.completed.push(mission.id);
+      if (firstCompletion) this.state.rewarded.push(mission.id);
+      const reputation = firstCompletion ? mission.reputation : 0;
+      const index = this.definitions.indexOf(mission), next = this.definitions[index + 1];
+      this.state.active = next ? next.id : mission.id;
+      this.state.step = 0; this.state.checkpoint = 0; this.state.elapsed = 0; this.state.comfort = 100; this.state.damage = 0;
+      this.state.status = next ? 'active' : 'finished';
+      return this.event(next ? 'mission-complete' : 'campaign-complete', mission.outro, {reward, reputation, firstCompletion, next: next && next.id});
+    }
+    fail(reason) {
+      this.state.status = 'failed'; this.state.delays += 1;
+      return this.event('failed', 'Missão perdida: ' + reason + '.', {reason});
+    }
+    retry() {
+      if (this.state.status !== 'failed') return null;
+      this.state.status = 'active'; this.state.step = this.state.checkpoint; this.state.elapsed = 0; this.state.comfort = 100; this.state.damage = 0; this.state.collected = [];
+      return this.event('retry', 'Checkpoint retomado.', {});
+    }
+    event(type, message, extra) { return this.lastEvent = {type, message, ...extra}; }
+  }
+  BN.Campaign = Campaign;
+})();
 
 </script>
   <script>
@@ -334,6 +623,18 @@ BN.CONFIG = Object.freeze({
         for(let wz=z-d/2+2;wz<z+d/2-1;wz+=3.6)for(const s of [-1,1])box(rand()<.67?windowLit:windowDark,x+s*(w/2+.025),y,wz,.05,1.8,1.5);
       }
       box(windowDark,x,1.4,z+d/2+.04,1.6,2.6,.09);
+      // Modular street-level silhouette: entrance, awning and occasional balconies.
+      const accent=material(style===1?0xf18b70:style===2?0x62b8ae:0xe5b657);
+      box(accent,x,2.95,z+d/2+.65,4.8,.22,1.25);
+      for(const s of [-1,1])box(cream,x+s*2.15,1.65,z+d/2+.32,.18,3.2,.45);
+      if(style===2&&h>12)for(let by=6;by<h-2;by+=7){
+        box(cream,x,by,z+d/2+.58,Math.min(w*.66,11),.22,1.1);
+        box(accent,x,by+.62,z+d/2+1.04,Math.min(w*.66,11),.08,.08);
+      }
+      if(style===1&&w>18){
+        box(windowDark,x-w*.28,1.7,z+d/2+.13,w*.28,2.5,.08);
+        box(windowDark,x+w*.28,1.7,z+d/2+.13,w*.28,2.5,.08);
+      }
       if(h>27){
         box(material(0x8eaaa7),x+w*.24,h+.85,z-d*.18,2.5,1.2,3.6);
         inst(k.cylinder,material(0xd2b8a2),x-w*.2,h+2,z+d*.18,1.4,3,1.4);
@@ -443,11 +744,47 @@ BN.CONFIG = Object.freeze({
     facadeSign('CAFÉ ONDA',-198,5.5,-172.8,11,'#425956');
     facadeSign('HOTEL MARÉ',-53,8.0,-91.6,11,'#ad6671');
     facadeSign('RÁDIO CAJU',40,8.8,-23.7,13,'#3f6d79');
+    // Four activity landmarks use distinct silhouettes that stay readable at street height.
+    const radio={x:40,z:-24};
+    box(material(0xf18b70),radio.x,3.4,radio.z+8.8,15,.35,2);
+    box(material(0x274e5d),radio.x,1.8,radio.z+9.9,5.2,3.4,.18);
+    inst(k.cylinder,material(0x314f58),radio.x,22,radio.z,0.18,36,0.18);
+    for(let y=8;y<38;y+=6)box(material(0xd8c6a1),radio.x,y,radio.z,4,.12,.12,Math.PI/4);
+    inst(k.cone,material(0xff8a68),radio.x,40,radio.z,1.1,3.5,1.1);
+    const market={x:253,z:145};
+    box(material(0x73c7b6),market.x,2.2,market.z,13,4.4,10);
+    box(cream,market.x,4.7,market.z,15,.6,12);
+    for(let x=market.x-5;x<=market.x+5;x+=5)box(windowDark,x,2.2,market.z+5.1,3.5,2.6,.1);
+    sign('MERCADO MARÉ ALTA',market.x,6.2,market.z+6.1,16,Math.PI,'#286260');
+    const workshop={x:-74.3,z:40};
+    box(material(0x254d55),workshop.x,3,workshop.z,18,6,12);
+    box(material(0xff9b67),workshop.x,5.8,workshop.z+6.3,20,.45,1.2);
+    box(windowDark,workshop.x,2.7,workshop.z+6.1,10,4.4,.12);
+    sign('OFICINA DO CANAL',workshop.x,7.2,workshop.z+6.5,17,0,'#a84f3f');
+    const pier={x:286,z:-160};
+    box(trunk,pier.x,.65,pier.z,24,1.1,8);
+    for(const x of [pier.x-10,pier.x, pier.x+10])for(const z of [pier.z-3,pier.z+3])box(trunk,x,-1.2,z,.45,4,.45);
+    box(material(0xf0dfbf),pier.x+7,5.2,pier.z,5,9.5,5);
+    box(material(0xf18b70),pier.x+7,10.4,pier.z,7,1,7);
+    inst(k.cylinder,material(0x314f58),pier.x+7,15.5,pier.z,.13,10,.13);
+    sign('PÍER FAROL',pier.x-3,3.8,pier.z+4.2,10,0,'#3f6d79');
+    const finale=new T.Group();finale.position.set(pier.x,0,pier.z);finale.visible=false;scene.add(finale);
+    for(let i=0;i<8;i++){const a=i*Math.PI/4,r=5+i%2*1.5;part(T,k.sphere,new T.MeshStandardMaterial({color:i%2?0xff805b:0x8de3cf,emissive:i%2?0xff805b:0x8de3cf,emissiveIntensity:2}),Math.sin(a)*r,4+Math.sin(a*2),Math.cos(a)*r,.22,.22,.22,finale);}
     const beachSign=sign('PRAIA AURORA',266,4.1,10,13,Math.PI/2,'#386d6d');
     beachSign.userData.mount='posts';
     for(const z of [5,15])box(trunk,265.9,2.1,z,.20,4.2,.20);
     facadeSign('ALUGA SOL',-212,6,65.4,10,'#a77465');
     facadeSign('CALOR & CAOS',200,7,145.5,14,'#755a71');
+    const puddleMaterial=new T.MeshStandardMaterial({color:0x6caab0,roughness:.18,metalness:.35,transparent:true,opacity:0,depthWrite:false});
+    const puddles=[];
+    [[-80,-205,5,2.2],[0,115,4,1.8],[80,-45,6,2.1],[160,205,5,2.4],[240,-110,7,2.2],[-240,35,4,1.7]].forEach(([x,z,sx,sz])=>{
+      const mesh=new T.Mesh(new T.CircleGeometry(1,20),puddleMaterial);mesh.rotation.x=-Math.PI/2;mesh.position.set(x,.205,z);mesh.scale.set(sx,sz,1);scene.add(mesh);puddles.push(mesh);
+    });
+    // Bus shelters and planters create recognizable corners without blocking the roadway.
+    [[-229,-149],[91,171],[171,-69],[251,91]].forEach(([x,z],i)=>{
+      prop(x,z,1.2);box(material(0x34515b),x,1.5,z,4,.18,2.2,i%2?Math.PI/2:0);box(windowDark,x,2.3,z,4,2.2,.10,i%2?Math.PI/2:0);box(cream,x,3.5,z,4.5,.25,2.6,i%2?Math.PI/2:0);
+    });
+    [[-213,-67],[13,93],[173,13],[253,-227]].forEach(([x,z])=>{prop(x,z,.7);inst(k.cylinder,material(0xc9896b),x,.55,z,.75,1.1,.75);bush(x,z,1.05);});
     for(const b of batches.values()){
       const mesh=new T.InstancedMesh(b.geo,b.mat,b.items.length),tmp=new T.Object3D();
       b.items.forEach((o,i)=>{tmp.position.set(o.x,o.y,o.z);tmp.rotation.set(o.rx,o.ry,o.rz);tmp.scale.set(o.sx,o.sy,o.sz);tmp.updateMatrix();mesh.setMatrixAt(i,tmp.matrix);});
@@ -492,6 +829,8 @@ BN.CONFIG = Object.freeze({
       trafficHorizontal.emissive.copy(trafficHorizontal.color);
       trafficVertical.emissiveIntensity=trafficHorizontal.emissiveIntensity=.8+night;
       asphalt.roughness=.96-rain*.64;
+      puddleMaterial.opacity=rain*.48;
+      puddles.forEach((mesh,i)=>{mesh.visible=rain>.06;mesh.scale.z=1+Math.sin(time*.8+i)*.03;});
       signs.forEach(m=>m.emissiveIntensity=.32+night*1.6);
       waterMat.color.setHex(night>.65?0x153f59:0x2ba7af);
       for(const a of animals){
@@ -509,6 +848,7 @@ BN.CONFIG = Object.freeze({
         }
       }
       fireMat.opacity=Math.max(0,night-.35)*1.3*(1-rain*.8);
+      if(finale.visible)finale.rotation.y=time*.28;
       if((frame++%3)===0){
         fireBase.forEach((p,i)=>{firePos[i*3]=p.x+Math.sin(time+p.phase)*.6;firePos[i*3+1]=p.y+Math.sin(time*1.7+p.phase)*.4;firePos[i*3+2]=p.z+Math.cos(time*.8+p.phase)*.6;});
         fireGeo.attributes.position.needsUpdate=true;
@@ -518,7 +858,7 @@ BN.CONFIG = Object.freeze({
       }
     }
     function getDistrict(x,z){return x>250?'Praia Aurora':x>85&&x<150?'Canal das Garças':x<70&&z<0?'Centro Solar':z>60&&x<0?'Jardim Maré':'Costa Coral';}
-    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,parks,alleys,lots,counts:{buildings:buildings.length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
+    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,parks,alleys,lots,counts:{buildings:buildings.length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
   };
 })();
 
@@ -528,13 +868,14 @@ BN.CONFIG = Object.freeze({
 (function () {
   'use strict';
   BN.Audio = class {
-    constructor() { this.enabled = false; this.ctx = null; this.musicTimer = 0; this.step = 0; }
+    constructor() { this.enabled = false; this.ctx = null; this.musicTimer = 0; this.step = 0; this.volume = 0.3; }
+    setVolume(value) { this.volume = Math.max(0, Math.min(1, Number(value) || 0)); if (this.ctx) this.master.gain.setTargetAtTime(this.enabled ? this.volume : 0, this.ctx.currentTime, 0.1); }
     toggle() {
       if (!this.ctx) this.init();
       this.enabled = !this.enabled;
       if (this.ctx) {
         this.ctx.resume().catch(function () {});
-        this.master.gain.setTargetAtTime(this.enabled ? 0.3 : 0, this.ctx.currentTime, 0.15);
+        this.master.gain.setTargetAtTime(this.enabled ? this.volume : 0, this.ctx.currentTime, 0.15);
       }
       return this.enabled;
     }
@@ -822,8 +1163,8 @@ BN.CONFIG = Object.freeze({
     function rand() {seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;}
     const cars=[],peds=[],keys=new Set();
     let mode='intro',helpReturn='menu',introTime=0,elapsed=0,hour=cfg.startHour,night=0,rain=0,rainTarget=0,weatherTimer=55;
-    let orbitYaw=Math.PI,orbitPitch=.48,dragging=false,lastPointer={x:0,y:0},toastTime=0,missionIndex=0,balance=0,hudTimer=0,collisionCooldown=0,footstep=0,missionCooldown=0;
-    let completed=0,frameCount=0,fpsAccum=0,measuredFPS=60,quality='normal';
+    let orbitYaw=Math.PI,orbitPitch=.48,dragging=false,lastPointer={x:0,y:0},toastTime=0,missionIndex=0,hudTimer=0,collisionCooldown=0,footstep=0,missionCooldown=0;
+    let frameCount=0,fpsAccum=0,measuredFPS=60,quality='normal';
     let deathTime=0,lastShotCrime=-99,lastHitCrime=-99,chatTimer=0,shake=0,boomTime=0,hitFlash=0,downPointer={x:0,y:0};const rnd=Math.random;
     const cameraGoal=new THREE.Vector3(),lookGoal=new THREE.Vector3(),cameraOffset=new THREE.Vector3(),lookAhead={x:0,z:0};
     // Three cars that answer the first corner differently: grip, steering, brakes and toughness.
@@ -833,19 +1174,30 @@ BN.CONFIG = Object.freeze({
       sport:{radius:1.55,name:'ESPORTIVO BRISA 78',accel:17,top:38,grip:6.2,steer:1.6,brake:5,tough:1,scale:[1.04,.86,1.1],price:1600,note:'Retomada forte, traseira solta'}
     };
     const upgrades={brakes:false,tires:false,cargo:false},garageOwned=new Set(['compact']);
-    let saved={};try{saved=JSON.parse(localStorage.getItem('baia-neon-save')||'{}')||{};}catch(e){saved={};}
-    const num=(v,d,lo,hi)=>Number.isFinite(Number(v))&&v!==null&&v!==undefined?clamp(Number(v),lo,hi):d;
-    balance=num(saved.balance,0,0,1e7);completed=num(saved.completed,0,0,1e6);
-    for(const k in upgrades)upgrades[k]=Boolean(saved.upgrades&&saved.upgrades[k]);
-    (Array.isArray(saved.owned)?saved.owned:[]).forEach(t=>{if(VEHICLES[t])garageOwned.add(t);});
-    Object.assign(player,{ammo:num(saved.ammo,12,0,12),reserve:num(saved.reserve,36,0,240),reload:0,grenades:num(saved.grenades,2,0,9),health:num(saved.health,100,25,100)});
-    // Progress that matters between sessions. The city itself is rebuilt from the seed.
-    function save(){try{localStorage.setItem('baia-neon-save',JSON.stringify({balance,completed,upgrades,owned:[...garageOwned],car:starterCar.type,ammo:player.ammo,reserve:player.reserve,grenades:player.grenades,health:Math.max(25,Math.round(player.health))}));}catch(e){}}
+    const catalogues={vehicles:Object.keys(VEHICLES),upgrades:Object.keys(upgrades),campaignIds:cfg.campaign.map(item=>item.id)};
+    const loaded=BN.Save.load(localStorage,catalogues),saved=loaded.data;
+    let balance=saved.balance,completed=saved.completed,reputation=saved.reputation;
+    for(const k in upgrades)upgrades[k]=Boolean(saved.upgrades[k]);
+    saved.owned.forEach(t=>{if(VEHICLES[t])garageOwned.add(t);});
+    Object.assign(player,{ammo:saved.ammo,reserve:saved.reserve,reload:0,grenades:saved.grenades,health:saved.health});
+    const campaign=new BN.Campaign(cfg.campaign,saved.campaign);
+    if(campaign.state.status==='finished'&&world.setFinale)world.setFinale(true);
+    const raceRecords=saved.raceRecords||{};
+    let tutorialSeen=saved.tutorialSeen,cameraMotion=saved.cameraMotion,audioVolume=saved.audioVolume;audio.volume=audioVolume;
+    let routeDestination=null,routePoints=[],dialogueTime=0,activeRace=null,raceIndex=0,photoReturn='play',mapReturn='play',photoClean=false;
+    function progressData(){return {schemaVersion:BN.Save.SCHEMA_VERSION,balance,completed,reputation,upgrades,owned:[...garageOwned],car:starterCar.type,ammo:player.ammo,reserve:player.reserve,grenades:player.grenades,health:Math.max(25,Math.round(player.health)),campaign:campaign.state,raceRecords,tutorialSeen,cameraMotion,audioVolume};}
+    // Progress writes only at meaningful events. The untouched v1 key remains available to older builds.
+    function save(){try{BN.Save.persist(localStorage,progressData());}catch(e){toast('Não foi possível salvar neste navegador.');}}
     function toast(text){$('toast').textContent=text;$('toast').classList.add('show');toastTime=4.5;}
-    function setMode(next){mode=next;show('intro',next==='intro');show('menu',next==='menu');show('hud',next==='play'||next==='pause'||next==='garage');show('pause',next==='pause');show('help',next==='help');show('wasted',next==='dead');show('garage',next==='garage');keys.clear();dragging=false;}
-    function menuStats(){$('statMoney').textContent='R$ '+balance;$('statJobs').textContent=completed;$('statCars').textContent=garageOwned.size+'/3';$('statUps').textContent=Object.values(upgrades).filter(Boolean).length+'/3';}
+    function dialogue(speaker,text){$('dialogueSpeaker').textContent=speaker;$('dialogueText').textContent=text;show('dialogue',true);dialogueTime=6;}
+    if(loaded.migrated)setTimeout(()=>toast('Progresso v0.2 preservado e migrado com cópia de recuperação.'),0);
+    function setMode(next){mode=next;show('intro',next==='intro');show('menu',next==='menu');show('hud',(next==='play'||next==='pause'||next==='garage'||next==='map')&&!photoClean);show('pause',next==='pause');show('help',next==='help');show('wasted',next==='dead');show('garage',next==='garage');show('cityMap',next==='map');show('photoMode',next==='photo');keys.clear();dragging=false;}
+    function menuStats(){$('statMoney').textContent='R$ '+balance;$('statJobs').textContent=completed;$('statCars').textContent=garageOwned.size+'/'+Object.keys(VEHICLES).length;$('statUps').textContent=Object.values(upgrades).filter(Boolean).length+'/'+Object.keys(upgrades).length;}
+    const build=BN.BUILD_INFO||{version:cfg.version,tag:'development',sha:'development'};
+    const versionLabel='v'+build.version+(build.tag==='development'?' dev':'');
+    $('menuVersion').textContent=versionLabel;$('pauseVersion').textContent=versionLabel;
     function endIntro(){menuStats();setMode('menu');introTime=cfg.introDuration;}
-    function play(){setMode('play');audio.beep(587,.16);toast('Escolha um serviço com 1, 2 ou 3. O carro coral é seu.');}
+    function play(){setMode('play');audio.beep(587,.16);if(!tutorialSeen){tutorialSeen=true;dialogue('DORA DENDÊ','Você dirige, eu falo. Primeiro me busque na Praia Aurora. M abre o mapa.');toast('Introdução: siga o marcador coral. M abre o mapa.');save();}else toast('A Rádio Caju ainda tem serviço. M abre o mapa.');updateMission();}
     function togglePause(){if(mode==='play')setMode('pause');else if(mode==='pause')setMode('play');}
     function help(){helpReturn=mode;setMode('help');}
     function createCar(x,z,color,isTraffic=false,heading=0,owned=false,type='compact'){const mesh=BN.createCar(THREE,color,false),sc=VEHICLES[type].scale;mesh.scale.set(sc[0],sc[1],sc[2]);scene.add(mesh);mesh.position.set(x,0,z);mesh.rotation.y=heading;const c={x,z,heading,speed:0,lat:0,type,color,baseY:sc[1],mesh,traffic:isTraffic,owned,path:[],waypoint:0,damage:0,hitCooldown:0,home:{x,z,heading},wreck:false,wreckTime:0,scared:0,stuck:0,byPlayer:false};cars.push(c);return c;}
@@ -888,6 +1240,7 @@ BN.CONFIG = Object.freeze({
       peds.concat(cars).forEach(w=>w.call=null);callers=[];grenades.forEach(g=>{g.t=0;g.m.visible=false;});
       police.units.forEach(u=>{u.foot=false;u.back=false;if(u.officer)u.officer.visible=false;});
       if(job)failJob(kind==='busted'?'você foi preso':'você não chegou');
+      if(campaign&&campaign.state.status==='active')applyCampaignEvent(campaign.fail(kind==='busted'?'você foi preso':'você não chegou'));
       ending=kind;deathTime=0;$('wastedTitle').textContent=title;$('wastedCause').textContent=cause;$('wastedText').style.opacity=0;$('wasted').classList.toggle('busted',kind==='busted');setMode('dead');}
     function caught(){
       if(mode!=='play')return;const c=player.car;if(c){c.speed=0;player.car=null;}
@@ -898,18 +1251,25 @@ BN.CONFIG = Object.freeze({
     // A crime only reaches the police when an officer sees it or a witness finishes a phone call.
     // The vehicle the police believe the suspect is using. null means on foot.
     let crimeCount=0,knownCar=null,alleyHint=-99;
-    function crime(kind,weight,direct){
-      crimeCount++;
+    const CRIME_TYPES=Object.freeze({
+      vehicle_theft:{label:'Furto de veículo',weight:2,violent:false},vehicle_robbery:{label:'Roubo de veículo',weight:2,violent:false},radio_car_theft:{label:'Furto do carro da rádio',weight:2,violent:false},
+      dangerous_collision:{label:'Colisão perigosa',weight:1,violent:false},hit_and_run:{label:'Atropelamento',weight:3,violent:true},fatal_hit:{label:'Atropelamento fatal',weight:3,violent:true},
+      gunfire:{label:'Disparos em via pública',weight:1,violent:true},armed_assault:{label:'Agressão armada',weight:2,violent:true},homicide:{label:'Homicídio',weight:3,violent:true},explosion:{label:'Explosão',weight:4,violent:true},
+      police_shot:{label:'Policial baleado',weight:3,violent:true},police_killed:{label:'Policial morto',weight:4,violent:true},police_attack:{label:'Ataque a viatura',weight:3,violent:true},police_collision:{label:'Colisão com viatura',weight:2,violent:true},police_destroyed:{label:'Viatura destruída',weight:4,violent:true},
+      test:{label:'Ocorrência de teste',weight:2,violent:false}
+    });
+    function crime(code,direct){
+      const occurrence=CRIME_TYPES[code];if(!occurrence)throw new Error('Código de ocorrência desconhecido: '+code);
+      const {label,weight,violent}=occurrence;crimeCount++;
       peds.forEach(p=>{if(!p.dead&&!p.frozen&&dist(p,player)<35&&p.panic<=0){p.panic=5;p.fear=null;p.cower=false;}});
       const sees=u=>{const e=u.foot?{x:u.fx,z:u.fz}:u;return dist(e,player)<cfg.policeSight&&BN.hasLineOfSight(e,player,world.buildings);};
-      const violent=/Disparos|Homicídio|Explosão|Agressão|Policial|fatal|Ataque|destruída/.test(kind);
-      if(direct||police.units.some(sees)){knownCar=player.car;police.report(kind,weight,player,violent);return;}
-      let w=null,best=1e9;
-      for(const p of peds){if(p.dead||p.down>0)continue;const d=dist(p,player);if(d>42||!BN.hasLineOfSight(p,player,world.buildings))continue;const score=d-(p.call?100:0);if(score<best){best=score;w=p;}}
-      if(!w)w=cars.find(c=>c.traffic&&!c.wreck&&dist(c,player)<32&&BN.hasLineOfSight(c,player,world.buildings));
-      if(!w){toast(kind+' · Ninguém viu');return;}
-      w.call={t:w.call?w.call.t:3.5+rnd()*2,kind,weight:(w.call?w.call.weight:0)+weight,x:player.x,z:player.z,violent:violent||Boolean(w.call&&w.call.violent),car:player.car};
-      toast(kind+' · Uma testemunha está ligando para a polícia');
+      if(direct||police.units.some(sees)){knownCar=player.car;police.report(label,weight,player,violent);return;}
+      let witness=null,best=1e9;
+      for(const p of peds){if(p.dead||p.down>0)continue;const d=dist(p,player);if(d>42||!BN.hasLineOfSight(p,player,world.buildings))continue;const score=d-(p.call?100:0);if(score<best){best=score;witness=p;}}
+      if(!witness)witness=cars.find(c=>c.traffic&&!c.wreck&&dist(c,player)<32&&BN.hasLineOfSight(c,player,world.buildings));
+      if(!witness){toast(label+' · Ninguém viu');return;}
+      witness.call={t:witness.call?witness.call.t:3.5+rnd()*2,code,label,weight:(witness.call?witness.call.weight:0)+weight,x:player.x,z:player.z,violent:violent||Boolean(witness.call&&witness.call.violent),car:player.car};
+      toast(label+' · Uma testemunha está ligando para a polícia');
     }
     const callMarks=Array.from({length:6},()=>{const m=new THREE.Mesh(new THREE.OctahedronGeometry(.28),new THREE.MeshBasicMaterial({color:0xffd23f}));m.visible=false;scene.add(m);return m;});
     let callers=[];
@@ -919,7 +1279,7 @@ BN.CONFIG = Object.freeze({
         if(!w.call)continue;
         if(w.dead||w.down>0||w.wreck){w.call=null;toast('Testemunha silenciada. A ligação caiu.');continue;}
         w.call.t-=dt;
-        if(w.call.t<=0){knownCar=w.call.car;police.report(w.call.kind,w.call.weight,{x:w.call.x,z:w.call.z},w.call.violent);w.call=null;}else callers.push(w);
+        if(w.call.t<=0){knownCar=w.call.car;police.report(w.call.label,w.call.weight,{x:w.call.x,z:w.call.z},w.call.violent);w.call=null;}else callers.push(w);
       }
       callMarks.forEach((m,i)=>{const w=callers[i];m.visible=Boolean(w);if(w){m.position.set(w.x,2.6+Math.sin(elapsed*6)*.12,w.z);m.rotation.y=elapsed*3;}});
     }
@@ -943,7 +1303,7 @@ BN.CONFIG = Object.freeze({
       police.destroy(u);(u.mesh.userData.lights||[]).forEach(m=>{if(m.material)m.material.emissiveIntensity=.05;});
       // The empty cruiser stays behind and can be driven away.
       cars.push({x:u.x,z:u.z,heading:u.heading,speed:0,lat:0,type:'sedan',color:0xf0eee2,baseY:1,mesh:u.mesh,traffic:false,owned:false,path:[],waypoint:0,damage:u.damage,hitCooldown:0,home:{x:u.x,z:u.z,heading:u.heading},wreck:false,wreckTime:0,scared:0,stuck:0,byPlayer:false});
-      crime(label,4,true);
+      crime('police_killed',true);
     }
     function attemptMove(actor,nx,nz,r){
       const steps=Math.max(1,Math.ceil(Math.hypot(nx-actor.x,nz-actor.z)/.65)),dx=(nx-actor.x)/steps,dz=(nz-actor.z)/steps;let hit=false;
@@ -984,7 +1344,7 @@ BN.CONFIG = Object.freeze({
           const drv=peds.find(p=>!p.dead&&!p.frozen&&!p.call&&p.down<=0&&dist(p,player)>110),sx=near.x+Math.cos(near.heading)*2.4,sz=near.z-Math.sin(near.heading)*2.4;
           if(drv&&!world.isBlocked(sx,sz,.6)){drv.x=sx;drv.z=sz;drv.kind='walker';drv.panic=9;drv.fear={x:near.x,z:near.z};drv.cower=false;drv.chat=0;drv.wait=0;}
         }
-        if(!near.owned){near.owned=true;crime(jacked?'Roubo de veículo':'Furto de veículo',2);}else toast(VEHICLES[near.type].name+' · '+VEHICLES[near.type].note);
+        if(!near.owned){near.owned=true;crime(jacked?'vehicle_robbery':'vehicle_theft');}else toast(VEHICLES[near.type].name+' · '+VEHICLES[near.type].note);
       }
     }
     function animateHuman(mesh,phase,amount){(mesh.userData.legs||[]).forEach((m,i)=>m.rotation.x=Math.sin(phase+i*Math.PI)*amount);(mesh.userData.arms||[]).forEach((m,i)=>m.rotation.x=-Math.sin(phase+i*Math.PI)*amount*.8);}
@@ -993,14 +1353,28 @@ BN.CONFIG = Object.freeze({
     const ring=new THREE.Mesh(new THREE.TorusGeometry(4,.17,6,40),markerMaterial);ring.rotation.x=Math.PI/2;ring.position.y=.3;missionGroup.add(ring);
     const beam=new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.1,14,12,1,true),new THREE.MeshBasicMaterial({color:0x8de3cf,transparent:true,opacity:.11,side:THREE.DoubleSide,depthWrite:false}));beam.position.y=7;missionGroup.add(beam);
     const diamond=new THREE.Mesh(new THREE.OctahedronGeometry(.85),new THREE.MeshStandardMaterial({color:0x8de3cf,emissive:0x8de3cf,emissiveIntensity:1}));diamond.position.y=4;missionGroup.add(diamond);
-    // ---- Contracts: accept, pick up, carry under a cargo rule, deliver, get an explained result ----
+    // ---- Campaign, contracts and time trials share one contextual objective layer. ----
     const RULES={perishable:'derrete com o tempo',fragile:'quebra em batidas',smooth:'bônus por direção suave'};
     let job=null,lastResult='';
-    function target(){return job?(job.stage==='pickup'?{x:job.def.px,z:job.def.pz}:job.def):null;}
+    function contractOffers(){
+      const unlocked=cfg.deliveries.filter(item=>reputation>=item.rep);
+      if(unlocked.length<=3)return unlocked;
+      const page=Math.floor(completed/3)%Math.ceil(unlocked.length/3),result=[];
+      for(let i=0;i<Math.min(3,unlocked.length);i++)result.push(unlocked[(page*3+i)%unlocked.length]);
+      return result;
+    }
+    function campaignTargets(){
+      const objective=campaign.objective();if(!objective||objective.failed)return [];
+      const landmarks=Object.values(cfg.landmarks);
+      return objective.targets.filter(id=>!campaign.state.collected.includes(id)).map(id=>landmarks.find(item=>item.id===id)).filter(Boolean);
+    }
+    function campaignTarget(){return campaignTargets()[0]||null;}
+    function raceTarget(){if(!activeRace)return null;const p=activeRace.def.points[activeRace.checkpoint];return p&&{x:p[0],z:p[1]};}
+    function target(){return job?(job.stage==='pickup'?{x:job.def.px,z:job.def.pz}:job.def):(raceTarget()||campaignTarget());}
     function acceptJob(i){
-      const def=cfg.deliveries[i];if(job||!def||mode!=='play')return;
+      const def=contractOffers()[i];if(job||activeRace||!def||mode!=='play')return;
       job={i,def,stage:'pickup',cargo:100,time:0,limit:0,car:null,hits:0};missionIndex=i;lastResult='';
-      toast(def.name+' aceito · Retire a carga de carro');audio.beep(523,.12);updateMission();
+      toast(def.name+' aceito · '+(def.family==='passenger'?'Busque o passageiro':def.family==='recovery'?'Recupere o veículo':'Retire a carga de carro'));audio.beep(523,.12);updateMission();
     }
     function failJob(why){if(!job)return;lastResult=job.def.name+' perdido: '+why+'. Sem pagamento.';toast(lastResult);job=null;missionCooldown=3;updateMission();}
     // Impacts hurt fragile cargo most. Padding in the garage softens every loss.
@@ -1014,25 +1388,60 @@ BN.CONFIG = Object.freeze({
       if(job.stage==='pickup'){
         if(!stopped)return;
         job.stage='deliver';job.car=player.car;job.time=0;job.limit=Math.hypot(def.x-def.px,def.z-def.pz)/9+22;missionCooldown=1.5;
-        toast('Carga a bordo · '+RULES[def.kind]);audio.beep(587,.12);updateMission();return;
+        toast((def.family==='passenger'?'Passageiro a bordo':def.family==='recovery'?'Veículo recuperado':'Carga a bordo')+' · '+RULES[def.kind]);audio.beep(587,.12);updateMission();return;
       }
       job.time+=dt;
-      if(job.car.wreck){failJob('o carro da carga foi destruído');return;}
+      if(job.car.wreck){failJob('o veículo do serviço foi destruído');return;}
       if(def.kind==='perishable')cargoLoss(100/job.limit*dt/(upgrades.cargo?.6:1)*(upgrades.cargo?.8:1));
-      if(job.cargo<=0&&def.kind!=='smooth'){failJob(def.kind==='perishable'?'o sorvete virou sopa':'o figurino ficou em pedaços');return;}
+      if(job.cargo<=0&&def.kind!=='smooth'){failJob(def.kind==='perishable'?'o sorvete virou sopa':'a integridade chegou a zero');return;}
       if(!stopped||player.car!==job.car||police.level>0)return;
-      // Part of the pay is guaranteed, the rest follows the cargo. Rain pays a risk bonus.
-      const base={perishable:.3,fragile:.25,smooth:.6}[def.kind],fixed=Math.round(def.reward*base),quality=Math.round(def.reward*(1-base)*job.cargo/100),wetBonus=rain>.5?Math.round(def.reward*.2):0,total=fixed+quality+wetBonus;
-      balance+=total;completed++;missionCooldown=3;
-      lastResult=def.name+' · R$ '+total+' = garantido '+fixed+' + '+({perishable:'qualidade',fragile:'integridade',smooth:'suavidade'}[def.kind])+' '+Math.round(job.cargo)+'% '+quality+(wetBonus?' + chuva '+wetBonus:'')+(job.hits?' · '+job.hits+' batida'+(job.hits>1?'s':''):' · sem batidas');
+      const base={perishable:.3,fragile:.25,smooth:.6}[def.kind],fixed=Math.round(def.reward*base),qualityPay=Math.round(def.reward*(1-base)*job.cargo/100),wetBonus=rain>.5?Math.round(def.reward*.2):0,total=fixed+qualityPay+wetBonus;
+      balance+=total;completed++;reputation+=def.family==='delivery'?1:2;missionCooldown=3;
+      lastResult=def.name+' · R$ '+total+' = garantido '+fixed+' + '+({perishable:'qualidade',fragile:'integridade',smooth:'conforto'}[def.kind])+' '+Math.round(job.cargo)+'% '+qualityPay+(wetBonus?' + chuva '+wetBonus:'')+(job.hits?' · '+job.hits+' batida'+(job.hits>1?'s':''):' · sem batidas');
       toast(lastResult);audio.beep(659,.3);job=null;updateMission();save();
+    }
+    function applyCampaignEvent(event){
+      if(!event)return;
+      if(event.type==='blocked'){if(missionCooldown<=0){toast(event.message);missionCooldown=2;}return;}
+      balance=Math.max(0,balance-(event.spent||0));balance+=event.reward||0;reputation+=event.reputation||0;missionCooldown=1.6;
+      const mission=campaign.definition(),speaker=mission&&mission.number%2===0?'NANDO HERTZ':'DORA DENDÊ';
+      dialogue(speaker,event.message);audio.beep(event.type.includes('complete')?784:587,.2,'triangle',.14);
+      if(event.type==='campaign-complete'&&world.setFinale)world.setFinale(true);
+      routeDestination=null;routePoints=[];updateMission();save();
+    }
+    function updateCampaign(dt){
+      if(job||activeRace)return;
+      const car=player.car,roughness=car?Math.abs(car.lat)*.25+(keys.has('Space')&&Math.abs(car.speed)>8?2:0):0;
+      const event=campaign.tick(dt,{roughness,damage:car?car.damage:0});if(event){applyCampaignEvent(event);return;}
+      if(campaign.state.status!=='active'||missionCooldown>0)return;
+      for(const landmark of campaignTargets())if(dist(player,landmark)<6&&player.speed<2){applyCampaignEvent(campaign.arrive(landmark.id,{hasCar:Boolean(player.car),balance}));break;}
+    }
+    function startRace(){
+      if(job||activeRace||campaign.state.status==='failed')return;
+      const def=cfg.races[raceIndex++%cfg.races.length];activeRace={def,checkpoint:0,time:0,vehicle:player.car&&player.car.type};lastResult='';toast(def.name+' · vá ao primeiro checkpoint');updateMission();
+    }
+    function updateRace(dt){
+      if(!activeRace)return;activeRace.time+=dt;
+      if(!player.car){toast('Contrarrelógio encerrado: você saiu do carro.');activeRace=null;updateMission();return;}
+      const t=raceTarget();if(!t||dist(player,t)>7)return;
+      activeRace.checkpoint++;audio.beep(700+activeRace.checkpoint*35,.08);
+      if(activeRace.checkpoint<activeRace.def.points.length){updateMission();return;}
+      const key=activeRace.def.id+':'+player.car.type,old=Number(raceRecords[key])||Infinity,time=activeRace.time,delta=Number.isFinite(old)?time-old:null;
+      if(time<old)raceRecords[key]=Number(time.toFixed(2));
+      const medals=activeRace.def.medals,medal=time<=medals[0]?'OURO':time<=medals[1]?'PRATA':time<=medals[2]?'BRONZE':'CONCLUÍDO';
+      lastResult=activeRace.def.name+' · '+time.toFixed(2)+' s · '+medal+(delta===null?' · primeiro recorde':delta<0?' · '+Math.abs(delta).toFixed(2)+' s melhor':' · +'+delta.toFixed(2)+' s do recorde');
+      reputation+=medal==='OURO'?3:medal==='PRATA'?2:1;activeRace=null;toast(lastResult);save();updateMission();
     }
     function updateMission(){
       const t=target();missionGroup.visible=Boolean(t);if(t)missionGroup.position.set(t.x,0,t.z);
+      const campaignActive=!job&&!activeRace&&campaign.state.status!=='finished';markerMaterial.color.setHex(campaignActive?0xff805b:0x8de3cf);diamond.material.color.setHex(campaignActive?0xff805b:0x8de3cf);diamond.material.emissive.setHex(campaignActive?0xff805b:0x8de3cf);
       $('balance').textContent='R$ '+balance;
-      if(job){$('missionTitle').textContent=job.def.name;$('missionText').textContent=job.stage==='pickup'?'Retire a carga no marcador. Pare o carro dentro do círculo.':job.def.text;return;}
-      $('missionTitle').textContent='Quadro de serviços';
-      $('missionText').innerHTML=(lastResult?'<b>'+lastResult+'</b><br>':'')+cfg.deliveries.map((d,i)=>'<kbd>'+(i+1)+'</kbd> '+d.name+' · até R$ '+d.reward+' · '+RULES[d.kind]).join('<br>');
+      if(job){$('missionTitle').textContent=job.def.name;$('missionText').textContent=job.stage==='pickup'?(job.def.family==='passenger'?'Busque o passageiro e pare para o embarque.':job.def.family==='recovery'?'Entre no veículo indicado.':'Retire a carga no marcador. Pare o carro dentro do círculo.'):job.def.text;return;}
+      if(activeRace){$('missionTitle').textContent=activeRace.def.name;$('missionText').textContent='Checkpoint '+(activeRace.checkpoint+1)+' de '+activeRace.def.points.length+' · '+activeRace.time.toFixed(1)+' s';return;}
+      const objective=campaign.objective();
+      if(objective){$('missionTitle').textContent=objective.failed?'Missão interrompida':'Capítulo '+objective.mission.number+' · '+objective.mission.title;$('missionText').innerHTML='<b>'+objective.text+'</b><br><span class="route-note">Reputação '+reputation+' · M para traçar rota · L para contrarrelógio</span>';return;}
+      const offers=contractOffers();$('missionTitle').textContent='Mundo aberto · quadro de serviços';
+      $('missionText').innerHTML=(lastResult?'<b>'+lastResult+'</b><br>':'')+offers.map((d,i)=>'<kbd>'+(i+1)+'</kbd> '+d.name+' · até R$ '+d.reward+' · '+RULES[d.kind]).join('<br>');
     }
     // ---- Garage: repairs, upgrades with a trade-off, supplies and other cars ----
     const garageMark=new THREE.Group();scene.add(garageMark);garageMark.position.set(cfg.garage.x,0,cfg.garage.z);
@@ -1041,6 +1450,7 @@ BN.CONFIG = Object.freeze({
     const nearGarage=()=>dist(player,cfg.garage)<8&&player.speed<2;
     function garageItems(){
       const c=player.car,items=[],buy=(label,note,cost,ok,fn)=>items.push({label,note,cost,ok:ok&&balance>=cost,fn});
+      if(starterCar.wreck||(!c&&balance<40))buy('Resgate comunitário','Recoloca o Maré Compacto na oficina sem custo',0,true,()=>{starterCar.mesh.traverse(m=>{if(m.isMesh&&m.userData.paint)m.material=m.userData.paint;});starterCar.mesh.rotation.z=0;starterCar.mesh.scale.y=starterCar.baseY||1;starterCar.wreck=false;starterCar.damage=0;starterCar.lat=starterCar.speed=0;starterCar.x=cfg.garage.x+3;starterCar.z=cfg.garage.z+7;starterCar.mesh.position.set(starterCar.x,0,starterCar.z);starterCar.mesh.visible=true;});
       if(c)buy('Reparar '+VEHICLES[c.type].name,'Dano atual '+Math.round(Math.min(100,c.damage))+'%',40+Math.round(Math.min(100,c.damage)*.4),c.damage>1,()=>{c.damage=0;c.warned=false;c.mesh.scale.y=c.baseY;});
       if(police.level>0&&c)buy('Repintar e trocar a placa','A polícia passa a procurar o carro antigo',150,true,()=>{setCarType(c,c.type,[0x3f8f8a,0xd9a441,0x8a5a7a,0xc9cfd2,0x2f3b46][Math.floor(rnd()*5)]);knownCar={};});
       buy('Freios reforçados','Para 60% mais forte',300,!upgrades.brakes,()=>upgrades.brakes=true);
@@ -1124,7 +1534,7 @@ BN.CONFIG = Object.freeze({
         if(hit&&impact>5){if(collisionCooldown===0){hurt(Math.min(15,impact*.35),'batida de carro');c.damage+=impact*.8/v.tough;cargoHit(impact);sparks(c.x+hs*2,c.z+hc*2,10);audio.impact();collisionCooldown=.8;}c.speed*=-.2;c.lat=0;}
         else if(hit)c.lat*=.5;
         player.x=c.x;player.z=c.z;player.heading=c.heading;player.speed=Math.hypot(c.speed,c.lat);
-        if(!dragging)orbitYaw+=wrap(c.heading+Math.PI-orbitYaw)*Math.min(1,dt*2.1);
+        if(!dragging&&cameraMotion)orbitYaw+=wrap(c.heading+Math.PI-orbitYaw)*Math.min(1,dt*2.1);
         c.mesh.position.set(c.x,0,c.z);c.mesh.rotation.y=c.heading;
         (c.mesh.userData.wheels||[]).forEach(w=>w.rotation.x+=c.speed*dt*2);
       }else{
@@ -1186,7 +1596,7 @@ BN.CONFIG = Object.freeze({
     }
     function killPed(p,byPlayer,label){
       p.dead=true;p.deadTime=38;p.down=0;p.panic=0;p.health=0;p.hitCooldown=8;p.mesh.scale.y=1;p.mesh.rotation.set(-Math.PI/2,0,rnd()*6.28);p.mesh.position.set(p.x,.24,p.z);animateHuman(p.mesh,0,0);
-      bleed(p.x,p.z,1.1+rnd()*.6);dropCash(p.x,p.z);if(byPlayer)crime(label,3);
+      bleed(p.x,p.z,1.1+rnd()*.6);dropCash(p.x,p.z);if(byPlayer)crime(label==='fatal_hit'?'fatal_hit':'homicide');
     }
     function burn(mesh){mesh.traverse(m=>{if(m.isMesh){m.userData.paint=m.material;m.material=burnt;}});mesh.rotation.z=.06;mesh.scale.y*=.86;}
     function explode(x,z,byPlayer,radius=10){
@@ -1198,9 +1608,9 @@ BN.CONFIG = Object.freeze({
       for(const p of peds){if(p.dead)continue;const d=dist(p,at);if(d<radius*.7)killPed(p,byPlayer,'Explosão fatal');else if(d<radius*1.4){p.down=4;p.health-=40;}}
       for(const c of cars){const d=dist(c,at);if(d<radius&&!c.wreck){c.damage+=110*(1-d/radius)+15;if(byPlayer)c.byPlayer=true;}}
       for(const u of police.units){const d=dist(u,at);if(d<radius){u.damage+=110*(1-d/radius)+15;if(byPlayer)u.byPlayer=true;}}
-      for(const u of police.units.slice())if(u.foot&&Math.hypot(u.fx-x,u.fz-z)<radius*.7)officerDown(u,'Policial morto');
+      for(const u of police.units.slice())if(u.foot&&Math.hypot(u.fx-x,u.fz-z)<radius*.7)officerDown(u,'police_killed');
       const d=dist(player,at),reach=radius*1.2;if(d<reach&&player.invincible===0)hurt((player.car?55:125)*(1-d/reach),'explosão');
-      alarm(at,75);if(byPlayer)crime('Explosão',4);
+      alarm(at,75);if(byPlayer)crime('explosion');
     }
     function fire(){
       if(player.car||player.fireCooldown>0||player.stun>0||player.reload>0||mode!=='play')return;
@@ -1219,19 +1629,19 @@ BN.CONFIG = Object.freeze({
       audio.beep(170,.07,'square',.32);audio.beep(85,.14,'sawtooth',.3);
       alarm(player,45);
       const witnesses=peds.some(p=>!p.dead&&dist(p,player)<55)||police.units.some(u=>dist(u,player)<80);
-      if(witnesses&&elapsed-lastShotCrime>8){lastShotCrime=elapsed;crime('Disparos em via pública',1);}
+      if(witnesses&&elapsed-lastShotCrime>8){lastShotCrime=elapsed;crime('gunfire');}
       if(!best){sparks(ex,ez,5);return;}
       const o=best.o;
       if(best.kind==='officer'){
         const u=o.unit;u.oh=(u.oh===undefined?100:u.oh)-55;spray(o.x,o.z,10);
-        if(u.oh<=0)officerDown(u,'Policial morto');else crime('Policial baleado',3,true);
+        if(u.oh<=0)officerDown(u,'police_killed');else crime('police_shot',true);
       }else if(best.kind==='ped'){
         o.health-=55;spray(o.x,o.z,10);
-        if(o.health<=0)killPed(o,true,'Homicídio');
-        else{o.panic=10;o.cower=false;o.fear={x:player.x,z:player.z};if(elapsed-lastHitCrime>4){lastHitCrime=elapsed;crime('Agressão armada',2);}}
+        if(o.health<=0)killPed(o,true,'homicide');
+        else{o.panic=10;o.cower=false;o.fear={x:player.x,z:player.z};if(elapsed-lastHitCrime>4){lastHitCrime=elapsed;crime('armed_assault');}}
       }else{
         o.damage+=best.kind==='cop'?9:13;o.byPlayer=true;sparks(o.x,o.z,8);
-        if(best.kind==='cop'){if(elapsed-lastHitCrime>4){lastHitCrime=elapsed;crime('Ataque a viatura',3,true);}}else if(o.traffic)o.scared=10;
+        if(best.kind==='cop'){if(elapsed-lastHitCrime>4){lastHitCrime=elapsed;crime('police_attack',true);}}else if(o.traffic)o.scared=10;
       }
     }
     function reload(){
@@ -1331,7 +1741,7 @@ BN.CONFIG = Object.freeze({
         if(interactive&&c!==player.car&&dist(c,player)<(player.car?2.8:2.1)&&c.hitCooldown===0){
           if(player.car){
             const v=Math.abs(player.car.speed);
-            if(v>5){if(!c.wreck)crime('Colisão perigosa',1);hurt(6,'batida de carro');cargoHit(v);if(!c.wreck){c.damage+=8+v*.5;c.byPlayer=true;}player.car.damage+=(6+v*.4)/VEHICLES[player.car.type].tough;player.car.lat=0;sparks(c.x,c.z,12);player.car.speed*=-.3;c.hitCooldown=2;audio.impact();}
+            if(v>5){if(!c.wreck)crime('dangerous_collision');hurt(6,'batida de carro');cargoHit(v);if(!c.wreck){c.damage+=8+v*.5;c.byPlayer=true;}player.car.damage+=(6+v*.4)/VEHICLES[player.car.type].tough;player.car.lat=0;sparks(c.x,c.z,12);player.car.speed*=-.3;c.hitCooldown=2;audio.impact();}
             else if(c.speed>4){player.car.speed=0;c.speed=0;c.hitCooldown=2;}
           }else if(c.speed>3&&player.invincible===0){
             // The player can be run over: damage grows with the speed of the car.
@@ -1408,12 +1818,13 @@ BN.CONFIG = Object.freeze({
         }
         if(interactive&&player.car&&player.speed>4&&far<2.5&&p.hitCooldown===0&&p.down<=0){
           player.car.damage+=3;player.car.speed*=.6;cargoHit(7);audio.impact();spray(p.x,p.z,8);
-          if(player.speed>13)killPed(p,true,'Atropelamento fatal');
-          else{p.down=5;p.hitCooldown=8;p.health-=35;if(p.health<=0)killPed(p,true,'Atropelamento fatal');else crime('Atropelamento',3);}
+          if(player.speed>13)killPed(p,true,'fatal_hit');
+          else{p.down=5;p.hitCooldown=8;p.health-=35;if(p.health<=0)killPed(p,true,'fatal_hit');else crime('hit_and_run');}
         }
       }
     }
     function updateCamera(dt){
+      if(captureScene){const nightShot=captureScene==='night';camera.position.set(nightShot?330:310,nightShot?24:26,nightShot?-95:85);lookGoal.set(nightShot?286:253,nightShot?4:3,nightShot?-160:145);camera.lookAt(lookGoal);return;}
       if(mode==='intro'){
         const t=clamp(introTime/cfg.introDuration,0,1);
         if(t<.34){const q=t/.34;cameraGoal.set(365-q*75,100-q*28,210-q*90);lookGoal.set(70,15,10);}
@@ -1436,28 +1847,32 @@ BN.CONFIG = Object.freeze({
         let fraction=1;
         for(let i=1;i<=12;i++){const f=i/12,px=player.x+cameraOffset.x*f,pz=player.z+cameraOffset.z*f,py=lookGoal.y+cameraOffset.y*f;if(world.buildings.some(b=>px>b.minX-.5&&px<b.maxX+.5&&pz>b.minZ-.5&&pz<b.maxZ+.5&&py<b.height+.5)){fraction=Math.max(.15,(i-1)/12);break;}}
         cameraGoal.copy(lookGoal).addScaledVector(cameraOffset,fraction);camera.position.lerp(cameraGoal,1-Math.exp(-dt*8));camera.lookAt(lookGoal);
-        if(shake>0){camera.position.x+=(rnd()-.5)*shake;camera.position.y+=(rnd()-.5)*shake*.6;}
+        if(shake>0&&cameraMotion){camera.position.x+=(rnd()-.5)*shake;camera.position.y+=(rnd()-.5)*shake*.6;}
       }
     }
-    const map=$('minimap'),ctx=map.getContext('2d');
-    function drawMap(){
-      const w=210,s=w/640,px=x=>(x+320)*s,pz=z=>(z+320)*s;
-      ctx.fillStyle='#173a45';ctx.fillRect(0,0,w,w);ctx.fillStyle='#2e4948';ctx.fillRect(px(-300),pz(-300),600*s,600*s);
-      ctx.fillStyle='#567269';ctx.fillRect(px(260),pz(-300),40*s,600*s);ctx.fillStyle='#173a45';ctx.fillRect(px(106),pz(-300),26*s,600*s);
-      ctx.strokeStyle='#7a8780';ctx.lineWidth=2.7;world.roads.forEach(r=>{ctx.beginPath();ctx.moveTo(px(-295),pz(r));ctx.lineTo(px(295),pz(r));ctx.moveTo(px(r),pz(-295));ctx.lineTo(px(r),pz(295));ctx.stroke();});
-      ctx.fillStyle='#3f7a5a';world.parks.forEach(p=>ctx.fillRect(px(p.x-26),pz(p.z-27),52*s,54*s));
-      ctx.fillStyle='#5b6c70';world.lots.forEach(l=>ctx.fillRect(px(l.x-10),pz(l.z-9),20*s,18*s));
-      ctx.fillStyle='#405957';world.buildings.forEach(b=>ctx.fillRect(px(b.minX),pz(b.minZ),(b.maxX-b.minX)*s,(b.maxZ-b.minZ)*s));
-      ctx.strokeStyle='#e7b53c';ctx.lineWidth=1.4;world.alleys.forEach(a=>{ctx.beginPath();ctx.moveTo(px(a.x),pz(a.z-a.half));ctx.lineTo(px(a.x),pz(a.z+a.half));ctx.stroke();});
-      if(police.level>0){ctx.fillStyle='#e1876c22';ctx.beginPath();ctx.arc(px(police.lastSeen.x),pz(police.lastSeen.z),40*s,0,Math.PI*2);ctx.fill();}
-      // While searching, each unit shows the cone it can see.
-      if(police.state==='search')police.units.forEach(p=>{if(!p.respond)return;const x=p.foot?p.fx:p.x,z=p.foot?p.fz:p.z,a=Math.PI/2-(p.foot?p.fh:p.heading);ctx.fillStyle='#6fb6ff55';ctx.beginPath();ctx.moveTo(px(x),pz(z));ctx.arc(px(x),pz(z),45*s,a-1.05,a+1.05);ctx.closePath();ctx.fill();});
-      police.units.forEach(p=>{ctx.fillStyle=p.respond?'#ff8a6d':'#7da2b4';ctx.fillRect(px(p.x)-2,pz(p.z)-2,4,4);if(p.foot)ctx.fillRect(px(p.fx)-1,pz(p.fz)-1,2,2);});
-      ctx.fillStyle='#ffd23f';callers.forEach(w=>{ctx.beginPath();ctx.arc(px(w.x),pz(w.z),2.5,0,Math.PI*2);ctx.fill();});
-      ctx.fillStyle='#ffa24a';ctx.fillRect(px(cfg.garage.x)-3,pz(cfg.garage.z)-3,6,6);
-      const m=target();ctx.strokeStyle='#8de3cf';ctx.lineWidth=2;if(m){ctx.beginPath();ctx.arc(px(m.x),pz(m.z),5,0,Math.PI*2);ctx.stroke();}else cfg.deliveries.forEach(d=>{ctx.beginPath();ctx.arc(px(d.px),pz(d.pz),2.5,0,Math.PI*2);ctx.stroke();});
-      ctx.save();ctx.translate(px(player.x),pz(player.z));ctx.rotate(-player.heading);ctx.fillStyle='#fff1cf';ctx.beginPath();ctx.moveTo(0,5);ctx.lineTo(-3.5,-3.5);ctx.lineTo(3.5,-3.5);ctx.closePath();ctx.fill();ctx.restore();
+    const map=$('minimap'),largeMap=$('largeMap');
+    function paintMap(canvas,large){
+      const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height,sx=w/640,sz=h/640,px=x=>(x+320)*sx,pz=z=>(z+320)*sz;
+      ctx.fillStyle='#173a45';ctx.fillRect(0,0,w,h);ctx.fillStyle='#2e4948';ctx.fillRect(px(-300),pz(-300),600*sx,600*sz);
+      ctx.fillStyle='#d8c58f';ctx.fillRect(px(260),pz(-300),40*sx,600*sz);ctx.fillStyle='#173a45';ctx.fillRect(px(106),pz(-300),26*sx,600*sz);
+      ctx.strokeStyle='#7a8780';ctx.lineWidth=large?5:2.7;world.roads.forEach(r=>{ctx.beginPath();ctx.moveTo(px(-295),pz(r));ctx.lineTo(px(295),pz(r));ctx.moveTo(px(r),pz(-295));ctx.lineTo(px(r),pz(295));ctx.stroke();});
+      ctx.fillStyle='#3f7a5a';world.parks.forEach(p=>ctx.fillRect(px(p.x-26),pz(p.z-27),52*sx,54*sz));
+      ctx.fillStyle='#405957';world.buildings.forEach(b=>ctx.fillRect(px(b.minX),pz(b.minZ),(b.maxX-b.minX)*sx,(b.maxZ-b.minZ)*sz));
+      ctx.strokeStyle='#e7b53c';ctx.lineWidth=large?3:1.4;world.alleys.forEach(a=>{ctx.beginPath();ctx.moveTo(px(a.x),pz(a.z-a.half));ctx.lineTo(px(a.x),pz(a.z+a.half));ctx.stroke();});
+      if(routePoints.length>1){ctx.strokeStyle='#8de3cf';ctx.lineWidth=large?7:3;ctx.lineJoin='round';ctx.beginPath();routePoints.forEach((p,i)=>i?ctx.lineTo(px(p.x),pz(p.z)):ctx.moveTo(px(p.x),pz(p.z)));ctx.stroke();}
+      if(police.level>0){ctx.fillStyle='#e1876c22';ctx.beginPath();ctx.arc(px(police.lastSeen.x),pz(police.lastSeen.z),40*Math.min(sx,sz),0,Math.PI*2);ctx.fill();}
+      if(police.state==='search')police.units.forEach(p=>{if(!p.respond)return;const x=p.foot?p.fx:p.x,z=p.foot?p.fz:p.z,a=Math.PI/2-(p.foot?p.fh:p.heading);ctx.fillStyle='#6fb6ff55';ctx.beginPath();ctx.moveTo(px(x),pz(z));ctx.arc(px(x),pz(z),45*Math.min(sx,sz),a-1.05,a+1.05);ctx.closePath();ctx.fill();});
+      police.units.forEach(p=>{ctx.fillStyle=p.respond?'#ff8a6d':'#7da2b4';ctx.fillRect(px(p.x)-2,pz(p.z)-2,4,4);});
+      const markers=Object.values(cfg.landmarks);markers.forEach(point=>{ctx.fillStyle=point.id==='garage'?'#ffa24a':'#ff805b';ctx.beginPath();ctx.arc(px(point.x),pz(point.z),large?6:2.5,0,Math.PI*2);ctx.fill();if(large&&['radio','market','garage','pier'].includes(point.id)){ctx.fillStyle='#fff1cf';ctx.font='bold 12px sans-serif';ctx.fillText(point.name,px(point.x)+9,pz(point.z)-7);}});
+      ctx.fillStyle='#ffd23f';callers.forEach(person=>{ctx.beginPath();ctx.arc(px(person.x),pz(person.z),large?5:2.5,0,Math.PI*2);ctx.fill();});
+      const m=target();ctx.strokeStyle='#8de3cf';ctx.lineWidth=large?5:2;if(m){ctx.beginPath();ctx.arc(px(m.x),pz(m.z),large?11:5,0,Math.PI*2);ctx.stroke();}
+      ctx.save();ctx.translate(px(player.x),pz(player.z));ctx.rotate(-player.heading);ctx.fillStyle='#fff1cf';ctx.beginPath();ctx.moveTo(0,large?10:5);ctx.lineTo(large?-7:-3.5,large?-7:-3.5);ctx.lineTo(large?7:3.5,large?-7:-3.5);ctx.closePath();ctx.fill();ctx.restore();
+      if(large){ctx.fillStyle='#fff1cf';ctx.font='bold 15px sans-serif';ctx.fillText('CENTRO SOLAR',px(-190),pz(-245));ctx.fillText('CANAL DAS GARÇAS',px(92),pz(285));ctx.fillText('PRAIA AURORA',px(205),pz(-270));}
     }
+    function drawMap(){paintMap(map,false);}
+    function drawLargeMap(){paintMap(largeMap,true);}
+    function openMap(){if(!['play','pause'].includes(mode))return;mapReturn=mode==='pause'?'pause':'play';setMode('map');drawLargeMap();}
+    function chooseRoute(x,z){routeDestination={x:clamp(x,-295,295),z:clamp(z,-295,295)};routePoints=BN.Navigation.route(player,routeDestination,world.roads);toast('Destino marcado · rota pelas ruas e pontes');drawLargeMap();}
     function updateHud(){
       $('district').textContent=world.getDistrict?world.getDistrict(player.x,player.z):'Baía Neon';
       $('clock').textContent=String(Math.floor(hour)).padStart(2,'0')+'h'+String(Math.floor(hour%1*60)).padStart(2,'0')+' · '+(rain>.35?'Chuva tropical':night>.5?'Noite na baía':'Céu aberto');
@@ -1468,23 +1883,44 @@ BN.CONFIG = Object.freeze({
       $('arsenal').textContent=player.car?'DANO DO CARRO · '+Math.round(Math.min(100,player.car.damage))+'%':(player.reload>0?'RECARREGANDO':'PISTOLA '+player.ammo+'/'+player.reserve)+' · GRANADAS '+player.grenades;$('aim').style.opacity=player.car?0:1;
       $('healthValue').textContent=Math.max(0,Math.ceil(player.health));$('healthFill').style.width=clamp(player.health,0,100)+'%';
       const m=target(),distance=m?dist(player,m):Infinity;
-      $('missionDistance').textContent=!job?'Oficina a '+Math.round(dist(player,cfg.garage))+' m · quadrado laranja no mapa':job.stage==='pickup'?'Retirada a '+Math.round(distance)+' m':'Entrega a '+Math.round(distance)+' m · '+({perishable:'qualidade',fragile:'integridade',smooth:'suavidade'}[job.def.kind])+' '+Math.round(job.cargo)+'%'+(job.def.kind==='perishable'?' · '+Math.max(0,Math.ceil(job.limit*(job.cargo/100)*(upgrades.cargo?1.25:1)))+' s':'');
+      if(job)$('missionDistance').textContent=job.stage==='pickup'?'Retirada a '+Math.round(distance)+' m':'Destino a '+Math.round(distance)+' m · '+({perishable:'qualidade',fragile:'integridade',smooth:'conforto'}[job.def.kind])+' '+Math.round(job.cargo)+'%'+(job.def.kind==='perishable'?' · '+Math.max(0,Math.ceil(job.limit*(job.cargo/100)*(upgrades.cargo?1.25:1)))+' s':'');
+      else if(activeRace)$('missionDistance').textContent='Checkpoint a '+Math.round(distance)+' m · recorde salvo por veículo';
+      else if(campaign.objective())$('missionDistance').textContent=(campaign.objective().failed?'Y para repetir':'Próxima ação a '+Math.round(distance)+' m')+' · reputação '+reputation;
+      else $('missionDistance').textContent='Oficina a '+Math.round(dist(player,cfg.garage))+' m · L inicia um contrarrelógio';
       let interaction='';if(player.car&&Math.abs(player.car.speed)<4)interaction='E para sair do carro';else if(!player.car&&cars.some(c=>!c.wreck&&dist(c,player)<6&&Math.abs(c.speed)<5))interaction='E para entrar no carro';
-      if(distance<10)interaction=!player.car?'A carga vai de carro':job.stage==='pickup'?'Pare dentro do círculo para carregar':player.car!==job.car?'A carga está no outro carro':police.level>0?'Despiste a polícia antes da entrega':'Pare dentro do círculo para entregar';
+      if(distance<10&&job)interaction=!player.car?'Este serviço exige um carro':job.stage==='pickup'?'Pare dentro do círculo para embarcar ou carregar':player.car!==job.car?'O serviço está no outro carro':police.level>0?'Despiste a polícia antes da conclusão':'Pare dentro do círculo para concluir';
+      else if(distance<10&&activeRace)interaction='Atravesse o checkpoint na ordem indicada';
+      else if(distance<10&&campaign.objective())interaction=campaign.objective().failed?'Y para repetir do checkpoint':!player.car&&campaign.step()&&campaign.step().requiresCar?'Entre num carro para continuar':'Pare no marcador coral';
       if(nearGarage())interaction='ENTER para abrir a oficina';
       show('interaction',Boolean(interaction));$('interaction').textContent=interaction;drawMap();
     }
+    function download(name,blob){const link=document.createElement('a'),url=URL.createObjectURL(blob);link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+    function exportSave(){download('baia-neon-progresso-v'+cfg.version+'.json',new Blob([BN.Save.exportProgress(progressData(),build)],{type:'application/json'}));toast('Progresso exportado. Guarde o arquivo em local seguro.');}
+    function importSaveFile(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const imported=BN.Save.importProgress(String(reader.result),catalogues);BN.Save.persist(localStorage,imported);toast('Progresso validado e importado. Recarregando…');setTimeout(()=>location.reload(),500);}catch(error){toast(error.message);}};reader.readAsText(file);}
+    function openPhoto(){if(!['play','pause'].includes(mode))return;photoReturn=mode==='pause'?'pause':'play';photoClean=false;document.body.classList.remove('photo-clean');setMode('photo');}
+    function closePhoto(){document.body.classList.remove('photo-clean');photoClean=false;setMode(photoReturn);}
+    function capturePhoto(){const finish=blob=>{if(blob)download('baia-neon-'+Date.now()+'.png',blob);toast('Captura salva no computador.');};if(canvas.toBlob)canvas.toBlob(finish,'image/png');else finish(null);}
     $('skipIntro').onclick=endIntro;$('play').onclick=play;$('replayIntro').onclick=()=>{introTime=0;setMode('intro');};
     $('resume').onclick=()=>setMode('play');$('backMenu').onclick=()=>{menuStats();setMode('menu');};$('menuHelp').onclick=help;$('pauseHelp').onclick=help;
+    $('openMapPause').onclick=openMap;$('closeMap').onclick=()=>setMode(mapReturn);largeMap.onclick=e=>{const rect=largeMap.getBoundingClientRect();chooseRoute((e.clientX-rect.left)/rect.width*640-320,(e.clientY-rect.top)/rect.height*640-320);};
+    $('photoFromPause').onclick=openPhoto;$('closePhoto').onclick=closePhoto;$('capturePhoto').onclick=capturePhoto;$('togglePhotoHud').onclick=()=>{photoClean=!photoClean;document.body.classList.toggle('photo-clean',photoClean);};
+    $('toggleCameraMotion').textContent='MOVIMENTO DE CÂMERA: '+(cameraMotion?'LIGADO':'DESLIGADO');$('toggleCameraMotion').onclick=()=>{cameraMotion=!cameraMotion;$('toggleCameraMotion').textContent='MOVIMENTO DE CÂMERA: '+(cameraMotion?'LIGADO':'DESLIGADO');save();};
+    $('exportSave').onclick=exportSave;$('importSave').onclick=()=>$('importSaveFile').click();$('importSaveFile').onchange=e=>importSaveFile(e.target.files&&e.target.files[0]);
     $('closeGarage').onclick=()=>setMode('play');$('garageList').onclick=e=>{const b=e.target&&e.target.closest?e.target.closest('button'):null;if(b)garageBuy(Number(b.getAttribute('data-i')));};
     $('closeHelp').onclick=()=>setMode(helpReturn);$('sound').onclick=()=>{$('sound').textContent=audio.toggle()?'SOM LIGADO':'SOM DESLIGADO';};
     window.addEventListener('keydown',e=>{
       if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
       if(e.repeat){if(mode==='play')keys.add(e.code);return;}
-      if(e.code==='Escape'){if(mode==='intro')endIntro();else if(mode==='help')setMode(helpReturn);else if(mode==='garage')setMode('play');else togglePause();return;}
+      if(e.code==='Escape'){if(mode==='intro')endIntro();else if(mode==='help')setMode(helpReturn);else if(mode==='garage')setMode('play');else if(mode==='map')setMode(mapReturn);else if(mode==='photo')closePhoto();else togglePause();return;}
+      if(mode==='photo'){if(e.code==='KeyP')closePhoto();if(e.code==='ArrowLeft')orbitYaw+=.12;if(e.code==='ArrowRight')orbitYaw-=.12;if(e.code==='ArrowUp')orbitPitch=clamp(orbitPitch-.08,.1,1.1);if(e.code==='ArrowDown')orbitPitch=clamp(orbitPitch+.08,.1,1.1);return;}
       if(mode!=='play')return;keys.add(e.code);
       if(e.code==='KeyE')enterExit();
       if(e.code==='KeyH')help();
+      if(e.code==='KeyM')openMap();
+      if(e.code==='KeyP')openPhoto();
+      if(e.code==='KeyL')startRace();
+      if(e.code==='KeyY')applyCampaignEvent(campaign.retry());
+      if(e.code==='KeyX'&&campaign.definition()&&campaign.definition().id==='carro-radio'&&campaign.step()&&campaign.step().target==='regular-lot'&&dist(player,cfg.landmarks.regularLot)<10){const event=campaign.arrive('regular-lot',{hasCar:Boolean(player.car),balance,ignoreCost:true});crime('radio_car_theft');applyCampaignEvent(event);}
       if(e.code==='KeyR')reload();
       if(e.code==='Enter')openGarage();
       if(/^Digit[1-3]$/.test(e.code))acceptJob(Number(e.code.slice(5))-1);
@@ -1496,7 +1932,7 @@ BN.CONFIG = Object.freeze({
     window.addEventListener('keyup',e=>keys.delete(e.code));
     window.addEventListener('blur',()=>{if(BN.debug&&BN.debug.keepFocus)return;keys.clear();dragging=false;if(mode==='play')setMode('pause');});
     document.addEventListener('visibilitychange',()=>{if(BN.debug&&BN.debug.keepFocus)return;if(document.hidden&&mode==='play')setMode('pause');});
-    canvas.addEventListener('pointerdown',e=>{if(mode!=='play')return;dragging=true;lastPointer={x:e.clientX,y:e.clientY};downPointer={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);});
+    canvas.addEventListener('pointerdown',e=>{if(!['play','photo'].includes(mode))return;dragging=true;lastPointer={x:e.clientX,y:e.clientY};downPointer={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);});
     canvas.addEventListener('pointermove',e=>{if(!dragging)return;orbitYaw-=(e.clientX-lastPointer.x)*.006;orbitPitch=clamp(orbitPitch+(e.clientY-lastPointer.y)*.003,.1,1.1);lastPointer={x:e.clientX,y:e.clientY};});
     // Left click fires. Dragging with any button turns the camera, and the right button never fires.
     canvas.addEventListener('pointerup',e=>{const click=dragging&&e.button===0&&Math.hypot(e.clientX-downPointer.x,e.clientY-downPointer.y)<6;dragging=false;if(click)fire();});canvas.addEventListener('contextmenu',e=>e.preventDefault());
@@ -1513,7 +1949,7 @@ BN.CONFIG = Object.freeze({
         $('wastedText').style.opacity=k;$('wastedText').style.transform='scale('+(1.7-.7*k).toFixed(3)+')';
         if(deathTime>(ending==='busted'?5:7))respawn();
       }
-      if(mode!=='pause'&&mode!=='help'&&mode!=='garage'){
+      if(!['pause','help','garage','map','photo'].includes(mode)){
         elapsed+=dt;weather(dt);updateFx(dt);$('vignette').classList.toggle('hit',hitFlash>0);
         if(mode==='intro'){introTime+=dt;$('introProgress').style.width=clamp(introTime/cfg.introDuration*100,0,100)+'%';
           const part=Math.floor(introTime/6);const captions=[['O SOL SE PÕE. A CIDADE ACORDA.','Todo mundo tem<br>um plano por aqui.'],['NEM TODO ATALHO TERMINA BEM.','Alguns planos<br>vêm com sirenes.'],['UMA CIDADE PEQUENA. UMA NOITE LONGA.','Bem-vindo<br>à Baía Neon.']];
@@ -1528,11 +1964,11 @@ BN.CONFIG = Object.freeze({
           policeFire(dt);updateCalls(dt);updateOfficers();updateCash(dt);
           for(const p of police.units.slice()){
             p.mesh.visible=dist(p,player)<180;carWear(p,dt);
-            if(p.damage>=100){if(p.officer)scene.remove(p.officer);burn(p.mesh);p.mesh.visible=true;wrecks.push({mesh:p.mesh,t:40});police.destroy(p);explode(p.x,p.z,p.byPlayer,9);if(p.byPlayer)crime('Viatura destruída',4,true);continue;}
-            if(player.car&&dist(p,player)<3.2&&Math.abs(player.car.speed)>6&&collisionCooldown===0){crime('Colisão com viatura',2,true);cargoHit(Math.abs(player.car.speed));p.damage+=14;p.byPlayer=true;player.car.damage+=10;sparks(p.x,p.z,12);player.car.speed*=-.25;hurt(7,'batida em viatura');collisionCooldown=2;audio.impact();}
+            if(p.damage>=100){if(p.officer)scene.remove(p.officer);burn(p.mesh);p.mesh.visible=true;wrecks.push({mesh:p.mesh,t:40});police.destroy(p);explode(p.x,p.z,p.byPlayer,9);if(p.byPlayer)crime('police_destroyed',true);continue;}
+            if(player.car&&dist(p,player)<3.2&&Math.abs(player.car.speed)>6&&collisionCooldown===0){crime('police_collision',true);cargoHit(Math.abs(player.car.speed));p.damage+=14;p.byPlayer=true;player.car.damage+=10;sparks(p.x,p.z,12);player.car.speed*=-.25;hurt(7,'batida em viatura');collisionCooldown=2;audio.impact();}
             else if(!player.car&&p.speed>8&&dist(p,player)<2.3&&player.invincible===0){hurt(24,'atropelamento por viatura');player.invincible=1.2;player.stun=.8;spray(player.x,player.z,8);audio.impact();}
           }
-          updateJob(dt);
+          updateJob(dt);updateCampaign(dt);updateRace(dt);
           hudTimer-=dt;if(hudTimer<=0){updateHud();hudTimer=.1;}
         }else{updateTraffic(dt,false);updatePeds(dt,false);}
         garageMark.scale.setScalar(1+Math.sin(elapsed*2+1)*.03);diamond.rotation.y+=dt;diamond.position.y=4+Math.sin(elapsed*2)*.25;ring.scale.setScalar(1+Math.sin(elapsed*2)*.04);
@@ -1540,19 +1976,32 @@ BN.CONFIG = Object.freeze({
       updateCamera(dt);
       audio.update(dt,{driving:Boolean(player.car),speed:player.car?player.car.speed:0,siren:police.level>0&&police.units.some(p=>dist(p,player)<80),playing:mode==='play',rain:mode==='pause'?0:rain,cinematic:mode==='intro'||mode==='menu'});
       if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('toast').classList.remove('show');}
+      if(dialogueTime>0){dialogueTime-=dt;if(dialogueTime<=0)show('dialogue',false);}
       renderer.render(scene,camera);
       frameCount++;fpsAccum+=dt;if(fpsAccum>3){measuredFPS=frameCount/fpsAccum;frameCount=0;fpsAccum=0;if(measuredFPS<28&&quality==='normal'){renderer.setPixelRatio(1);renderer.shadowMap.enabled=false;quality='leve';}}
     }
     requestAnimationFrame(frame);
     // Development helpers are exposed only for local acceptance runs.
     if(new URLSearchParams(location.search).get('test')==='1')BN.debug={
-      getState:()=>({mode,hour,night,rain,rainTarget,quality,fps:measuredFPS,player:{x:player.x,z:player.z,health:player.health,driving:!!player.car,speed:player.speed,grenades:player.grenades},police:{state:police.state,level:police.level,visible:police.visible,search:police.search,capture:police.capture,lastSeen:{...police.lastSeen}},missionIndex,balance,completed,crimes:crimeCount,job:job?{stage:job.stage,cargo:job.cargo,kind:job.def.kind}:null,counts:{cars:cars.length,pedestrians:peds.length,police:police.units.length,...world.counts},render:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles}}),
+      getState:()=>({mode,hour,night,rain,rainTarget,quality,fps:measuredFPS,player:{x:player.x,z:player.z,health:player.health,driving:!!player.car,speed:player.speed,grenades:player.grenades},police:{state:police.state,level:police.level,visible:police.visible,search:police.search,capture:police.capture,lastSeen:{...police.lastSeen}},missionIndex,balance,completed,reputation,crimes:crimeCount,campaign:{...campaign.state},race:activeRace?{id:activeRace.def.id,checkpoint:activeRace.checkpoint,time:activeRace.time}:null,job:job?{stage:job.stage,cargo:job.cargo,kind:job.def.kind}:null,counts:{cars:cars.length,pedestrians:peds.length,police:police.units.length,...world.counts},render:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles}}),
       teleport:(x,z)=>{player.x=x;player.z=z;if(player.car){player.car.x=x;player.car.z=z;player.car.speed=0;}human.position.set(x,0,z);},
-      setHour:h=>hour=h,setRain:r=>{rain=rainTarget=r;weatherTimer=100;},crime:()=>crime('Ocorrência de teste',2,true),witnessCrime:()=>crime('Ocorrência de teste',2),clearPolice:()=>{police.reset();peds.concat(cars).forEach(w=>w.call=null);},
-      fire,throwGrenade,explode,hurt,setYaw:a=>orbitYaw=a,acceptJob,getJob:()=>job,getResult:()=>lastResult,openGarage,garageBuy,garageItems:()=>garageList,upgrades,VEHICLES,setCarType,setBalance:v=>{balance=v;},reload,
+      setHour:h=>hour=h,setRain:r=>{rain=rainTarget=r;weatherTimer=100;},crime:()=>crime('test',true),witnessCrime:()=>crime('test'),clearPolice:()=>{police.reset();peds.concat(cars).forEach(w=>w.call=null);},
+      fire,throwGrenade,explode,hurt,setYaw:a=>orbitYaw=a,acceptJob,getJob:()=>job,getResult:()=>lastResult,openGarage,garageBuy,garageItems:()=>garageList,upgrades,VEHICLES,setCarType,setBalance:v=>{balance=v;},setReputation:v=>{reputation=v;},reload,campaign,updateCampaign,startRace,updateRace,getRoute:()=>routePoints,chooseRoute,save,progressData,
       putPedestrianAhead:()=>{const p=peds[0],c=player.car||player;p.frozen=true;p.dead=false;p.health=100;p.panic=0;p.mesh.rotation.set(0,0,0);p.x=c.x+Math.sin(c.heading)*9;p.z=c.z+Math.cos(c.heading)*9;p.speed=0;p.down=0;p.hitCooldown=0;p.mesh.position.set(p.x,0,p.z);return {x:p.x,z:p.z};},
       keepFocus:false,step:(seconds,dt=1/60)=>{for(let t=0;t<seconds;t+=dt)tick(dt);},press:(code,down=true)=>{if(down)keys.add(code);else keys.delete(code);},enterExit,getMode:()=>mode,skipIntro:endIntro,world,police,player,cars,peds,renderer,scene,camera
     };
+    const params=new URLSearchParams(location.search),captureScene=params.get('capture'),acceptanceScene=params.get('acceptance');
+    if(captureScene&&BN.debug){tutorialSeen=true;endIntro();play();$('toast').classList.remove('show');toastTime=0;if(captureScene==='night'){hour=22;rain=rainTarget=1;BN.debug.teleport(280,-110);orbitYaw=0;}else{hour=17.5;rain=rainTarget=0;BN.debug.teleport(240,80);orbitYaw=Math.PI;}for(let i=0;i<180;i++)tick(1/60);}
+    if(acceptanceScene&&BN.debug){
+      tutorialSeen=true;endIntro();play();BN.debug.teleport(starterCar.x,starterCar.z+3);enterExit();
+      const go=id=>{const place=Object.values(cfg.landmarks).find(item=>item.id===id);BN.debug.teleport(place.x,place.z);if(player.car)player.car.speed=player.car.lat=0;missionCooldown=0;applyCampaignEvent(campaign.arrive(id,{hasCar:Boolean(player.car),balance}));missionCooldown=0;};
+      go('presenter');go('radio');go('regular-lot');go('radio');go('archive-beach');go('archive-north');go('radio');go('technician');
+      applyCampaignEvent(campaign.fail('ensaio de falha'));applyCampaignEvent(campaign.retry());go('antenna');go('radio');go('market');go('pier');
+      startRace();for(const point of cfg.races[0].points){BN.debug.teleport(point[0],point[1]);updateRace(.2);}
+      chooseRoute(-240,240);BN.debug.teleport(cfg.garage.x,cfg.garage.z);openGarage();const brakeIndex=garageList.findIndex(item=>item.label.includes('Freios'));if(brakeIndex>=0)garageBuy(brakeIndex);$('closeGarage').onclick();save();
+      const restored=BN.Save.load(localStorage,catalogues).data,report={campaignStatus:campaign.state.status,missions:campaign.state.completed.length,rewards:campaign.state.rewarded.length,failedRetries:campaign.state.delays,balance,reputation,routeSegments:routePoints.length,raceRecords:Object.keys(raceRecords).length,brakes:upgrades.brakes,savedCampaign:restored.campaign.status,schemaVersion:restored.schemaVersion};
+      const pre=document.createElement('pre');pre.id='acceptance-report';pre.textContent='ACEITE V03\n'+JSON.stringify(report,null,2);Object.assign(pre.style,{position:'fixed',inset:'40px',zIndex:'200',padding:'28px',margin:'0',background:'#101d26',color:'#8de3cf',font:'18px/1.5 monospace',whiteSpace:'pre-wrap'});document.body.appendChild(pre);document.title='ACCEPTANCE '+JSON.stringify(report);
+    }
   }catch(error){fatal(error);}
 })();
 
