@@ -2,6 +2,14 @@
 
 Kit local para continuar um jogo 3D no Fable 5.2. Inclui prompt, protótipo, código, texturas, modelos, sons e geradores. A cidade é fictícia, com praia, canal e arquitetura costeira em uma área de cerca de 600 por 600 metros.
 
+## Jogar no navegador
+
+**https://iosbilario.github.io/baia-neon/**
+
+Funciona em computador, com teclado e mouse, em navegador com WebGL. O site precisa de conexão para carregar. Para jogar sem internet, baixe [JOGAR_OFFLINE.html](https://iosbilario.github.io/baia-neon/JOGAR_OFFLINE.html) e abra o arquivo no navegador.
+
+A publicação usa o GitHub Pages direto da branch `main`, pasta raiz, sem etapa de compilação. Todo push na `main` republica o site em cerca de um minuto. Depois de editar os fontes, rode `python3 tools/package.py` antes do commit para que a versão única acompanhe o site.
+
 ## Começar
 
 1. Extraia todo o ZIP.
