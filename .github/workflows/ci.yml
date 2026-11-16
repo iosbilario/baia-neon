@@ -1,0 +1,37 @@
+name: Validação
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testar lógica e integração
+        run: |
+          node tests/police.test.js
+          node tests/integration.test.js
+          node tests/v03.test.js
+      - name: Gerar e auditar pacote offline
+        run: |
+          python3 tools/package.py
+          python3 tools/audit_offline.py
+          python3 tests/release.test.py
+      - name: Confirmar pacote reproduzível no repositório
+        run: git diff --exit-code -- JOGAR_OFFLINE.html

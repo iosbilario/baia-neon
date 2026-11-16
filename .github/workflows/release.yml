@@ -1,0 +1,169 @@
+name: Publicar release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Versão sem o prefixo v
+        required: true
+        type: string
+      target_sha:
+        description: SHA completo aprovado
+        required: true
+        type: string
+      prerelease:
+        description: Publicar como candidata
+        required: true
+        default: true
+        type: boolean
+      deploy_pages:
+        description: Publicar esta distribuição no Pages
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: baia-neon-release
+  cancel-in-progress: false
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.target.outputs.sha }}
+      tag: ${{ steps.target.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_sha }}
+          fetch-depth: 0
+      - id: target
+        name: Resolver uma vez o SHA e a tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha="$(git rev-parse HEAD)"
+          test "$sha" = "${{ inputs.target_sha }}"
+          version="${{ inputs.version }}"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]]
+          if ${{ inputs.prerelease }}; then [[ "$version" == *-rc.* ]]; else [[ "$version" != *-rc.* ]]; fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Executar critérios automatizados
+        run: |
+          node tests/police.test.js
+          node tests/integration.test.js
+          node tests/v03.test.js
+          python3 tools/package.py
+          python3 tools/audit_offline.py
+          python3 tests/release.test.py
+          git diff --exit-code -- JOGAR_OFFLINE.html
+      - name: Exigir o mesmo SHA aprovado da candidata para a estável
+        if: ${{ !inputs.prerelease }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="v${{ inputs.version }}"
+          rc_tag="$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,isPrerelease --jq '[.[] | select(.isPrerelease and (.tagName | startswith("'"$base"'-rc.")))] | sort_by(.tagName) | last | .tagName // empty')"
+          test -n "$rc_tag"
+          rc_sha="$(git rev-list -n 1 "$rc_tag")"
+          test "$rc_sha" = "${{ steps.target.outputs.sha }}"
+      - name: Gerar a distribuição uma única vez
+        run: python3 tools/release.py --version "${{ inputs.version }}" --tag "${{ steps.target.outputs.tag }}" --sha "${{ steps.target.outputs.sha }}" --out dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ steps.target.outputs.tag }}
+          path: |
+            dist/baia-neon-*-web.zip
+            dist/baia-neon-*-offline.html
+            dist/baia-neon-*-offline.zip
+            dist/SHA256SUMS.txt
+            dist/build-info.json
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    needs: build-and-validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-${{ needs.build-and-validate.outputs.tag }}
+          path: dist
+      - name: Criar tag explícita no SHA validado
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ needs.build-and-validate.outputs.tag }}"
+          sha="${{ needs.build-and-validate.outputs.sha }}"
+          existing="$(git ls-remote origin "refs/tags/$tag" | cut -f1)"
+          if test -n "$existing"; then test "$(git rev-list -n 1 "$existing")" = "$sha"; else git tag "$tag" "$sha" && git push origin "refs/tags/$tag"; fi
+      - name: Criar rascunho, conferir anexos e publicar
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ needs.build-and-validate.outputs.tag }}"
+          notes="docs/release-notes/${{ inputs.version }}.md"
+          test -f "$notes"
+          assets=(dist/baia-neon-*-web.zip dist/baia-neon-*-offline.html dist/baia-neon-*-offline.zip dist/SHA256SUMS.txt dist/build-info.json)
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            mkdir verify
+            gh release download "$tag" --repo "$GITHUB_REPOSITORY" --dir verify
+            for asset in "${assets[@]}"; do cmp "$asset" "verify/$(basename "$asset")"; done
+          else
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --draft --verify-tag --title "Baía Neon $tag — Última Frequência" --notes-file "$notes" "${assets[@]}"
+          fi
+          count="$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets | length')"
+          test "$count" -eq 5
+          if ${{ inputs.prerelease }}; then gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false --prerelease; else gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false --prerelease=false --latest; fi
+
+  prepare-pages:
+    if: ${{ !inputs.prerelease && inputs.deploy_pages }}
+    needs: [build-and-validate, release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar exatamente a distribuição web da release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ needs.build-and-validate.outputs.tag }}"
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern 'baia-neon-*-web.zip' --pattern SHA256SUMS.txt
+          archive="$(find . -maxdepth 1 -name 'baia-neon-*-web.zip' -print -quit)"
+          grep "  $(basename "$archive")$" SHA256SUMS.txt | shasum -a 256 -c -
+          mkdir site
+          unzip -q "$archive" -d site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy-pages:
+    if: ${{ !inputs.prerelease && inputs.deploy_pages }}
+    needs: prepare-pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar sem permitir sobreposição antiga
+        id: deployment
+        uses: actions/deploy-pages@v4
