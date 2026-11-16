@@ -5,6 +5,7 @@
 | Código em src/, interface e ferramentas | Criado para este kit com assistência de IA | MIT |
 | Texturas, modelos, áudio, ícone e prancha | Geração procedural original em tools/generate_assets.py | CC0-1.0 |
 | Geometrias e áudio gerados em execução | Código original do kit | Recursos sob CC0-1.0 e código sob MIT |
+| Capturas em assets/release/ | Renderização local do próprio jogo nos SHAs v0.2.0 e v0.3.0 | MIT |
 | Three.js r160 | Repositório oficial mrdoob/three.js | MIT, aviso preservado |
 
 O motor foi obtido em 16 de novembro de 2026 a partir da versão fixa r160 do repositório oficial. Esta versão foi escolhida por oferecer um arquivo clássico autossuficiente para abertura local. Não se trata de uma afirmação de que seja a versão mais recente.

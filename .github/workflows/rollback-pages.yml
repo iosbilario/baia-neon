@@ -1,0 +1,51 @@
+name: Recuperar versão do Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release estável anterior sem o prefixo v
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: baia-neon-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar e validar a distribuição publicada
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ inputs.version }}"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          tag="v$version"
+          test "$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isPrerelease --jq .isPrerelease)" = false
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern "baia-neon-$version-web.zip" --pattern SHA256SUMS.txt --pattern build-info.json
+          grep "  baia-neon-$version-web.zip$" SHA256SUMS.txt | shasum -a 256 -c -
+          test "$(jq -r .channel build-info.json)" = stable
+          mkdir site
+          unzip -q "baia-neon-$version-web.zip" -d site
+          printf '{"deployedVersion":"%s","sourceRelease":"%s","deployedAt":"%s"}\n' "$version" "$tag" "$(date -u +%FT%TZ)" > site/deployment-info.json
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+  deploy:
+    needs: prepare
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

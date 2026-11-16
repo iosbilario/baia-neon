@@ -2,13 +2,14 @@
 (function () {
   'use strict';
   BN.Audio = class {
-    constructor() { this.enabled = false; this.ctx = null; this.musicTimer = 0; this.step = 0; }
+    constructor() { this.enabled = false; this.ctx = null; this.musicTimer = 0; this.step = 0; this.volume = 0.3; }
+    setVolume(value) { this.volume = Math.max(0, Math.min(1, Number(value) || 0)); if (this.ctx) this.master.gain.setTargetAtTime(this.enabled ? this.volume : 0, this.ctx.currentTime, 0.1); }
     toggle() {
       if (!this.ctx) this.init();
       this.enabled = !this.enabled;
       if (this.ctx) {
         this.ctx.resume().catch(function () {});
-        this.master.gain.setTargetAtTime(this.enabled ? 0.3 : 0, this.ctx.currentTime, 0.15);
+        this.master.gain.setTargetAtTime(this.enabled ? this.volume : 0, this.ctx.currentTime, 0.15);
       }
       return this.enabled;
     }

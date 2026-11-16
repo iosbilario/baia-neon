@@ -33,7 +33,8 @@ for name in ['index.html', 'JOGAR_OFFLINE.html']:
     if name == 'JOGAR_OFFLINE.html':
         assert all(ref.startswith('data:') for ref in parser.refs), 'standalone file has resource dependency'
         scripts = re.findall(r'<script>([\s\S]*?)</script>', html)
-        assert len(scripts) == 6, len(scripts)
+        source_count = len(re.findall(r'<script src="[^"]+"></script>', (ROOT / 'index.html').read_text(encoding='utf-8')))
+        assert len(scripts) == source_count, (len(scripts), source_count)
         for script in scripts:
             digest = base64.b64encode(hashlib.sha256(script.encode('utf-8')).digest()).decode('ascii')
             assert "'sha256-" + digest + "'" in parser.policy, 'inline script CSP hash mismatch'
