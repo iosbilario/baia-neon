@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101d26">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'">
+  <title>Baía Neon</title>
+  <link rel="icon" href="assets/textures/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="game" aria-label="Mundo 3D de Baía Neon"></canvas>
+  <div id="vignette"></div>
+  <div id="loading"><span class="eyebrow">UM PEQUENO MUNDO ABERTO</span><h1>BAÍA NEON</h1><p id="loadMessage">Preparando a cidade</p></div>
+  <section id="intro" class="hidden" aria-label="Abertura cinematográfica">
+    <div class="letterbox top"></div><div class="letterbox bottom"></div>
+    <div class="intro-brand">ESTÚDIO DA BAÍA <span>APRESENTA</span></div>
+    <div id="introCaption"><span class="eyebrow">O SOL SE PÕE. A CIDADE ACORDA.</span><h2>Todo mundo tem<br>um plano por aqui.</h2></div>
+    <button id="skipIntro" class="subtle skip">PULAR ABERTURA <span>ESC</span></button>
+    <div class="intro-progress"><i id="introProgress"></i></div>
+  </section>
+  <main id="menu" class="hidden">
+    <div class="menu-meta"><span>27° N · 80° O</span><span>UMA CIDADE INVENTADA</span></div>
+    <div class="menu-content"><div class="eyebrow"><i class="live-dot"></i> SOL, SIRENES E MÁS IDEIAS</div><h1>BAÍA<br><em>NEON</em><span class="title-dot">.</span></h1><p>Uma entrega. Um atalho.<br>Uma cidade inteira para se perder.</p><button id="play" class="primary">JOGAR <span>↗</span></button><div class="menu-links"><button id="replayIntro">REVER ABERTURA</button><button id="menuHelp">CONTROLES</button></div></div>
+    <div class="menu-footer"><span>CAPÍTULO 01<br><b>FIM DE TARDE, COMEÇO DO CAOS</b></span><span>PROTÓTIPO 3D<br><b>JOGO LOCAL · CÓDIGO ABERTO</b></span></div>
+  </main>
+  <div id="audioToggle"><button id="sound" aria-label="Ativar ou desativar som">SOM DESLIGADO</button></div>
+  <section id="hud" class="hidden" aria-label="Informações do jogo">
+    <div class="hud-top"><div class="place"><small>BAÍA NEON</small><strong id="district">Orla Coral</strong><span id="clock">17h24 · Céu aberto</span></div><div class="heat"><div id="heatPips" aria-label="Nível de procura"></div><div id="policeState">CIDADE TRANQUILA</div><div class="escape-track"><i id="escapeProgress"></i></div></div></div>
+    <div class="objective"><span class="eyebrow">SERVIÇO</span><h3 id="missionTitle"></h3><p id="missionText"></p><small id="missionDistance"></small></div>
+    <div class="minimap-wrap"><canvas id="minimap" width="210" height="210" aria-label="Mapa da cidade"></canvas><span>N</span><div class="map-caption">BAÍA NEON <b id="balance">R$ 0</b></div></div>
+    <div class="status"><div class="status-line"><span id="vehicleName">A PÉ</span><b id="speed">0 <small>KM/H</small></b></div><div class="health-label"><span>VIDA</span><span id="healthValue">100</span></div><div class="health-track"><i id="healthFill"></i></div><div id="arsenal" class="arsenal">PISTOLA ∞ · GRANADAS 4</div><div class="key-hints"><span><kbd>CLIQUE</kbd> atirar</span><span><kbd>G</kbd> granada</span><span><kbd>R</kbd> recarga</span><span><kbd>E</kbd> veículo</span><span><kbd>H</kbd> ajuda</span><span><kbd>ESC</kbd> pausa</span></div></div>
+    <div id="aim"></div><div id="interaction" class="hidden"></div><div id="toast" role="status"></div>
+  </section>
+  <section id="wasted" class="hidden" aria-label="Fim da linha"><div class="letterbox top"></div><div class="letterbox bottom"></div><div id="wastedText" class="wasted-text"><h2 id="wastedTitle">SE FUDEU</h2><p id="wastedCause"></p></div></section>
+  <section id="garage" class="overlay hidden"><div class="panel help-panel"><span class="eyebrow">OFICINA DO CANAL</span><h2>O que vai ser?</h2><p id="garageMoney"></p><div id="garageList" class="shop"></div><button id="closeGarage" class="primary">VOLTAR À RUA <span>↗</span></button></div></section>
+  <section id="pause" class="overlay hidden"><div class="panel"><span class="eyebrow">DÊ UM RESPIRO</span><h2>A cidade espera.</h2><button id="resume" class="primary">CONTINUAR <span>↗</span></button><button id="pauseHelp" class="secondary">CONTROLES E OBJETIVO</button><button id="backMenu" class="secondary">VOLTAR AO MENU</button></div></section>
+  <section id="help" class="overlay hidden"><div class="panel help-panel"><span class="eyebrow">MANUAL DA BAÍA</span><h2>Escolha seu atalho.</h2><div class="control-grid"><kbd>W A S D</kbd><span>Caminhar ou dirigir</span><kbd>SHIFT</kbd><span>Correr a pé</span><kbd>E</kbd><span>Entrar ou sair do carro</span><kbd>ESPAÇO</kbd><span>Freio de mão no carro</span><kbd>CLIQUE / F</kbd><span>Atirar a pé. No carro, F buzina</span><kbd>G</kbd><span>Arremessar granada</span><kbd>MOUSE</kbd><span>Arrastar para girar a câmera</span><kbd>1 2 3</kbd><span>Aceitar um serviço do quadro</span><kbd>ENTER</kbd><span>Abrir a oficina no marcador laranja</span><kbd>R</kbd><span>Recarregar a pistola</span><kbd>T</kbd><span>Alternar chuva</span><kbd>N</kbd><span>Alternar dia e noite</span><kbd>ESC</kbd><span>Pausar ou pular abertura</span></div><p>Aceite um serviço, retire a carga de carro e entregue: cada carga tem sua regra e o pagamento explica o que você perdeu. Gaste na oficina. Freio de mão solta a traseira. As vielas com marcos amarelos só deixam passar o compacto, e nos parques só se entra a pé: viaturas não seguem por nenhum dos dois. A polícia só vem se uma testemunha ou um policial vir o crime. Quem está com o marcador amarelo está ao telefone. Os policiais descem da viatura para prender e atiram a partir de duas estrelas. Fora de vista as estrelas piscam: fique longe dos cones azuis do minimapa até o alerta acabar. Carros danificados soltam fumaça, pegam fogo e explodem. Quebre o contato visual e saia da área em que você foi visto.</p><button id="closeHelp" class="primary">ENTENDI <span>↗</span></button></div></section>
+  <div id="fatal" class="overlay hidden"><div class="panel"><h2>A cidade não abriu.</h2><p id="fatalMessage"></p><p>Use um navegador com WebGL. Consulte LEIA_PRIMEIRO.md para executar a pasta localmente.</p></div></div>
+  <script src="vendor/three.min.js"></script>
+  <script src="src/config.js"></script>
+  <script src="src/world.js"></script>
+  <script src="src/audio.js"></script>
+  <script src="src/police.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>
