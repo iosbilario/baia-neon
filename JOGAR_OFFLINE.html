@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#101d26">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'sha256-QOCV7FZ6UsCB3p05v5odTrUH0P3g/IeqtP54rUIBrPo=' 'sha256-rr2JwAnT+wE1EnE1GP9Z9pTRweaf0EZlUayELAtap/s=' 'sha256-TyTBzyUnp1BUNJZytO/VaQMghmfBh/guGIo9mQw2A04=' 'sha256-EVUnTEWH4ElRsP1vUnyg4sVBczStLSuuixWpRIina6I=' 'sha256-aogUOImSoureDwfYrY4Damr3DWulkva8YzRw7MIZ/Vg=' 'sha256-/OmX/pcdYMhODXpkrxvEKLTuhZcWYlxkxm2RrsPU7HI='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'sha256-QOCV7FZ6UsCB3p05v5odTrUH0P3g/IeqtP54rUIBrPo=' 'sha256-x0HgVV7ZmHyik76VQRFy8tUc88ru8M2wC145s4N/+TY=' 'sha256-TyTBzyUnp1BUNJZytO/VaQMghmfBh/guGIo9mQw2A04=' 'sha256-EVUnTEWH4ElRsP1vUnyg4sVBczStLSuuixWpRIina6I=' 'sha256-aogUOImSoureDwfYrY4Damr3DWulkva8YzRw7MIZ/Vg=' 'sha256-AZeVEe6wDxVEcyu+rWUr3ISz0ulK3TKhW8aaPDT/BxQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'">
   <title>Baía Neon</title>
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE0IiBmaWxsPSIjMTMyNzM0Ii8+CjxjaXJjbGUgY3g9IjM0IiBjeT0iMzAiIHI9IjE3IiBmaWxsPSIjZjBhMTdmIi8+CjxwYXRoIGQ9Ik04IDM4aDQ4djE3SDh6IiBmaWxsPSIjMmM3ODdhIi8+CjxwYXRoIGQ9Ik0xMyA0M2gzOE0xOSA0OGgyNyIgc3Ryb2tlPSIjNzNiYmIwIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwIDU0YzQtMTIgNS0yMiAzLTMxIiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjI5MzQiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNMjMgMjNDMTQgMTIgOCAyMCA4IDI2YzUtNSAxMC01IDE1LTMgMS0xMyAxMS0xMyAxOC04LTggMC0xMyA0LTE4IDggMTEtNSAxOSAyIDE5IDgtOC02LTEyLTctMTktOC00IDYtOSA4LTE0IDggMy00IDctNyAxNC04eiIgZmlsbD0iIzEyMjkzNCIvPgo8L3N2Zz4K" type="image/svg+xml">
   <style>
@@ -25,6 +25,19 @@
 .shop-item:hover:not(:disabled){background:#ffffff1c}.shop-item:disabled{opacity:.38;cursor:default}
 #missionText kbd{display:inline-block;min-width:14px;padding:0 4px;margin-right:4px;border:1px solid #fff5;border-radius:3px;font-size:9px;text-align:center}
 #missionText b{color:var(--mint);font-weight:600}
+.menu-content p.menu-sub{font-size:11px;letter-spacing:.04em;color:#f4e8d48c;margin:-14px 0 26px}
+.menu-info{position:absolute;right:5.5%;top:19%;width:min(330px,28vw);display:flex;flex-direction:column;gap:12px}
+.info-block{background:var(--glass);backdrop-filter:blur(10px);border:1px solid #ffffff14;border-left:2px solid var(--mint);border-radius:3px;padding:16px 18px}
+.info-block .eyebrow{display:block;margin-bottom:10px}
+.info-block ol{list-style:none;counter-reset:step;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.info-block li{counter-increment:step;display:grid;grid-template-columns:22px 1fr;column-gap:8px}
+.info-block li::before{content:counter(step,decimal-leading-zero);grid-row:1/3;font-size:10px;letter-spacing:.08em;color:var(--coral);padding-top:1px}
+.info-block li b{font-size:12px;letter-spacing:.03em;color:var(--cream)}.info-block li span{font-size:10.5px;line-height:1.45;color:#f4e8d4a6}
+.menu-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.menu-stats b{display:block;font-size:17px;color:var(--cream);letter-spacing:-.01em;white-space:nowrap}.menu-stats small{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#f4e8d480}
+.menu-keys{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:9px;color:#f4e8d4a6;border-left-color:var(--coral)}
+.menu-keys kbd{display:inline-block;padding:2px 5px;margin-right:4px;border:1px solid #fff4;border-radius:3px;font-size:8px;color:var(--cream)}
+.menu-ext{display:flex;flex-wrap:wrap;gap:8px 18px;padding:2px 2px 0}.menu-ext a{font-size:9px;letter-spacing:.14em;color:#f4e8d4be;text-decoration:none;border-bottom:1px solid #fff4;padding-bottom:4px}.menu-ext a:hover{color:var(--mint);border-color:var(--mint)}
+@media (max-width:980px),(max-height:640px){.menu-info{display:none}}
 
 </style>
 </head>
@@ -41,8 +54,19 @@
   </section>
   <main id="menu" class="hidden">
     <div class="menu-meta"><span>27° N · 80° O</span><span>UMA CIDADE INVENTADA</span></div>
-    <div class="menu-content"><div class="eyebrow"><i class="live-dot"></i> SOL, SIRENES E MÁS IDEIAS</div><h1>BAÍA<br><em>NEON</em><span class="title-dot">.</span></h1><p>Uma entrega. Um atalho.<br>Uma cidade inteira para se perder.</p><button id="play" class="primary">JOGAR <span>↗</span></button><div class="menu-links"><button id="replayIntro">REVER ABERTURA</button><button id="menuHelp">CONTROLES</button></div></div>
-    <div class="menu-footer"><span>CAPÍTULO 01<br><b>FIM DE TARDE, COMEÇO DO CAOS</b></span><span>PROTÓTIPO 3D<br><b>JOGO LOCAL · CÓDIGO ABERTO</b></span></div>
+    <div class="menu-content"><div class="eyebrow"><i class="live-dot"></i> SOL, SIRENES E MÁS IDEIAS</div><h1>BAÍA<br><em>NEON</em><span class="title-dot">.</span></h1><p>Uma entrega. Um atalho.<br>Uma cidade inteira para se perder.</p><p class="menu-sub">Mundo aberto de serviços urbanos absurdos.<br>Grátis, sem cadastro, direto no navegador.</p><button id="play" class="primary">JOGAR <span>↗</span></button><div class="menu-links"><button id="replayIntro">REVER ABERTURA</button><button id="menuHelp">CONTROLES</button></div></div>
+    <aside class="menu-info" aria-label="Sobre o jogo">
+      <div class="info-block"><span class="eyebrow">COMO SE JOGA</span><ol>
+        <li><b>Aceite um serviço</b><span>Três contratos. Cada carga tem sua regra.</span></li>
+        <li><b>Dirija do seu jeito</b><span>O carro derrapa, e o pagamento explica o que você perdeu.</span></li>
+        <li><b>Gaste na oficina</b><span>Reparos, melhorias e carros que mudam a condução.</span></li>
+        <li><b>Despiste a polícia</b><span>Troque de carro, corte por vielas, atravesse parques a pé.</span></li>
+      </ol></div>
+      <div class="info-block"><span class="eyebrow">SEU PROGRESSO NESTE NAVEGADOR</span><div class="menu-stats"><div><b id="statMoney">R$ 0</b><small>saldo</small></div><div><b id="statJobs">0</b><small>entregas</small></div><div><b id="statCars">1/3</b><small>carros</small></div><div><b id="statUps">0/3</b><small>melhorias</small></div></div></div>
+      <div class="info-block menu-keys"><span><kbd>W A S D</kbd> mover</span><span><kbd>E</kbd> carro</span><span><kbd>ESPAÇO</kbd> freio de mão</span><span><kbd>1 2 3</kbd> serviço</span><span><kbd>ENTER</kbd> oficina</span><span><kbd>CLIQUE</kbd> atirar</span></div>
+      <div class="menu-ext"><a href="https://github.com/iosbilario/baia-neon" target="_blank" rel="noopener noreferrer">CÓDIGO NO GITHUB ↗</a><a href="JOGAR_OFFLINE.html" download>BAIXAR PARA JOGAR OFFLINE ↓</a></div>
+    </aside>
+    <div class="menu-footer"><span>CAPÍTULO 01<br><b>FIM DE TARDE, COMEÇO DO CAOS</b></span><span>PROTÓTIPO 3D · v0.2<br><b>RODA NO NAVEGADOR · CÓDIGO ABERTO</b></span></div>
   </main>
   <div id="audioToggle"><button id="sound" aria-label="Ativar ou desativar som">SOM DESLIGADO</button></div>
   <section id="hud" class="hidden" aria-label="Informações do jogo">
@@ -71,7 +95,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 /* SPDX-License-Identifier: MIT */
 window.BN = window.BN || {};
 BN.CONFIG = Object.freeze({
-  title: 'Baía Neon', seed: 5216, version: '0.1.0',
+  title: 'Baía Neon', seed: 5216, version: '0.2.0',
   citySize: 600, dayLength: 720, introDuration: 18,
   startHour: 17.4, walkSpeed: 5.2, runSpeed: 8.7,
   carSpeed: 32, carReverse: 10, carAcceleration: 14,
@@ -819,7 +843,8 @@ BN.CONFIG = Object.freeze({
     function save(){try{localStorage.setItem('baia-neon-save',JSON.stringify({balance,completed,upgrades,owned:[...garageOwned],car:starterCar.type,ammo:player.ammo,reserve:player.reserve,grenades:player.grenades,health:Math.max(25,Math.round(player.health))}));}catch(e){}}
     function toast(text){$('toast').textContent=text;$('toast').classList.add('show');toastTime=4.5;}
     function setMode(next){mode=next;show('intro',next==='intro');show('menu',next==='menu');show('hud',next==='play'||next==='pause'||next==='garage');show('pause',next==='pause');show('help',next==='help');show('wasted',next==='dead');show('garage',next==='garage');keys.clear();dragging=false;}
-    function endIntro(){setMode('menu');introTime=cfg.introDuration;}
+    function menuStats(){$('statMoney').textContent='R$ '+balance;$('statJobs').textContent=completed;$('statCars').textContent=garageOwned.size+'/3';$('statUps').textContent=Object.values(upgrades).filter(Boolean).length+'/3';}
+    function endIntro(){menuStats();setMode('menu');introTime=cfg.introDuration;}
     function play(){setMode('play');audio.beep(587,.16);toast('Escolha um serviço com 1, 2 ou 3. O carro coral é seu.');}
     function togglePause(){if(mode==='play')setMode('pause');else if(mode==='pause')setMode('play');}
     function help(){helpReturn=mode;setMode('help');}
@@ -1450,7 +1475,7 @@ BN.CONFIG = Object.freeze({
       show('interaction',Boolean(interaction));$('interaction').textContent=interaction;drawMap();
     }
     $('skipIntro').onclick=endIntro;$('play').onclick=play;$('replayIntro').onclick=()=>{introTime=0;setMode('intro');};
-    $('resume').onclick=()=>setMode('play');$('backMenu').onclick=()=>setMode('menu');$('menuHelp').onclick=help;$('pauseHelp').onclick=help;
+    $('resume').onclick=()=>setMode('play');$('backMenu').onclick=()=>{menuStats();setMode('menu');};$('menuHelp').onclick=help;$('pauseHelp').onclick=help;
     $('closeGarage').onclick=()=>setMode('play');$('garageList').onclick=e=>{const b=e.target&&e.target.closest?e.target.closest('button'):null;if(b)garageBuy(Number(b.getAttribute('data-i')));};
     $('closeHelp').onclick=()=>setMode(helpReturn);$('sound').onclick=()=>{$('sound').textContent=audio.toggle()?'SOM LIGADO':'SOM DESLIGADO';};
     window.addEventListener('keydown',e=>{

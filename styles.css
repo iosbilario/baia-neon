@@ -15,3 +15,16 @@
 .shop-item:hover:not(:disabled){background:#ffffff1c}.shop-item:disabled{opacity:.38;cursor:default}
 #missionText kbd{display:inline-block;min-width:14px;padding:0 4px;margin-right:4px;border:1px solid #fff5;border-radius:3px;font-size:9px;text-align:center}
 #missionText b{color:var(--mint);font-weight:600}
+.menu-content p.menu-sub{font-size:11px;letter-spacing:.04em;color:#f4e8d48c;margin:-14px 0 26px}
+.menu-info{position:absolute;right:5.5%;top:19%;width:min(330px,28vw);display:flex;flex-direction:column;gap:12px}
+.info-block{background:var(--glass);backdrop-filter:blur(10px);border:1px solid #ffffff14;border-left:2px solid var(--mint);border-radius:3px;padding:16px 18px}
+.info-block .eyebrow{display:block;margin-bottom:10px}
+.info-block ol{list-style:none;counter-reset:step;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.info-block li{counter-increment:step;display:grid;grid-template-columns:22px 1fr;column-gap:8px}
+.info-block li::before{content:counter(step,decimal-leading-zero);grid-row:1/3;font-size:10px;letter-spacing:.08em;color:var(--coral);padding-top:1px}
+.info-block li b{font-size:12px;letter-spacing:.03em;color:var(--cream)}.info-block li span{font-size:10.5px;line-height:1.45;color:#f4e8d4a6}
+.menu-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.menu-stats b{display:block;font-size:17px;color:var(--cream);letter-spacing:-.01em;white-space:nowrap}.menu-stats small{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#f4e8d480}
+.menu-keys{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:9px;color:#f4e8d4a6;border-left-color:var(--coral)}
+.menu-keys kbd{display:inline-block;padding:2px 5px;margin-right:4px;border:1px solid #fff4;border-radius:3px;font-size:8px;color:var(--cream)}
+.menu-ext{display:flex;flex-wrap:wrap;gap:8px 18px;padding:2px 2px 0}.menu-ext a{font-size:9px;letter-spacing:.14em;color:#f4e8d4be;text-decoration:none;border-bottom:1px solid #fff4;padding-bottom:4px}.menu-ext a:hover{color:var(--mint);border-color:var(--mint)}
+@media (max-width:980px),(max-height:640px){.menu-info{display:none}}

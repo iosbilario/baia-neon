@@ -1,123 +1,216 @@
-# Baía Neon
+<p align="center">
+  <a href="https://iosbilario.github.io/baia-neon/"><img src="assets/readme/banner.svg" width="100%" alt="Baía Neon. Sol, sirenes e más ideias. Mundo aberto de serviços urbanos absurdos que roda no navegador, sem instalar nada."></a>
+</p>
 
-Kit local para continuar um jogo 3D no Fable 5.2. Inclui prompt, protótipo, código, texturas, modelos, sons e geradores. A cidade é fictícia, com praia, canal e arquitetura costeira em uma área de cerca de 600 por 600 metros.
+<p align="center">
+  <a href="https://iosbilario.github.io/baia-neon/"><b>Jogar agora</b></a> ·
+  <a href="#como-se-joga">Como se joga</a> ·
+  <a href="#controles">Controles</a> ·
+  <a href="#a-cidade">A cidade</a> ·
+  <a href="#polícia">Polícia</a> ·
+  <a href="#por-dentro">Por dentro</a> ·
+  <a href="https://iosbilario.github.io/baia-neon/JOGAR_OFFLINE.html">Versão offline</a>
+</p>
 
-## Jogar no navegador
+Baía Neon é um jogo 3D de mundo aberto que roda direto no navegador. Você
+dirige por uma cidade litorânea inventada, aceita serviços de entrega com
+regras próprias, gasta o que ganha na oficina e foge da polícia quando o
+atalho dá errado. Sem instalação, sem cadastro, sem anúncios.
 
-**https://iosbilario.github.io/baia-neon/**
+**Jogue em [iosbilario.github.io/baia-neon](https://iosbilario.github.io/baia-neon/).**
+Precisa de computador com teclado e mouse e de um navegador com WebGL.
 
-Funciona em computador, com teclado e mouse, em navegador com WebGL. O site precisa de conexão para carregar. Para jogar sem internet, baixe [JOGAR_OFFLINE.html](https://iosbilario.github.io/baia-neon/JOGAR_OFFLINE.html) e abra o arquivo no navegador.
+<p align="center">
+  <img src="assets/readme/menu.webp" width="100%" alt="Tela inicial do Baía Neon: o título em letras grandes sobre a cidade vista de cima ao anoitecer, com torres, quarteirões, canal e praia, e o botão Jogar.">
+</p>
+<p align="center"><sub>Tela inicial, capturada do jogo publicado em 16/11/2026.</sub></p>
 
-A publicação usa o GitHub Pages direto da branch `main`, pasta raiz, sem etapa de compilação. Todo push na `main` republica o site em cerca de um minuto. Depois de editar os fontes, rode `python3 tools/package.py` antes do commit para que a versão única acompanhe o site.
+## Como se joga
 
-## Começar
+Dirigir bem, conhecer a cidade e improvisar uma fuga rendem dinheiro. O
+dinheiro muda a próxima partida.
 
-1. Extraia todo o ZIP.
-2. Abra JOGAR_OFFLINE.html no Chrome, Edge ou Firefox de um computador com WebGL habilitado.
-3. Assista à abertura ou use Esc para chegar ao menu. Clique em Jogar.
-4. Use Som desligado para ativar o áudio. O navegador exige essa ação para iniciar o som.
+- **Escolha um serviço.** O quadro oferece três contratos. Aceite com `1`,
+  `2` ou `3`, retire a carga de carro e leve até o destino.
+- **Cuide da carga.** Cada contrato tem uma regra, e o pagamento explica o
+  que você perdeu no caminho.
+- **Gaste na oficina.** Reparo, melhorias com contrapartida, munição e
+  outros carros. O progresso fica salvo no navegador.
+- **Fuja com a cabeça.** A polícia procura o carro em que você foi visto.
+  Trocar de veículo, entrar numa viela ou atravessar um parque a pé são
+  saídas diferentes.
 
-JOGAR_OFFLINE.html reúne o motor, o jogo, a interface e o ícone num arquivo. Não exige instalação, servidor, conta, npm ou conexão. A versão em arquivos separados está em index.html. Se o navegador restringir arquivos locais separados, use a versão única.
+### Contratos
 
-O alvo atual é computador com teclado e mouse. A interface se adapta a telas menores, mas não há controles de toque, suporte a console ou controle Bluetooth.
+| Contrato | Regra da carga | Pagamento |
+| --- | --- | --- |
+| Sorvete em risco | Derrete com o tempo | Até R$ 260, 30% garantido |
+| Reunião dos flamingos | Perde integridade a cada batida | Até R$ 300, 25% garantido |
+| Café depois das seis | Derrapagem e freada brusca derramam o bônus | Até R$ 240, 60% garantido |
 
-## Entregar ao Fable
+Chuva paga 20% a mais. Se a carga chega a zero ou o carro é destruído, o
+contrato acaba sem pagamento.
 
-Abra a pasta baia-neon no ambiente de programação usado com Fable 5.2. Cole o conteúdo de PROMPT_FABLE_5_2.md ou peça que o agente leia esse arquivo e siga as instruções. Ele precisa de acesso à pasta e de ferramentas para editar arquivos. Um chat sem acesso aos arquivos terá de receber o ZIP como anexo.
+### Veículos
 
-O prompt manda reutilizar esta base, verificar falhas e completar o acabamento. Ele restringe leituras de arquivos grandes, instalações, mudanças de arquitetura e ciclos de revisão sem objetivo. Não promete um custo fixo.
+| Modelo | Ponto forte | Limitação |
+| --- | --- | --- |
+| Maré Compacto | Curva rápido e cabe nas vielas | Amassa fácil |
+| Sedã Atlântico | Estável, freia bem, aguenta pancada | Lento para virar |
+| Esportivo Brisa 78 | Retomada e velocidade final | Traseira solta, pior na chuva |
 
-## O que está implementado
+O carro tem velocidade lateral: ele derrapa, e o freio de mão solta a
+traseira. Batidas e tiros amassam, tiram velocidade, soltam fumaça, pegam
+fogo e terminam em explosão.
 
-| Área | Comportamento da base |
-| --- | --- |
-| Abertura | Sequência de 18 segundos com três enquadramentos no próprio cenário, legendas, barras de cinema e opção de pular |
-| Cidade | Prédios, ruas, semáforos, pontes, canal, praia, parques, palmeiras e placas fictícias. Três vielas de 3 m cortam torres do centro e só o compacto passa. Cinco parques são só para pedestres. Nove estacionamentos têm carros para troca. Palmeiras, bancos, fontes e quiosques são sólidos |
-| Personagem | Caminhada, corrida, câmera em terceira pessoa e animação dos membros |
-| Veículos | Três modelos com condução própria: compacto ágil e frágil, sedã estável e resistente, esportivo forte e de traseira solta. Há velocidade lateral, então o carro derrapa e o freio de mão solta a traseira. A câmera olha à frente e abre com a velocidade |
-| População | 64 pedestres com rotina (calçada, semáforo, esquinas, conversa, parque, corrida, fuga), 14 veículos em circulação e cerca de 30 carros estacionados |
-| Combate | Pistola com mira assistida, granadas, explosões em cadeia, sangue e pedestres que morrem |
-| Dano | Carros amassam, soltam fumaça, pegam fogo e explodem. O guincho repõe os destroços depois |
-| Morte | O jogador pode ser atropelado, baleado ou explodido. Tela em câmera lenta com SE FUDEU e alta no ponto inicial |
-| Polícia | Patrulha, chamado por infração, perseguição, visão bloqueada por prédios, busca e captura. Só é acionada quando um policial vê o crime ou uma testemunha termina a ligação. Os policiais descem da viatura para prender, atiram a partir de duas estrelas quando houve violência, a segunda viatura tenta interceptar adiante, e voltam ao carro se o suspeito some |
-| Testemunhas | Quem viu o crime liga para a polícia com um marcador amarelo sobre a cabeça. Derrubar a testemunha antes do fim da ligação cancela a denúncia |
-| Procurado | Estrelas por gravidade acumulada: um crime leve dá uma estrela e cada estrela seguinte exige bem mais violência. Respondem tantas viaturas quantas estrelas, e os reforços chegam um a um |
-| Fuga | Exige ficar fora de vista a mais de 40 metros da última posição vista por 16 segundos com uma estrela, mais 5 por estrela extra. Na busca as estrelas piscam e cada viatura só enxerga um cone à frente, desenhado no minimapa |
-| Ambiente | Dia e noite em 12 minutos, janelas e faróis à noite, chuva ocasional e menor aderência |
-| Fauna | Cães, gaivotas, borboletas e vagalumes animados |
-| Contratos | Quadro com três serviços para escolher. Cada um tem retirada, entrega e regra de carga: o sorvete derrete com o tempo, o figurino quebra em batidas e o café paga bônus por direção suave. O resultado explica o pagamento. Chuva paga 20% a mais |
-| Oficina | Marcador laranja. Reparo, freios, pneus de chuva, proteção de carga, munição, granadas, outros carros e repintura durante a fuga. Melhorias têm contrapartida |
-| Identificação | A polícia procura o veículo em que você foi visto. Trocar de carro, descer ou repintar sem ser visto encurta o reconhecimento e a busca |
-| Salvamento | Dinheiro, entregas, melhorias, carros comprados, munição, granadas e vida |
+### Oficina
 
-O carro coral próximo ao personagem pode ser usado sem infração. Entre nele com E após se aproximar. Outros carros podem gerar um chamado por furto, e roubar um carro em movimento expulsa o motorista. Pedestres mortos deixam dinheiro. Ser preso mostra a tela RODOU. Atropelar, atirar, explodir, causar colisões fortes ou atingir viaturas também aumenta o alerta. A violência é estilizada em blocos, com sangue em partículas e poças.
+Fica no marcador laranja do mapa e abre com `Enter`.
+
+| Item | Efeito | Preço |
+| --- | --- | --- |
+| Reparo | Zera o dano do carro | R$ 40 a 80 |
+| Freios reforçados | Para 60% mais forte | R$ 300 |
+| Pneus de chuva | Quase sem perda no molhado, 6% menos velocidade final | R$ 300 |
+| Proteção de carga | Carga perde 40% menos, 8% menos aceleração | R$ 300 |
+| Munição e granadas | 24 balas ou 2 granadas | R$ 60 e R$ 90 |
+| Sedã e Esportivo | Trocam o seu carro | R$ 900 e R$ 1.600 |
+| Repintar | Durante a fuga, a polícia segue procurando o carro antigo | R$ 150 |
 
 ## Controles
 
 | Entrada | Ação |
 | --- | --- |
-| W A S D ou setas | Caminhar ou dirigir |
-| Shift | Correr |
-| E | Entrar ou sair de um carro próximo |
-| Espaço | Freio de mão |
-| Clique ou F | Atirar a pé. No carro, F buzina |
-| G | Arremessar granada |
+| `W` `A` `S` `D` ou setas | Caminhar ou dirigir |
+| `Shift` | Correr |
+| `E` | Entrar ou sair de um carro próximo |
+| `Espaço` | Freio de mão |
+| `1` `2` `3` | Aceitar um serviço do quadro |
+| `Enter` | Abrir a oficina no marcador laranja |
+| Clique ou `F` | Atirar a pé. No carro, `F` buzina |
+| `R` | Recarregar a pistola |
+| `G` | Arremessar granada |
 | Arrastar o mouse | Girar a câmera |
-| 1, 2, 3 | Aceitar um serviço do quadro |
-| Enter | Abrir a oficina no marcador laranja |
-| R | Recarregar a pistola |
-| T | Alternar chuva |
-| N | Alternar dia e noite |
-| H | Consultar controles |
-| Esc | Pausar ou pular a abertura |
+| `H` | Consultar controles |
+| `Esc` | Pausar ou pular a abertura |
 
-## Estrutura para edição
+`T` alterna a chuva e `N` alterna dia e noite, para experimentar.
 
-| Arquivo ou pasta | Uso |
+## A cidade
+
+Uma miniatura imaginária de litoral, com cerca de 600 por 600 metros, gerada
+sempre igual a partir de uma semente fixa.
+
+- **Centro Solar.** Torres, trânsito e três vielas de 3 metros com marcos
+  amarelos. Só o compacto passa por elas.
+- **Canal das Garças.** Sete pontes. Fora delas, a água não se atravessa.
+- **Praia Aurora.** Avenida aberta para ganhar velocidade, com pouco abrigo.
+- **Parques.** Cinco áreas só para pedestres. Carros e viaturas param nos
+  balizadores.
+- **Estacionamentos.** Nove pátios com carros parados, bons para trocar de
+  veículo longe de testemunhas.
+
+A cidade tem 64 pedestres com rotina (esperam o semáforo, viram esquinas,
+conversam, passeiam, correm e fogem do perigo), trânsito que freia para o
+que está na faixa, cães, gaivotas, borboletas e vagalumes. O dia dura 12
+minutos, as janelas acendem à noite e a chuva chega de vez em quando.
+
+## Polícia
+
+O sistema de procurado segue a lógica de estrelas dos jogos de mundo aberto,
+com regras que dá para entender e explorar.
+
+| Regra | Como funciona |
 | --- | --- |
-| PROMPT_FABLE_5_2.md | Pedido completo para o agente |
-| index.html e styles.css | Interface, menu e HUD |
-| src/config.js | Parâmetros e entregas |
-| src/world.js | Cidade, materiais e modelos procedurais |
-| src/main.js | Controles, simulação, câmera e interface |
-| src/police.js | Rotas, detecção, perseguição e fuga |
-| src/audio.js | Síntese sonora local |
-| assets/ | 16 PNGs, 9 GLBs, 9 WAVs, ícone, prancha e catálogo |
-| vendor/ | Three.js r160 com versão fixa |
-| tools/ | Geradores, validador de recursos e empacotador |
-| tests/ | Verificações de lógica e integração |
-| docs/ | Direção criativa, critérios de aceite e relatório de verificação |
-| licenses/ | Licença dos recursos, aviso do motor e procedência |
+| Denúncia | A polícia só vem se um policial vir o crime ou uma testemunha terminar a ligação. Quem está ligando ganha um marcador amarelo |
+| Estrelas | Sobem pela gravidade acumulada. Um furto dá uma estrela, e cada estrela seguinte exige bem mais violência |
+| Resposta | Uma viatura por estrela, com reforços chegando um a um. A partir de duas estrelas, a segunda tenta interceptar adiante |
+| Abordagem | Os policiais descem da viatura para prender. Só atiram a partir de duas estrelas e se houve violência |
+| Identificação | Eles procuram o veículo em que você foi visto. Trocar, descer ou repintar sem ser visto encurta a busca |
+| Busca | Fora de vista as estrelas piscam, e cada unidade só enxerga um cone à frente, desenhado no minimapa |
+| Fuga | 16 segundos fora de vista e longe da última posição com uma estrela, mais 5 por estrela extra |
 
-O jogo usa geometrias, cores e sons criados no próprio código. Os PNGs, GLBs e WAVs exportados ficam prontos para expansão. Eles não são carregados todos pelo protótipo. A prancha assets/preview.png mostra os recursos exportados e não é uma captura da tela do jogo.
+Morrer mostra a tela em câmera lenta e custa R$ 150. Ser preso custa R$ 100,
+as granadas e a munição reserva.
 
-## Atualizar a versão única
+## Por dentro
 
-Edite os arquivos de origem e execute com Python 3 já instalado. O comando usa somente a biblioteca padrão e não acessa a rede.
+HTML, CSS e JavaScript clássico com uma cópia local do Three.js r160. Não há
+etapa de compilação, dependência de pacote, servidor, conta ou telemetria. A
+política de segurança da página bloqueia qualquer conexão do jogo.
+
+```mermaid
+flowchart LR
+  A["config.js<br/>parâmetros e contratos"] --> D
+  B["world.js<br/>cidade procedural<br/>e colisores"] --> D
+  C["police.js<br/>rotas, visão,<br/>estrelas e busca"] --> D
+  E["audio.js<br/>síntese sonora"] --> D
+  D["main.js<br/>simulação, câmera,<br/>contratos e interface"] --> F["index.html<br/>GitHub Pages"]
+  D --> G["tools/package.py"] --> H["JOGAR_OFFLINE.html<br/>arquivo único"]
+```
+
+| Caminho | Conteúdo |
+| --- | --- |
+| `index.html`, `styles.css` | Interface, menu e HUD |
+| `src/` | Código do jogo |
+| `vendor/` | Three.js r160, versão fixa |
+| `assets/` | Texturas, modelos, sons e catálogo com a origem de cada recurso |
+| `tests/` | 29 cenários de lógica policial e de integração |
+| `tools/` | Empacotador, auditoria offline, gerador e validador de recursos |
+| `docs/` | Direção criativa, critérios de aceite e registro de verificação |
+| `licenses/` | Licenças e procedência |
+
+### Rodar e testar
+
+Abra `index.html` no navegador ou sirva a pasta com qualquer servidor
+estático. Os testes usam só o Node, sem instalar pacotes.
+
+```sh
+node tests/police.test.js
+node tests/integration.test.js
+python3 tools/audit_offline.py
+```
+
+### Publicação
+
+O site é o GitHub Pages da branch `main`, pasta raiz. Todo push republica em
+cerca de um minuto. Depois de editar os fontes, recrie a versão de arquivo
+único antes do commit:
 
 ```sh
 python3 tools/package.py
 ```
 
-Ele recria JOGAR_OFFLINE.html com o código atual. Não edite esse HTML grande à mão nem peça ao agente para lê-lo inteiro.
+### Jogar sem internet
 
-## Verificar
-
-Os testes de lógica usam Node já instalado e não exigem npm. A validação dos recursos exige Python 3 e Pillow. O gerador dos recursos também usa NumPy. Essas dependências de desenvolvimento não são necessárias para jogar.
-
-```sh
-node tests/police.test.js
-node tests/integration.test.js
-python3 tools/validate_assets.py
-python3 tools/audit_offline.py
-```
-
-O teste de integração usa classes reais de geometria do Three.js com renderizador substituído. Ele verifica a simulação, sem abrir um navegador. Consulte docs/VERIFICACAO.md para distinguir o que foi executado do que ainda exige conferência visual.
+O site precisa de conexão para carregar. Para jogar offline, baixe
+[JOGAR_OFFLINE.html](https://iosbilario.github.io/baia-neon/JOGAR_OFFLINE.html)
+e abra o arquivo no navegador. Ele reúne motor, jogo, interface e ícone.
 
 ## Limites atuais
 
-Este é um protótipo compacto com colisões por volumes e direção arcade. Não há interiores, bloqueios de rua, ruas de sentido único, eventos de rua, troca de armas, tiro de dentro do carro, física de capotamento, multiplayer ou campanha longa. Carros são sólidos para o jogador a pé. Pedestres ainda não bloqueiam a passagem. Postes de luz e semáforos ainda não têm colisão. NPCs não têm diálogos e podem repetir trajetos. Os modelos exportados não têm esqueleto de animação.
+Este é um protótipo compacto, com colisões por volumes e direção arcade.
 
-A meta de fluidez não representa FPS medido. A imagem e o ciclo de jogo foram conferidos num navegador Chromium. Áudio reproduzido, desempenho em GPU e abertura direta por file:// ainda precisam de conferência no computador de destino. A base inclui redução automática de resolução e desativação de sombras quando a taxa observada cair.
+- Alvo é computador com teclado e mouse. Não há controles de toque nem
+  suporte a controle.
+- Não há interiores, bloqueios de rua, ruas de sentido único, troca de
+  armas, tiro de dentro do carro, capotamento, multiplayer ou campanha.
+- Pedestres não bloqueiam a passagem. Postes e semáforos não têm colisão.
+- O desempenho não foi medido. Se a taxa de quadros cair, o jogo reduz a
+  resolução e desliga as sombras sozinho.
+- O que já foi conferido e o que falta está em
+  [docs/VERIFICACAO.md](docs/VERIFICACAO.md).
 
-O código próprio e o Three.js usam MIT. Os recursos originais gerados têm dedicação CC0-1.0 nos limites dos direitos aplicáveis. O nome Baía Neon é provisório e não passou por pesquisa de registro. Os avisos e textos de licença ficam no pacote.
+## Licença e autoria
+
+O código próprio usa a [licença MIT](LICENSE). O Three.js acompanha seu
+[aviso MIT](licenses/THREE-MIT.txt). Os recursos originais têm dedicação
+[CC0 1.0](licenses/ASSETS-CC0.md), com a origem registrada em
+[licenses/PROCEDENCIA.md](licenses/PROCEDENCIA.md).
+
+A cidade, os nomes e os estabelecimentos são fictícios. O jogo não usa
+personagens, mapas, marcas, músicas ou carros de outros jogos. O nome Baía
+Neon é provisório e não passou por pesquisa de registro.
+
+O projeto foi desenvolvido com o Claude Code a partir do pedido registrado em
+[PROMPT_FABLE_5_2.md](PROMPT_FABLE_5_2.md).

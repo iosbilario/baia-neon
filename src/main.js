@@ -52,7 +52,8 @@
     function save(){try{localStorage.setItem('baia-neon-save',JSON.stringify({balance,completed,upgrades,owned:[...garageOwned],car:starterCar.type,ammo:player.ammo,reserve:player.reserve,grenades:player.grenades,health:Math.max(25,Math.round(player.health))}));}catch(e){}}
     function toast(text){$('toast').textContent=text;$('toast').classList.add('show');toastTime=4.5;}
     function setMode(next){mode=next;show('intro',next==='intro');show('menu',next==='menu');show('hud',next==='play'||next==='pause'||next==='garage');show('pause',next==='pause');show('help',next==='help');show('wasted',next==='dead');show('garage',next==='garage');keys.clear();dragging=false;}
-    function endIntro(){setMode('menu');introTime=cfg.introDuration;}
+    function menuStats(){$('statMoney').textContent='R$ '+balance;$('statJobs').textContent=completed;$('statCars').textContent=garageOwned.size+'/3';$('statUps').textContent=Object.values(upgrades).filter(Boolean).length+'/3';}
+    function endIntro(){menuStats();setMode('menu');introTime=cfg.introDuration;}
     function play(){setMode('play');audio.beep(587,.16);toast('Escolha um serviço com 1, 2 ou 3. O carro coral é seu.');}
     function togglePause(){if(mode==='play')setMode('pause');else if(mode==='pause')setMode('play');}
     function help(){helpReturn=mode;setMode('help');}
@@ -683,7 +684,7 @@
       show('interaction',Boolean(interaction));$('interaction').textContent=interaction;drawMap();
     }
     $('skipIntro').onclick=endIntro;$('play').onclick=play;$('replayIntro').onclick=()=>{introTime=0;setMode('intro');};
-    $('resume').onclick=()=>setMode('play');$('backMenu').onclick=()=>setMode('menu');$('menuHelp').onclick=help;$('pauseHelp').onclick=help;
+    $('resume').onclick=()=>setMode('play');$('backMenu').onclick=()=>{menuStats();setMode('menu');};$('menuHelp').onclick=help;$('pauseHelp').onclick=help;
     $('closeGarage').onclick=()=>setMode('play');$('garageList').onclick=e=>{const b=e.target&&e.target.closest?e.target.closest('button'):null;if(b)garageBuy(Number(b.getAttribute('data-i')));};
     $('closeHelp').onclick=()=>setMode(helpReturn);$('sound').onclick=()=>{$('sound').textContent=audio.toggle()?'SOM LIGADO':'SOM DESLIGADO';};
     window.addEventListener('keydown',e=>{

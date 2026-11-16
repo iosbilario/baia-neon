@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" role="img" aria-label="Baía Neon. Sol, sirenes e más ideias. Um mundo aberto de serviços urbanos absurdos que roda no navegador.">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0c1722"/><stop offset=".6" stop-color="#101d2e"/><stop offset="1" stop-color="#17263c"/></linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0c1722"/><stop offset=".55" stop-color="#0c1722" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="1280" height="400" fill="url(#sky)"/>
+  <g transform="translate(760 70) skewX(-32) scale(1 .62)" opacity=".9">
+    <rect x="-40" y="0" width="640" height="520" fill="#1d3a3a"/>
+    <g fill="#26333b"><rect x="-40" y="96" width="640" height="26"/><rect x="-40" y="226" width="640" height="26"/><rect x="-40" y="356" width="640" height="26"/><rect x="96" y="0" width="26" height="520"/><rect x="226" y="0" width="26" height="520"/><rect x="356" y="0" width="26" height="520"/></g>
+    <rect x="486" y="0" width="34" height="520" fill="#1f6f7a"/>
+    <rect x="540" y="0" width="60" height="520" fill="#d9c08c"/>
+    <g fill="#e7b53c"><rect x="170" y="130" width="6" height="90"/><rect x="300" y="260" width="6" height="90"/></g>
+    <g fill="#3f7a5a"><rect x="130" y="260" width="88" height="88"/><rect x="390" y="130" width="88" height="88"/></g>
+    <g><rect x="10" y="14" width="74" height="70" fill="#e9cf9b"/><rect x="136" y="14" width="34" height="70" fill="#9fcac1"/><rect x="182" y="14" width="34" height="70" fill="#ebad98"/><rect x="262" y="14" width="82" height="72" fill="#c0b5cc"/><rect x="10" y="134" width="74" height="80" fill="#91bbc8"/><rect x="262" y="134" width="82" height="80" fill="#e6c3b5"/><rect x="10" y="264" width="74" height="80" fill="#e9ded0"/><rect x="262" y="264" width="34" height="80" fill="#9fcac1"/><rect x="310" y="264" width="34" height="80" fill="#ebad98"/><rect x="392" y="264" width="82" height="80" fill="#e9cf9b"/><rect x="392" y="14" width="82" height="70" fill="#c5cbb9"/></g>
+    <g fill="#ff805b"><rect x="104" y="150" width="9" height="16"/></g><g fill="#f0eee2"><rect x="104" y="60" width="9" height="16"/><rect x="232" y="300" width="9" height="16"/></g>
+  </g>
+  <rect width="1280" height="400" fill="url(#fade)"/>
+  <circle cx="84" cy="92" r="5" fill="#ff805b"/>
+  <text x="100" y="97" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="15" font-weight="700" letter-spacing="4.5" fill="#fff1cf">SOL, SIRENES E MÁS IDEIAS</text>
+  <text x="76" y="212" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="128" font-weight="900" letter-spacing="-7" fill="#fff1cf">BAÍA</text>
+  <text x="76" y="318" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="128" font-weight="900" letter-spacing="-7" fill="#ff805b">NEON</text>
+  <rect x="408" y="296" width="22" height="22" fill="#8de3cf"/>
+  <text x="80" y="362" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="18" fill="#f4e8d4" opacity=".8">Mundo aberto de serviços urbanos absurdos. Roda no navegador, sem instalar nada.</text>
+</svg>
