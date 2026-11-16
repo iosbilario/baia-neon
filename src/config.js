@@ -37,7 +37,7 @@ BN.CONFIG = Object.freeze({
   ]),
   campaign: Object.freeze([
     {id:'voz-atrasada', number:1, title:'A voz chegou atrasada', reward:320, reputation:3, outro:'Dora chegou a tempo de reclamar do trânsito no ar.', steps:[
-      {target:'presenter', text:'Busque Dora Dendê perto da Praia Aurora.', requiresCar:true, checkpoint:true, done:'Dora embarcou. “Se esse banco ranger, eu narro ao vivo.”'},
+      {target:'presenter', text:'Entre no carro coral com E e siga o marcador coral até Dora, na Praia Aurora.', requiresCar:true, checkpoint:true, done:'Dora embarcou. “Se esse banco ranger, eu narro ao vivo.”'},
       {target:'radio', text:'Leve Dora à Rádio Caju. Dirija com suavidade.', requiresCar:true}
     ]},
     {id:'carro-radio', number:2, title:'O carro da rádio', reward:380, reputation:4, outro:'O carro voltou para a Caju. A história do documento fica para outro programa.', steps:[

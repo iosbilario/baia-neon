@@ -30,9 +30,9 @@
         <li><b>Gaste na oficina</b><span>Reparos, melhorias e carros que mudam a condução.</span></li>
         <li><b>Despiste a polícia</b><span>Troque de carro, corte por vielas, atravesse parques a pé.</span></li>
       </ol></div>
-      <div class="info-block"><span class="eyebrow">SEU PROGRESSO NESTE NAVEGADOR</span><div class="menu-stats"><div><b id="statMoney">R$ 0</b><small>saldo</small></div><div><b id="statJobs">0</b><small>entregas</small></div><div><b id="statCars">1/3</b><small>carros</small></div><div><b id="statUps">0/3</b><small>melhorias</small></div></div></div>
+      <div class="info-block"><span class="eyebrow">PROGRESSO SALVO AUTOMATICAMENTE NESTE NAVEGADOR</span><div class="menu-stats"><div><b id="statMoney">R$ 0</b><small>saldo</small></div><div><b id="statJobs">0</b><small>serviços</small></div><div><b id="statCars">1/3</b><small>carros</small></div><div><b id="statUps">0/3</b><small>melhorias</small></div></div></div>
       <div class="info-block menu-keys"><span><kbd>W A S D</kbd> mover</span><span><kbd>E</kbd> carro</span><span><kbd>ESPAÇO</kbd> freio de mão</span><span><kbd>1 2 3</kbd> serviço</span><span><kbd>ENTER</kbd> oficina</span><span><kbd>CLIQUE</kbd> atirar</span></div>
-      <div class="menu-ext"><a href="https://github.com/iosbilario/baia-neon" target="_blank" rel="noopener noreferrer">CÓDIGO NO GITHUB ↗</a><a href="JOGAR_OFFLINE.html" download>BAIXAR PARA JOGAR OFFLINE ↓</a></div>
+      <div class="menu-ext"><a href="https://github.com/iosbilario/baia-neon" target="_blank" rel="noopener noreferrer">CÓDIGO NO GITHUB ↗</a><a href="JOGAR_OFFLINE.html" download>BAIXAR PARA JOGAR OFFLINE ↓</a><button id="menuExport">EXPORTAR PROGRESSO</button><button id="menuImport">IMPORTAR PROGRESSO</button></div>
     </aside>
     <div class="menu-footer"><span>CAPÍTULO 02<br><b>ÚLTIMA FREQUÊNCIA</b></span><span>BAÍA NEON · <b id="menuVersion">v0.3.0</b><br><b>RODA NO NAVEGADOR · CÓDIGO ABERTO</b></span></div>
   </main>
@@ -41,7 +41,7 @@
     <div class="hud-top"><div class="place"><small>BAÍA NEON</small><strong id="district">Orla Coral</strong><span id="clock">17h24 · Céu aberto</span></div><div class="heat"><div id="heatPips" aria-label="Nível de procura"></div><div id="policeState">CIDADE TRANQUILA</div><div class="escape-track"><i id="escapeProgress"></i></div></div></div>
     <div class="objective"><span class="eyebrow">SERVIÇO</span><h3 id="missionTitle"></h3><p id="missionText"></p><small id="missionDistance"></small></div>
     <div class="minimap-wrap"><canvas id="minimap" width="210" height="210" aria-label="Mapa da cidade"></canvas><span>N</span><div class="map-caption">BAÍA NEON <b id="balance">R$ 0</b></div></div>
-    <div class="status"><div class="status-line"><span id="vehicleName">A PÉ</span><b id="speed">0 <small>KM/H</small></b></div><div class="health-label"><span>VIDA</span><span id="healthValue">100</span></div><div class="health-track"><i id="healthFill"></i></div><div id="arsenal" class="arsenal">PISTOLA ∞ · GRANADAS 4</div><div class="key-hints"><span><kbd>CLIQUE</kbd> atirar</span><span><kbd>G</kbd> granada</span><span><kbd>R</kbd> recarga</span><span><kbd>E</kbd> veículo</span><span><kbd>H</kbd> ajuda</span><span><kbd>ESC</kbd> pausa</span></div></div>
+    <div class="status"><div class="status-line"><span id="vehicleName">A PÉ</span><b id="speed">0 <small>KM/H</small></b></div><div class="health-label"><span>VIDA</span><span id="healthValue">100</span></div><div class="health-track"><i id="healthFill"></i></div><div id="arsenal" class="arsenal">PISTOLA ∞ · GRANADAS 4</div><div class="key-hints"><span><kbd>WASD</kbd> mover</span><span><kbd>E</kbd> veículo</span><span><kbd>M</kbd> mapa</span><span><kbd>H</kbd> ajuda</span><span><kbd>ESC</kbd> pausa</span></div></div>
     <div id="aim"></div><div id="interaction" class="hidden"></div><div id="toast" role="status"></div>
   </section>
   <section id="wasted" class="hidden" aria-label="Fim da linha"><div class="letterbox top"></div><div class="letterbox bottom"></div><div id="wastedText" class="wasted-text"><h2 id="wastedTitle">SE FUDEU</h2><p id="wastedCause"></p></div></section>

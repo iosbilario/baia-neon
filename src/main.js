@@ -44,6 +44,7 @@
     const upgrades={brakes:false,tires:false,cargo:false},garageOwned=new Set(['compact']);
     const catalogues={vehicles:Object.keys(VEHICLES),upgrades:Object.keys(upgrades),campaignIds:cfg.campaign.map(item=>item.id)};
     const loaded=BN.Save.load(localStorage,catalogues),saved=loaded.data;
+    const hasProgress=loaded.migrated||Boolean(saved.savedAt||saved.balance||saved.completed||saved.campaign.completed.length||Object.keys(saved.raceRecords).length||Object.values(saved.upgrades).some(Boolean)||saved.owned.length>1);
     let balance=saved.balance,completed=saved.completed,reputation=saved.reputation;
     for(const k in upgrades)upgrades[k]=Boolean(saved.upgrades[k]);
     saved.owned.forEach(t=>{if(VEHICLES[t])garageOwned.add(t);});
@@ -63,9 +64,9 @@
     function menuStats(){$('statMoney').textContent='R$ '+balance;$('statJobs').textContent=completed;$('statCars').textContent=garageOwned.size+'/'+Object.keys(VEHICLES).length;$('statUps').textContent=Object.values(upgrades).filter(Boolean).length+'/'+Object.keys(upgrades).length;}
     const build=BN.BUILD_INFO||{version:cfg.version,tag:'development',sha:'development'};
     const versionLabel='v'+build.version+(build.tag==='development'?' dev':'');
-    $('menuVersion').textContent=versionLabel;$('pauseVersion').textContent=versionLabel;
+    $('menuVersion').textContent=versionLabel;$('pauseVersion').textContent=versionLabel;$('play').innerHTML=(hasProgress?'CONTINUAR':'JOGAR')+' <span>↗</span>';
     function endIntro(){menuStats();setMode('menu');introTime=cfg.introDuration;}
-    function play(){setMode('play');audio.beep(587,.16);if(!tutorialSeen){tutorialSeen=true;dialogue('DORA DENDÊ','Você dirige, eu falo. Primeiro me busque na Praia Aurora. M abre o mapa.');toast('Introdução: siga o marcador coral. M abre o mapa.');save();}else toast('A Rádio Caju ainda tem serviço. M abre o mapa.');updateMission();}
+    function play(){setMode('play');audio.beep(587,.16);if(!tutorialSeen){tutorialSeen=true;dialogue('DORA DENDÊ · APRESENTADORA DA RÁDIO CAJU','Eu falo, você dirige. Entre no carro coral com E e me busque na Praia Aurora. M abre o mapa.');toast('O progresso é salvo automaticamente neste navegador.');save();}else toast('Progresso retomado · M abre o mapa.');updateMission();}
     function togglePause(){if(mode==='play')setMode('pause');else if(mode==='pause')setMode('play');}
     function help(){helpReturn=mode;setMode('help');}
     function createCar(x,z,color,isTraffic=false,heading=0,owned=false,type='compact'){const mesh=BN.createCar(THREE,color,false),sc=VEHICLES[type].scale;mesh.scale.set(sc[0],sc[1],sc[2]);scene.add(mesh);mesh.position.set(x,0,z);mesh.rotation.y=heading;const c={x,z,heading,speed:0,lat:0,type,color,baseY:sc[1],mesh,traffic:isTraffic,owned,path:[],waypoint:0,damage:0,hitCooldown:0,home:{x,z,heading},wreck:false,wreckTime:0,scared:0,stuck:0,byPlayer:false};cars.push(c);return c;}
@@ -307,7 +308,7 @@
       if(job){$('missionTitle').textContent=job.def.name;$('missionText').textContent=job.stage==='pickup'?(job.def.family==='passenger'?'Busque o passageiro e pare para o embarque.':job.def.family==='recovery'?'Entre no veículo indicado.':'Retire a carga no marcador. Pare o carro dentro do círculo.'):job.def.text;return;}
       if(activeRace){$('missionTitle').textContent=activeRace.def.name;$('missionText').textContent='Checkpoint '+(activeRace.checkpoint+1)+' de '+activeRace.def.points.length+' · '+activeRace.time.toFixed(1)+' s';return;}
       const objective=campaign.objective();
-      if(objective){$('missionTitle').textContent=objective.failed?'Missão interrompida':'Capítulo '+objective.mission.number+' · '+objective.mission.title;$('missionText').innerHTML='<b>'+objective.text+'</b><br><span class="route-note">Reputação '+reputation+' · M para traçar rota · L para contrarrelógio</span>';return;}
+      if(objective){const firstStep=objective.mission.number===1&&campaign.state.step===0;$('missionTitle').textContent=objective.failed?'Missão interrompida':'Capítulo '+objective.mission.number+' · '+objective.mission.title;$('missionText').innerHTML='<b>'+objective.text+'</b><br><span class="route-note">'+(firstStep?'M abre o mapa · o marcador coral mostra o destino':'Reputação '+reputation+' · M mapa · L corridas · P foto')+'</span>';return;}
       const offers=contractOffers();$('missionTitle').textContent='Mundo aberto · quadro de serviços';
       $('missionText').innerHTML=(lastResult?'<b>'+lastResult+'</b><br>':'')+offers.map((d,i)=>'<kbd>'+(i+1)+'</kbd> '+d.name+' · até R$ '+d.reward+' · '+RULES[d.kind]).join('<br>');
     }
@@ -773,7 +774,7 @@
     $('openMapPause').onclick=openMap;$('closeMap').onclick=()=>setMode(mapReturn);largeMap.onclick=e=>{const rect=largeMap.getBoundingClientRect();chooseRoute((e.clientX-rect.left)/rect.width*640-320,(e.clientY-rect.top)/rect.height*640-320);};
     $('photoFromPause').onclick=openPhoto;$('closePhoto').onclick=closePhoto;$('capturePhoto').onclick=capturePhoto;$('togglePhotoHud').onclick=()=>{photoClean=!photoClean;document.body.classList.toggle('photo-clean',photoClean);};
     $('toggleCameraMotion').textContent='MOVIMENTO DE CÂMERA: '+(cameraMotion?'LIGADO':'DESLIGADO');$('toggleCameraMotion').onclick=()=>{cameraMotion=!cameraMotion;$('toggleCameraMotion').textContent='MOVIMENTO DE CÂMERA: '+(cameraMotion?'LIGADO':'DESLIGADO');save();};
-    $('exportSave').onclick=exportSave;$('importSave').onclick=()=>$('importSaveFile').click();$('importSaveFile').onchange=e=>importSaveFile(e.target.files&&e.target.files[0]);
+    $('exportSave').onclick=exportSave;$('menuExport').onclick=exportSave;$('importSave').onclick=()=>$('importSaveFile').click();$('menuImport').onclick=()=>$('importSaveFile').click();$('importSaveFile').onchange=e=>importSaveFile(e.target.files&&e.target.files[0]);
     $('closeGarage').onclick=()=>setMode('play');$('garageList').onclick=e=>{const b=e.target&&e.target.closest?e.target.closest('button'):null;if(b)garageBuy(Number(b.getAttribute('data-i')));};
     $('closeHelp').onclick=()=>setMode(helpReturn);$('sound').onclick=()=>{$('sound').textContent=audio.toggle()?'SOM LIGADO':'SOM DESLIGADO';};
     window.addEventListener('keydown',e=>{

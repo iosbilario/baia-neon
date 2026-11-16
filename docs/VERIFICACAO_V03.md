@@ -25,6 +25,16 @@ Chrome headless, viewport 1280 × 800, WebGL por SwiftShader e abertura direta p
 
 Na comparação, a v0.2 mostra quarteirões de fachadas lisas e repetidas. A v0.3 acrescenta marquises, sacadas, entradas, mobiliário, padrões de janela, o Mercado Maré Alta e o Píer Farol como silhuetas reconhecíveis. A cena noturna preserva a leitura da rua e deixa chuva, janelas emissivas e o letreiro do píer visíveis.
 
+## Revisão independente de primeiro uso
+
+A revisão sem contexto considerou o fluxo pronto com ressalvas e apontou descobribilidade de retomada, salvamento e mapa, além de sobreposição no HUD. Antes da candidata:
+
+- o botão passa a dizer `CONTINUAR` quando existe progresso;
+- o menu explica o salvamento automático e oferece exportação e importação;
+- o primeiro objetivo ensina `E`, o marcador coral e `M` sem antecipar jargão de progressão;
+- o HUD mostra `WASD` e `M`;
+- som, alerta e atalhos foram reposicionados e recapturados.
+
 ## Balanceamento
 
 A rota viária mínima pelos 12 objetivos da campanha mede 4.778 m. A 4 m/s de velocidade média efetiva, sem contar embarque, diálogos, mapa, reparos, polícia e exploração, ela ocupa 19,9 minutos. Isso sustenta a meta de 20 a 30 minutos, mas não substitui a cronometragem humana.
