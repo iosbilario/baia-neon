@@ -90,12 +90,15 @@ Fica no marcador laranja do mapa e abre com `Enter`.
 | `P` | Abrir o modo foto |
 | `Y` | Repetir uma missão após falhar |
 | `X` | Escolher a retirada arriscada na missão do carro |
-| Clique ou `F` | Atirar a pé. No carro, `F` buzina |
+| Movimento do mouse | Girar a câmera com o ponteiro preso ao jogo |
+| Segurar botão direito | Mirar sobre o ombro |
+| Clique esquerdo ou `F` | Atirar pela mira central; no carro, `F` buzina |
 | `R` | Recarregar a pistola |
 | `G` | Arremessar granada |
-| Arrastar o mouse | Girar a câmera |
 | `H` | Consultar controles |
 | `Esc` | Pausar ou pular a abertura |
+
+`Esc` também libera o ponteiro. Em celulares, use o aparelho na horizontal: analógico esquerdo para movimento ou direção, deslize do lado direito para olhar e use os botões contextuais de ação, corrida, mira, aceleração, freio e freio de mão.
 
 `T` alterna a chuva e `N` alterna dia e noite, para experimentar.
 
@@ -184,9 +187,9 @@ Consulte [docs/RELEASING.md](docs/RELEASING.md) para publicação e recuperaçã
 
 ### Jogar sem internet
 
-O site precisa de conexão para carregar. Para jogar offline, baixe o
-[HTML autocontido da última release](https://github.com/iosbilario/baia-neon/releases/latest/download/baia-neon-0.3.0-offline.html)
-e abra o arquivo no navegador. O ZIP offline também inclui instruções, licenças,
+O site precisa de conexão para carregar. Para jogar offline, abra a
+[página da release mais recente](https://github.com/iosbilario/baia-neon/releases/latest),
+baixe o HTML ou ZIP offline e abra o arquivo no navegador. O ZIP offline também inclui instruções, licenças,
 metadados de versão e hashes.
 
 ## Limites atuais
@@ -194,7 +197,7 @@ metadados de versão e hashes.
 Este é um protótipo compacto, com colisões por volumes e direção arcade.
 
 - Não há interiores, bloqueios de rua, ruas de sentido único, troca de armas,
-  tiro de dentro do carro, capotamento, multiplayer, controles de toque ou suporte a controle físico.
+  tiro de dentro do carro, capotamento, multiplayer ou suporte a controle físico.
 - Pedestres não bloqueiam a passagem. Postes e semáforos não têm colisão.
 - O jogo reduz resolução e desliga sombras quando a média medida cai abaixo de 28 FPS.
 - A campanha foi desenhada para 20 a 30 minutos; o tempo varia com exploração,
