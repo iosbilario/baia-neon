@@ -8,8 +8,10 @@
     const k = {
       box: new T.BoxGeometry(1, 1, 1),
       cylinder: new T.CylinderGeometry(1, 1, 1, 7),
+      cylinder12: new T.CylinderGeometry(1, 1, 1, 12),
       cone: new T.ConeGeometry(1, 1, 6),
       sphere: new T.IcosahedronGeometry(1, 0),
+      round: new T.SphereGeometry(1, 14, 9),
       matte: new T.MeshStandardMaterial({vertexColors:true, roughness:.83, flatShading:true}),
       rubber: new T.MeshStandardMaterial({color:0x19252a, roughness:.95}),
       window: new T.MeshStandardMaterial({color:0x213d4c, metalness:.35, roughness:.25}),
@@ -54,30 +56,37 @@
   }
   BN.createCar = function(T, color, police) {
     const k=kit(T), g=new T.Group();
-    const paint=police?0xf0eee2:(color===undefined?0x32bab5:color);
+    const paint=police?0xf0eee2:(color===undefined?0x32bab5:color),trim=police?0x17465a:paint;
+    // Rounded low-poly volumes replace the old stack of boxes while keeping the same collision footprint.
     g.add(solid(T,[
-      {x:0,y:.63,z:0,sx:1.9,sy:.62,sz:4.1,color:paint},
-      {x:0,y:.98,z:-.24,sx:1.75,sy:.25,sz:2.5,color:paint},
-      {x:0,y:1.28,z:-.27,sx:1.53,sy:.55,sz:1.9,color:0x193d4a},
-      {x:0,y:1.58,z:-.30,sx:1.64,sy:.13,sz:2.05,color:paint},
-      {x:0,y:.73,z:2.09,sx:1.82,sy:.17,sz:.13,color:0xc1cbd0},
-      {x:0,y:.67,z:-2.09,sx:1.82,sy:.15,sz:.13,color:0x3d535b},
-      {x:0,y:.77,z:2.17,sx:.55,sy:.14,sz:.03,color:0x172c37},
-      {x:-.91,y:1.10,z:.38,sx:.20,sy:.18,sz:.25,color:paint},
-      {x:.91,y:1.10,z:.38,sx:.20,sy:.18,sz:.25,color:paint},
-      {x:-.91,y:.90,z:-.28,sx:.05,sy:.1,sz:1.4,color:police?0x124555:paint},
-      {x:.91,y:.90,z:-.28,sx:.05,sy:.1,sz:1.4,color:police?0x124555:paint}
+      {geo:k.round,x:0,y:.70,z:0,sx:.96,sy:.34,sz:2.03,color:paint},
+      {geo:k.round,x:0,y:.83,z:1.12,sx:.91,sy:.27,sz:1.02,color:paint},
+      {geo:k.round,x:0,y:.82,z:-1.35,sx:.91,sy:.25,sz:.66,color:paint},
+      {geo:k.round,x:0,y:1.20,z:-.25,sx:.76,sy:.43,sz:1.08,color:0x193d4a},
+      {geo:k.round,x:0,y:1.57,z:-.30,sx:.78,sy:.16,sz:1.02,color:paint},
+      {x:0,y:.57,z:2.08,sx:1.78,sy:.20,sz:.16,color:0xc1cbd0},
+      {x:0,y:.56,z:-2.08,sx:1.76,sy:.18,sz:.16,color:0x263d46},
+      {x:0,y:.84,z:2.10,sx:.62,sy:.10,sz:.04,color:0x172c37},
+      {x:-.98,y:1.05,z:.18,sx:.16,sy:.16,sz:.28,color:paint},
+      {x:.98,y:1.05,z:.18,sx:.16,sy:.16,sz:.28,color:paint},
+      {x:-.91,y:.88,z:-.25,sx:.05,sy:.12,sz:1.35,color:trim},
+      {x:.91,y:.88,z:-.25,sx:.05,sy:.12,sz:1.35,color:trim},
+      {geo:k.round,x:-.78,y:.58,z:-1.25,sx:.34,sy:.28,sz:.48,color:paint},
+      {geo:k.round,x:.78,y:.58,z:-1.25,sx:.34,sy:.28,sz:.48,color:paint},
+      {geo:k.round,x:-.78,y:.58,z:1.25,sx:.34,sy:.28,sz:.48,color:paint},
+      {geo:k.round,x:.78,y:.58,z:1.25,sx:.34,sy:.28,sz:.48,color:paint}
     ]));
     const wheels=[];
     for(const x of [-.96,.96])for(const z of [-1.25,1.25]) {
       const wheel=new T.Group();
       const tire=part(T,k.cylinder,k.rubber,0,0,0,.39,.22,.39,wheel); tire.rotation.z=Math.PI/2;
+      const hub=part(T,k.cylinder,new T.MeshStandardMaterial({color:0x829095,metalness:.55,roughness:.35}),0,0,0,.19,.24,.19,wheel);hub.rotation.z=Math.PI/2;
       wheel.position.set(x,.39,z); g.add(wheel); wheels.push(wheel);
     }
     const headlights=[], lights=[];
     for(const x of [-.65,.65]) {
-      headlights.push(part(T,k.box,k.head,x,.86,2.09,.43,.22,.06,g));
-      part(T,k.box,k.red,x,.86,-2.09,.45,.16,.04,g);
+      headlights.push(part(T,k.round,k.head,x,.77,2.02,.20,.11,.065,g));
+      part(T,k.round,k.red,x,.70,-2.02,.21,.09,.055,g);
     }
     if(police){
       part(T,k.box,k.rubber,0,1.73,-.25,1.15,.12,.30,g);
@@ -92,19 +101,30 @@
   BN.createHuman = function(T, shirtColor, skinColor) {
     const k=kit(T),g=new T.Group();
     const shirt=shirtColor===undefined?0xf87770:shirtColor, skin=skinColor===undefined?0x9e6847:skinColor;
+    // Seven-sided cylinders and low-poly spheres keep the style light without looking like stacked cubes.
     g.add(solid(T,[
-      {y:1.12,sx:.48,sy:.60,sz:.29,color:shirt},
-      {y:1.57,sx:.29,sy:.33,sz:.29,color:skin},
-      {y:1.75,z:-.02,sx:.31,sy:.10,sz:.32,color:0x20242d},
-      {y:.80,sx:.43,sy:.16,sz:.28,color:0x284451}
+      {geo:k.cylinder12,y:1.18,sx:.31,sy:.64,sz:.27,color:shirt},
+      {geo:k.round,y:1.43,sx:.43,sy:.22,sz:.30,color:shirt},
+      {geo:k.round,y:.86,sx:.35,sy:.20,sz:.28,color:0x284451},
+      {geo:k.round,y:1.78,sx:.29,sy:.34,sz:.28,color:skin},
+      {geo:k.round,y:2.02,z:-.025,sx:.31,sy:.16,sz:.30,color:0x20242d},
+      {geo:k.round,x:-.29,y:1.80,z:.02,sx:.055,sy:.10,sz:.07,color:skin},
+      {geo:k.round,x:.29,y:1.80,z:.02,sx:.055,sy:.10,sz:.07,color:skin}
     ]));
     const legs=[],arms=[];
-    for(const x of [-.14,.14]) {
+    for(const x of [-.16,.16]) {
       const leg=new T.Group(); leg.position.set(x,.78,0);
-      leg.add(solid(T,[{y:-.31,sx:.17,sy:.62,sz:.19,color:0x284451},{y:-.66,z:.06,sx:.20,sy:.13,sz:.31,color:0xeee8ce}]));
+      leg.add(solid(T,[
+        {geo:k.cylinder12,y:-.31,sx:.105,sy:.62,sz:.105,color:0x284451},
+        {geo:k.round,y:-.65,z:.075,sx:.13,sy:.09,sz:.23,color:0xeee8ce}
+      ]));
       g.add(leg); legs.push(leg);
-      const arm=new T.Group();arm.position.set(Math.sign(x)*.32,1.35,0);
-      arm.add(solid(T,[{y:-.13,sx:.16,sy:.28,sz:.19,color:shirt},{y:-.39,sx:.13,sy:.28,sz:.15,color:skin}]));
+      const side=Math.sign(x),arm=new T.Group();arm.position.set(side*.37,1.46,0);arm.rotation.z=-side*.08;
+      arm.add(solid(T,[
+        {geo:k.cylinder12,y:-.17,sx:.095,sy:.34,sz:.095,color:shirt},
+        {geo:k.cylinder12,y:-.43,sx:.075,sy:.26,sz:.075,color:skin},
+        {geo:k.round,y:-.58,sx:.09,sy:.10,sz:.09,color:skin}
+      ]));
       g.add(arm); arms.push(arm);
     }
     g.userData={legs,arms}; return g;
@@ -112,7 +132,7 @@
   BN.createAnimal = function(T,type) {
     const k=kit(T), g=new T.Group();
     if(type==='gull' || type==='bird') {
-      g.add(solid(T,[{geo:k.sphere,y:0,sx:.33,sy:.16,sz:.6,color:0xf1eee7},{geo:k.sphere,y:.15,z:.44,sx:.15,sy:.15,sz:.16,color:0xffffff},{y:.12,z:.64,sx:.08,sy:.08,sz:.22,color:0xeab449}]));
+      g.add(solid(T,[{geo:k.round,y:0,sx:.33,sy:.16,sz:.6,color:0xf1eee7},{geo:k.round,y:.15,z:.44,sx:.15,sy:.15,sz:.16,color:0xffffff},{y:.12,z:.64,sx:.08,sy:.08,sz:.22,color:0xeab449}]));
       const wings=[];
       for(const s of [-1,1]){const w=new T.Group();w.position.x=s*.18;w.add(solid(T,[{x:s*.48,sx:1.0,sy:.035,sz:.25,rz:s*.06,color:0xd9e2db}]));g.add(w);wings.push(w);}
       g.userData.wings=wings;
@@ -139,7 +159,7 @@
   };
   BN.createWorld = function(T, scene) {
     const k=kit(T), roads=[-240,-160,-80,0,80,160,240];
-    const buildings=[], batches=new Map(), signs=[], animals=[], parks=[], alleys=[], lots=[], solidProps=[];
+    const buildings=[], batches=new Map(), signs=[], animals=[], parks=[], alleys=[], lots=[], solidProps=[],tunnels=[],hills=[];
     // Small solid objects (trunks, benches, fountains) live in a coarse grid so the check stays cheap.
     const props=new Map();
     function prop(x,z,r){const item={x,z,r};solidProps.push(item);const key=Math.floor(x/16)*1000+Math.floor(z/16);if(!props.has(key))props.set(key,[]);props.get(key).push(item);}
@@ -148,6 +168,9 @@
     const bounds={minX:-300,maxX:300,minZ:-300,maxZ:300};
     const matCache={};
     function material(color,roughness=.88) {const key=color+'_'+roughness;return matCache[key]||(matCache[key]=new T.MeshStandardMaterial({color,roughness,flatShading:true}));}
+    function getElevation(x,z){
+      let result=0;for(const hill of hills){const nx=(x-hill.x)/hill.rx,nz=(z-hill.z)/hill.rz,r2=nx*nx+nz*nz;if(r2<1)result=Math.max(result,hill.height*(1-r2)*(1-r2));}return result;
+    }
     const asphalt=new T.MeshStandardMaterial({color:0x3c5158,roughness:.96});
     const lightMat=new T.MeshStandardMaterial({color:0xe8dab1,emissive:0xffdc83,emissiveIntensity:.1});
     const windowLit=new T.MeshStandardMaterial({color:0x51717d,emissive:0xffd99a,emissiveIntensity:0,roughness:.35,metalness:.2});
@@ -162,22 +185,22 @@
       batches.get(key).items.push({x,y,z,sx,sy,sz,rx,ry,rz});
     }
     function box(mat,x,y,z,sx,sy,sz,ry=0){inst(k.box,mat,x,y,z,sx,sy,sz,0,ry,0);}
-    function palm(x,z,h=7){
+    function palm(x,z,h=7,base=0){
       prop(x,z,.35);
-      inst(k.cylinder,trunk,x,h*.48,z,.24,h,.24,0,0,.04);
+      inst(k.cylinder,trunk,x,base+h*.48,z,.24,h,.24,0,0,.04);
       for(let a=0;a<7;a++) {
         const angle=a*Math.PI*2/7;
-        inst(k.cone,a%2?palmMat:palmLight,x+Math.sin(angle)*1.4,h-.2,z+Math.cos(angle)*1.4,.65,4.7,.22,Math.cos(angle)*1.14,0,-Math.sin(angle)*1.14);
+        inst(k.cone,a%2?palmMat:palmLight,x+Math.sin(angle)*1.4,base+h-.2,z+Math.cos(angle)*1.4,.65,4.7,.22,Math.cos(angle)*1.14,0,-Math.sin(angle)*1.14);
       }
-      inst(k.sphere,shadowMat,x,h-.5,z,.55,.55,.55);
+      inst(k.sphere,shadowMat,x,base+h-.5,z,.55,.55,.55);
     }
-    function bush(x,z,size=1.4){inst(k.sphere,palmLight,x,size*.65,z,size,size*.8,size);}
-    function bench(x,z,angle=0){
+    function bush(x,z,size=1.4,base=0){inst(k.sphere,palmLight,x,base+size*.65,z,size,size*.8,size);}
+    function bench(x,z,angle=0,base=0){
       prop(x,z,1.1);
-      box(trunk,x,.65,z,2.7,.20,.72,angle);
+      box(trunk,x,base+.65,z,2.7,.20,.72,angle);
       const dx=Math.sin(angle)*.34,dz=Math.cos(angle)*.34;
-      box(trunk,x-dx,1.1,z-dz,2.7,.70,.14,angle);
-      for(const s of [-1,1])box(material(0x314b52),x+Math.cos(angle)*s,.30,z-Math.sin(angle)*s,.14,.6,.6,angle);
+      box(trunk,x-dx,base+1.1,z-dz,2.7,.70,.14,angle);
+      for(const s of [-1,1])box(material(0x314b52),x+Math.cos(angle)*s,base+.30,z-Math.sin(angle)*s,.14,.6,.6,angle);
     }
     function lamp(x,z,ang=0){
       inst(k.cylinder,material(0x34515b),x,3.7,z,.09,7.4,.09);
@@ -275,6 +298,14 @@
         for(let x=107;x<133;x+=4)box(cream,x,.65,r+s*9.2,.25,1.0,.25);
       }
     }
+    // A covered arterial segment creates a real drivable tunnel without blocking the road graph.
+    const tunnel={minX:-58,maxX:58,minZ:230,maxZ:250,z:240};tunnels.push(tunnel);
+    const tunnelConcrete=material(0x6f8584),tunnelDark=material(0x263b42);
+    box(tunnelConcrete,0,6.5,240,116,1.0,20);
+    box(tunnelConcrete,0,3.2,230.8,116,6.4,1.6);
+    box(tunnelConcrete,0,3.2,249.2,116,6.4,1.6);
+    box(tunnelDark,0,6.0,240,112,.12,16);
+    for(let x=-50;x<=50;x+=12){box(lightMat,x,5.65,240,2.8,.10,.55);}
     for(const x of roads)for(const z of roads){
       for(const sign of [-1,1]) {
         for(let s=-5;s<=5;s+=1.5){box(white,x+s,.195,z+sign*9.2,.7,.025,2.8);box(white,x+sign*9.2,.20,z+s,2.8,.025,.7);}
@@ -291,7 +322,7 @@
     }
     const colors=[0xebad98,0x9fcac1,0xe9cf9b,0xe6c3b5,0x91bbc8,0xc0b5cc,0xe9ded0,0xc5cbb9];
     const towerSlots=new Set(['2:1:1','2:2:4','2:3:2','3:1:4','3:3:4','3:4:4','4:1:1','4:2:4','4:3:1','6:1:4','6:3:1','6:5:4']);
-    const reservedSlots=new Set(['4:3:2','4:3:5','3:4:1','4:4:0']);
+    const reservedSlots=new Set(['1:5:5','4:3:2','4:3:5','3:4:1','4:4:0']);
     for(let ix=0;ix<8;ix++)for(let iz=0;iz<8;iz++){
       const minX=ix===0?-298:roads[ix-1]+12,maxX=ix===7?298:roads[ix]-12;
       const minZ=iz===0?-298:roads[iz-1]+12,maxZ=iz===7?298:roads[iz]-12;
@@ -305,21 +336,32 @@
       }
       const park=(ix===2&&iz===5)||(ix===3&&iz===2)||(ix===0&&iz%3===1);
       if(park){
-        const halfX=cellW/2,halfZ=cellD/2;
+        const halfX=cellW/2,halfZ=cellD/2,hill=ix===0&&iz===7;
+        if(hill){hills.push({x:cx,z:cz,rx:halfX-3,rz:halfZ-3,height:6});inst(k.round,material(0x5c956f),cx,0,cz,halfX-3,6,halfZ-3);}
         box(material(0x639e79),cx,.18,cz,cellW,.18,cellD);
         parks.push({x:cx,z:cz,halfX,halfZ});prop(cx,cz,3.7);
         // Reserved park parcel: every tree, bench and fountain stays inside this boundary.
         for(let x=minX+2;x<=maxX-2;x+=4){box(cream,x,.45,minZ+.7,.3,.7,.3);box(cream,x,.45,maxZ-.7,.3,.7,.3);}
         for(let z=minZ+2;z<=maxZ-2;z+=4){box(cream,minX+.7,.45,z,.3,.7,.3);box(cream,maxX-.7,.45,z,.3,.7,.3);}
-        box(material(0xd3c5a3),cx,.29,cz,3,.04,cellD-4);
-        box(material(0xd3c5a3),cx,.29,cz,cellW-4,.04,3);
+        if(hill){
+          for(let x=minX+3;x<maxX-2;x+=2.2)box(material(0xd3c5a3),x,getElevation(x,cz)+.20,cz,2.3,.08,2.6);
+          for(let z=minZ+3;z<maxZ-2;z+=2.2)box(material(0xd3c5a3),cx,getElevation(cx,z)+.21,z,2.6,.08,2.3);
+        }else{
+          box(material(0xd3c5a3),cx,.29,cz,3,.04,cellD-4);
+          box(material(0xd3c5a3),cx,.29,cz,cellW-4,.04,3);
+        }
         for(let i=0;i<13;i++){
           const a=i*2.399,r=.30+rand()*.58;
-          const tx=cx+Math.cos(a)*(halfX-6)*r,tz=cz+Math.sin(a)*(halfZ-6)*r;
-          palm(tx,tz,5.5+rand()*4);bush(cx+Math.cos(a+.7)*(halfX-7)*r,cz+Math.sin(a+.7)*(halfZ-7)*r,.8+rand()*.8);
+          const tx=cx+Math.cos(a)*(halfX-6)*r,tz=cz+Math.sin(a)*(halfZ-6)*r,base=getElevation(tx,tz);
+          const bx=cx+Math.cos(a+.7)*(halfX-7)*r,bz=cz+Math.sin(a+.7)*(halfZ-7)*r;
+          palm(tx,tz,5.5+rand()*4,base);bush(bx,bz,.8+rand()*.8,getElevation(bx,bz));
         }
-        bench(cx+halfX*.38,cz+halfZ*.30);bench(cx-halfX*.38,cz-halfZ*.30,Math.PI);
-        inst(k.cylinder,cream,cx,.5,cz,3.6,.7,3.6);inst(k.cylinder,waterMat,cx,.9,cz,3.1,.06,3.1);inst(k.cone,cream,cx,1.9,cz,.5,2.3,.5);
+        for(let i=0;i<56;i++){
+          const gx=cx+(rand()-.5)*(cellW-7),gz=cz+(rand()-.5)*(cellD-7);if(Math.hypot(gx-cx,gz-cz)<5)continue;
+          inst(k.cone,i%3?palmMat:palmLight,gx,getElevation(gx,gz)+.32,gz,.08+rand()*.08,.45+rand()*.35,.08+rand()*.08,0,rand()*6.28,0);
+        }
+        const b1={x:cx+halfX*.38,z:cz+halfZ*.30},b2={x:cx-halfX*.38,z:cz-halfZ*.30};bench(b1.x,b1.z,0,getElevation(b1.x,b1.z));bench(b2.x,b2.z,Math.PI,getElevation(b2.x,b2.z));
+        const centerY=getElevation(cx,cz);inst(k.cylinder,cream,cx,centerY+.5,cz,3.6,.7,3.6);inst(k.cylinder,waterMat,cx,centerY+.9,cz,3.1,.06,3.1);inst(k.cone,cream,cx,centerY+1.9,cz,.5,2.3,.5);
         continue;
       }
       const downtown=ix>=2&&ix<=4&&iz>=1&&iz<=3,coastal=ix===6;
@@ -415,10 +457,11 @@
     parks.forEach((p,i)=>{
       const dog=BN.createAnimal(T,'dog');dog.position.set(p.x+8,.3,p.z+8);scene.add(dog);animals.push({g:dog,type:'dog',x:p.x,z:p.z,phase:i*2,speed:.25});
       for(let j=0;j<4;j++){const bug=BN.createAnimal(T,'butterfly');bug.position.set(p.x,.7,p.z);scene.add(bug);animals.push({g:bug,type:'butterfly',x:p.x+6,z:p.z+6,phase:rand()*20,speed:.5+rand()});}
+      for(let j=0;j<2;j++){const bird=BN.createAnimal(T,'gull');scene.add(bird);animals.push({g:bird,type:'gull',x:p.x,z:p.z,phase:rand()*20,speed:.16+rand()*.06,park:true});}
     });
     for(let i=0;i<8;i++){const bird=BN.createAnimal(T,'gull');scene.add(bird);animals.push({g:bird,type:'gull',x:280,z:-240+i*65,phase:rand()*20,speed:.13+rand()*.08});}
     const fireGeo=new T.BufferGeometry(), fireCount=70,firePos=new Float32Array(fireCount*3),fireBase=[];
-    for(let i=0;i<fireCount;i++){const p=parks[i%parks.length];const x=p.x+(rand()-.5)*35,z=p.z+(rand()-.5)*35,y=1+rand()*2;fireBase.push({x,y,z,phase:rand()*10});firePos.set([x,y,z],i*3);}
+    for(let i=0;i<fireCount;i++){const p=parks[i%parks.length];const x=p.x+(rand()-.5)*35,z=p.z+(rand()-.5)*35,y=getElevation(x,z)+1+rand()*2;fireBase.push({x,y,z,phase:rand()*10});firePos.set([x,y,z],i*3);}
     fireGeo.setAttribute('position',new T.BufferAttribute(firePos,3));
     const fireMat=new T.PointsMaterial({color:0xeaff98,size:.22,transparent:true,opacity:0,depthWrite:false});
     const fireflies=new T.Points(fireGeo,fireMat);scene.add(fireflies);
@@ -426,6 +469,7 @@
       if(x-r<bounds.minX||x+r>bounds.maxX||z-r<bounds.minZ||z+r>bounds.maxZ)return true;
       if(x+r>106&&x-r<132&&!roads.some(a=>Math.abs(z-a)<8-r))return true;
       if(buildings.some(b=>x+r>b.minX&&x-r<b.maxX&&z+r>b.minZ&&z-r<b.maxZ))return true;
+      if(tunnels.some(t=>x+r>t.minX&&x-r<t.maxX&&((z-r<t.minZ+1.6&&z+r>t.minZ)||(z-r<t.maxZ&&z+r>t.maxZ-1.6))))return true;
       // Anything as wide as a car stops at the park bollards.
       if(r>=1&&parks.some(p=>Math.abs(x-p.x)<p.halfX-1&&Math.abs(z-p.z)<p.halfZ-1))return true;
       const gx=Math.floor(x/16),gz=Math.floor(z/16);
@@ -456,13 +500,13 @@
       for(const a of animals){
         const t=time*a.speed+a.phase;
         if(a.type==='dog'){
-          a.g.position.set(a.x+Math.sin(t)*11,.30,a.z+Math.cos(t)*11);a.g.rotation.y=t+Math.PI/2;
+          a.g.position.set(a.x+Math.sin(t)*11,getElevation(a.x+Math.sin(t)*11,a.z+Math.cos(t)*11)+.30,a.z+Math.cos(t)*11);a.g.rotation.y=t+Math.PI/2;
           a.g.userData.legs.forEach((l,i)=>l.rotation.x=Math.sin(time*6+i*Math.PI)*.26);
         }else if(a.type==='gull'){
-          a.g.position.set(a.x+Math.sin(t)*26,12+Math.sin(t*2)*3,a.z+Math.cos(t)*26);a.g.rotation.y=t+Math.PI/2;
+          const gx=a.x+Math.sin(t)*26,gz=a.z+Math.cos(t)*26;a.g.position.set(gx,getElevation(gx,gz)+12+Math.sin(t*2)*3,gz);a.g.rotation.y=t+Math.PI/2;
           a.g.userData.wings.forEach((w,i)=>w.rotation.z=Math.sin(time*3+a.phase)*(i?-.25:.25));
         }else{
-          a.g.position.set(a.x+Math.sin(t)*3,1.1+Math.sin(t*2)*.45,a.z+Math.cos(t*1.3)*3);
+          const gx=a.x+Math.sin(t)*3,gz=a.z+Math.cos(t*1.3)*3;a.g.position.set(gx,getElevation(gx,gz)+1.1+Math.sin(t*2)*.45,gz);
           a.g.visible=night<.8 && rain<.7;a.g.rotation.y=t;
           a.g.userData.wings.forEach((w,i)=>w.rotation.z=Math.sin(time*27)*(i?-1:1));
         }
@@ -478,6 +522,6 @@
       }
     }
     function getDistrict(x,z){return x>250?'Praia Aurora':x>85&&x<150?'Canal das Garças':x<70&&z<0?'Centro Solar':z>60&&x<0?'Jardim Maré':'Costa Coral';}
-    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,parks,alleys,lots,solidProps,counts:{buildings:buildings.length,skyscrapers:buildings.filter(b=>b.tower).length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
+    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,getElevation,parks,alleys,lots,tunnels,hills,solidProps,counts:{buildings:buildings.length,skyscrapers:buildings.filter(b=>b.tower).length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
   };
 })();
