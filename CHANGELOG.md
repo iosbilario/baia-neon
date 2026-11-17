@@ -2,7 +2,7 @@
 
 ## [0.5.0] — Na Mão
 
-### Em desenvolvimento
+### Para quem joga
 
 - Controle de PC inspirado no padrão de jogos de mundo aberto: câmera pelo mouse com pointer lock, mira central e visão sobre o ombro.
 - Clique esquerdo atira, botão direito segura a mira e `Esc` libera o ponteiro e pausa.
