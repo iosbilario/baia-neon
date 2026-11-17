@@ -2,7 +2,7 @@
 
 ## [0.4.0] — Cidade Viva
 
-### Em desenvolvimento
+### Para quem joga
 
 - Cidade reconstruída com 249 prédios, 12 arranha-céus de até 125 metros, lotes sem sobreposição e skyline por bairros.
 - Personagens articulados e carros com volumes arredondados, rodas e iluminação mais detalhadas.
