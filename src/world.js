@@ -139,10 +139,10 @@
   };
   BN.createWorld = function(T, scene) {
     const k=kit(T), roads=[-240,-160,-80,0,80,160,240];
-    const buildings=[], batches=new Map(), signs=[], animals=[], parks=[], alleys=[], lots=[];
+    const buildings=[], batches=new Map(), signs=[], animals=[], parks=[], alleys=[], lots=[], solidProps=[];
     // Small solid objects (trunks, benches, fountains) live in a coarse grid so the check stays cheap.
     const props=new Map();
-    function prop(x,z,r){const key=Math.floor(x/16)*1000+Math.floor(z/16);if(!props.has(key))props.set(key,[]);props.get(key).push({x,z,r});}
+    function prop(x,z,r){const item={x,z,r};solidProps.push(item);const key=Math.floor(x/16)*1000+Math.floor(z/16);if(!props.has(key))props.set(key,[]);props.get(key).push(item);}
     let seed=631842;
     function rand(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;}
     const bounds={minX:-300,maxX:300,minZ:-300,maxZ:300};
@@ -203,10 +203,15 @@
       mesh.userData.mount='facade';mesh.userData.building=buildings.indexOf(nearest);
     }
     function building(x,z,w,d,h,color,style){
-      const face=material(color);
-      buildings.push({minX:x-w/2,maxX:x+w/2,minZ:z-d/2,maxZ:z+d/2,height:h});
-      box(face,x,h/2,z,w,h,d);
-      box(cream,x,h+.2,z,w+.7,.65,d+.7);
+      const face=material(color),tower=style===3&&h>55,baseHeight=tower?8:h;
+      const upperW=tower?w*(.62+rand()*.10):w,upperD=tower?d*(.62+rand()*.12):d;
+      buildings.push({minX:x-w/2,maxX:x+w/2,minZ:z-d/2,maxZ:z+d/2,height:h,tower});
+      if(tower){
+        box(face,x,baseHeight/2,z,w,baseHeight,d);
+        box(face,x,(h+baseHeight)/2,z,upperW,h-baseHeight,upperD);
+        box(cream,x,baseHeight+.15,z,w+.35,.34,d+.35);
+      }else box(face,x,h/2,z,w,h,d);
+      box(cream,x,h+.2,z,upperW+.7,.65,upperD+.7);
       box(cream,x,1.1,z,w+.4,.9,d+.4);
       if(style===1){
         box(face,x,h+1.8,z,w*.65,3,d*.65);
@@ -214,24 +219,31 @@
         box(face,x,h+4,z,w*.32,1.5,d*.35);
       }
       for(let y=4;y<h-1;y+=3.6){
-        if(style===2)box(cream,x,y-1.3,z,w+.2,.25,d+.2);
-        for(let wx=x-w/2+2;wx<x+w/2-1;wx+=3.6)for(const s of [-1,1])box(rand()<.67?windowLit:windowDark,wx,y,z+s*(d/2+.025),1.5,1.8,.05);
-        for(let wz=z-d/2+2;wz<z+d/2-1;wz+=3.6)for(const s of [-1,1])box(rand()<.67?windowLit:windowDark,x+s*(w/2+.025),y,wz,.05,1.8,1.5);
+        const fw=tower&&y>baseHeight?upperW:w,fd=tower&&y>baseHeight?upperD:d;
+        if(style===2)box(cream,x,y-1.3,z,fw+.2,.25,fd+.2);
+        for(let wx=x-fw/2+1.7;wx<x+fw/2-1;wx+=3.2)for(const s of [-1,1])box(rand()<.67?windowLit:windowDark,wx,y,z+s*(fd/2+.025),1.25,1.75,.05);
+        for(let wz=z-fd/2+1.7;wz<z+fd/2-1;wz+=3.2)for(const s of [-1,1])box(rand()<.67?windowLit:windowDark,x+s*(fw/2+.025),y,wz,.05,1.75,1.25);
       }
       box(windowDark,x,1.4,z+d/2+.04,1.6,2.6,.09);
-      // Modular street-level silhouette: entrance, awning and occasional balconies.
-      const accent=material(style===1?0xf18b70:style===2?0x62b8ae:0xe5b657);
-      box(accent,x,2.95,z+d/2+.65,4.8,.22,1.25);
-      for(const s of [-1,1])box(cream,x+s*2.15,1.65,z+d/2+.32,.18,3.2,.45);
+      // Modular street level: every parcel gets an entrance and awning.
+      const accent=material(style===1?0xf18b70:style===2?0x62b8ae:tower?0xffa66f:0xe5b657);
+      box(accent,x,2.95,z+d/2+.65,Math.min(4.8,w*.55),.22,1.25);
+      for(const s of [-1,1])box(cream,x+s*Math.min(2.15,w*.24),1.65,z+d/2+.32,.18,3.2,.45);
       if(style===2&&h>12)for(let by=6;by<h-2;by+=7){
-        box(cream,x,by,z+d/2+.58,Math.min(w*.66,11),.22,1.1);
-        box(accent,x,by+.62,z+d/2+1.04,Math.min(w*.66,11),.08,.08);
+        const bw=tower&&by>baseHeight?upperW:w;
+        box(cream,x,by,z+(tower&&by>baseHeight?upperD:d)/2+.58,Math.min(bw*.66,11),.22,1.1);
+        box(accent,x,by+.62,z+(tower&&by>baseHeight?upperD:d)/2+1.04,Math.min(bw*.66,11),.08,.08);
       }
-      if(style===1&&w>18){
-        box(windowDark,x-w*.28,1.7,z+d/2+.13,w*.28,2.5,.08);
-        box(windowDark,x+w*.28,1.7,z+d/2+.13,w*.28,2.5,.08);
+      if(style===1&&w>15){
+        box(windowDark,x-w*.28,1.7,z+d/2+.13,w*.25,2.5,.08);
+        box(windowDark,x+w*.28,1.7,z+d/2+.13,w*.25,2.5,.08);
       }
-      if(h>27){
+      if(tower){
+        // Staggered crown makes each skyscraper readable in the skyline.
+        box(face,x,h+2,z,upperW*.72,3.6,upperD*.72);
+        box(accent,x,h+4.1,z,upperW*.42,.6,upperD*.42);
+        inst(k.cylinder,material(0xd2b8a2),x,h+10,z,.16,12,.16);
+      }else if(h>27){
         box(material(0x8eaaa7),x+w*.24,h+.85,z-d*.18,2.5,1.2,3.6);
         inst(k.cylinder,material(0xd2b8a2),x-w*.2,h+2,z+d*.18,1.4,3,1.4);
       }
@@ -278,51 +290,63 @@
       }
     }
     const colors=[0xebad98,0x9fcac1,0xe9cf9b,0xe6c3b5,0x91bbc8,0xc0b5cc,0xe9ded0,0xc5cbb9];
+    const towerSlots=new Set(['2:1:1','2:2:4','2:3:2','3:1:4','3:3:4','3:4:4','4:1:1','4:2:4','4:3:1','6:1:4','6:3:1','6:5:4']);
+    const reservedSlots=new Set(['4:3:2','4:3:5','3:4:1','4:4:0']);
     for(let ix=0;ix<8;ix++)for(let iz=0;iz<8;iz++){
-      const cx=-280+ix*80,cz=-280+iz*80;
-      if(cx>250)continue;
-      const park=(ix===2&&iz===5)||(ix===3&&iz===2)||(ix===5)||(ix===0&&iz%3===1);
-      if(park){
-        const px=cx===120?94:cx;
-        const pw=cx===120?14:52;
-        box(material(0x639e79),px,.18,cz,pw,.18,54);
-        if(cx!==120){
-          parks.push({x:cx,z:cz});prop(cx,cz,3.7);
-          // Bollards: parks are for walking. Cars stay out, people and officers on foot get in.
-          for(let t=-26;t<=26;t+=4){for(const s of [-1,1]){box(cream,cx+t,.45,cz+s*27,.3,.7,.3);box(cream,cx+s*26,.45,cz+t,.3,.7,.3);}}
-          box(material(0xd3c5a3),cx,.29,cz,3,.04,54);
-          box(material(0xd3c5a3),cx,.29,cz,54,.04,3);
-          for(let i=0;i<7;i++){const a=i*2.4;palm(cx+Math.sin(a)*20,cz+Math.cos(a)*20,5+rand()*4);bush(cx+Math.cos(a)*14,cz+Math.sin(a)*14,1+rand());}
-          bench(cx+6,cz+4);bench(cx-6,cz-4,Math.PI);
-          inst(k.cylinder,cream,cx,.5,cz,3.6,.7,3.6);inst(k.cylinder,waterMat,cx,.9,cz,3.1,.06,3.1);
-          inst(k.cone,cream,cx,1.9,cz,.5,2.3,.5);
-        }else{for(let j=-20;j<=20;j+=20)palm(94,cz+j,7);}
+      const minX=ix===0?-298:roads[ix-1]+12,maxX=ix===7?298:roads[ix]-12;
+      const minZ=iz===0?-298:roads[iz-1]+12,maxZ=iz===7?298:roads[iz]-12;
+      const cx=(minX+maxX)/2,cz=(minZ+maxZ)/2,cellW=maxX-minX,cellD=maxZ-minZ;
+      // The eastern strip remains beach; the canal strip remains water and promenades.
+      if(ix===7)continue;
+      if(ix===5){
+        box(material(0x639e79),94,.18,cz,14,.18,cellD);
+        for(let z=minZ+7;z<maxZ-3;z+=13)palm(94,z,6+rand()*2);
         continue;
       }
-      const downtown=cx<70&&cx>-180&&cz<60&&cz>-220;
-      const w=19+rand()*5,d=20+rand()*6;
-      const positions=[[cx-13,cz-13],[cx+13,cz+13]];
-      if(downtown&&rand()>.50){
-        const h=38+rand()*37,color=colors[Math.floor(rand()*colors.length)];
-        if((ix+iz)%2===0){
-          // A tower split by a 3 m service alley from street to street. Only a narrow car fits.
-          building(cx-9.5,cz,16,33,h,color,1);building(cx+9.5,cz,16,33,h*(.72+rand()*.25),colors[Math.floor(rand()*colors.length)],1);
-          alleys.push({x:cx,z:cz,half:28});
-          box(material(0x2f4046),cx,.2,cz,3,.05,56);
-          for(const s of [-1,1]){box(material(0xe7b53c),cx-1.9,.5,cz+s*27,.5,1,.5);box(material(0xe7b53c),cx+1.9,.5,cz+s*27,.5,1,.5);box(material(0xe7b53c),cx,.22,cz+s*25,3,.03,.6);}
-        }else building(cx,cz,35,33,h,color,1);
-      }else{
-        for(const p of positions)building(p[0],p[1],w,d,8+rand()*(downtown?30:14),colors[Math.floor(rand()*colors.length)],Math.floor(rand()*3));
+      const park=(ix===2&&iz===5)||(ix===3&&iz===2)||(ix===0&&iz%3===1);
+      if(park){
+        const halfX=cellW/2,halfZ=cellD/2;
+        box(material(0x639e79),cx,.18,cz,cellW,.18,cellD);
+        parks.push({x:cx,z:cz,halfX,halfZ});prop(cx,cz,3.7);
+        // Reserved park parcel: every tree, bench and fountain stays inside this boundary.
+        for(let x=minX+2;x<=maxX-2;x+=4){box(cream,x,.45,minZ+.7,.3,.7,.3);box(cream,x,.45,maxZ-.7,.3,.7,.3);}
+        for(let z=minZ+2;z<=maxZ-2;z+=4){box(cream,minX+.7,.45,z,.3,.7,.3);box(cream,maxX-.7,.45,z,.3,.7,.3);}
+        box(material(0xd3c5a3),cx,.29,cz,3,.04,cellD-4);
+        box(material(0xd3c5a3),cx,.29,cz,cellW-4,.04,3);
+        for(let i=0;i<13;i++){
+          const a=i*2.399,r=.30+rand()*.58;
+          const tx=cx+Math.cos(a)*(halfX-6)*r,tz=cz+Math.sin(a)*(halfZ-6)*r;
+          palm(tx,tz,5.5+rand()*4);bush(cx+Math.cos(a+.7)*(halfX-7)*r,cz+Math.sin(a+.7)*(halfZ-7)*r,.8+rand()*.8);
+        }
+        bench(cx+halfX*.38,cz+halfZ*.30);bench(cx-halfX*.38,cz-halfZ*.30,Math.PI);
+        inst(k.cylinder,cream,cx,.5,cz,3.6,.7,3.6);inst(k.cylinder,waterMat,cx,.9,cz,3.1,.06,3.1);inst(k.cone,cream,cx,1.9,cz,.5,2.3,.5);
+        continue;
       }
-      palm(cx-25,cz+23,6+rand()*3);palm(cx+25,cz-23,6+rand()*3);
-      // Some open corners are public parking: a place to leave one car and take another.
-      if(!alleys.some(a=>a.x===cx&&a.z===cz)&&!(downtown&&buildings.length&&buildings[buildings.length-1].maxX-buildings[buildings.length-1].minX>30)&&(ix*3+iz)%4===0){
-        const lx=cx+14,lz=cz-14;lots.push({x:lx,z:lz});
-        box(asphalt,lx,.2,lz,20,.05,18);
-        for(let i=-2;i<=2;i++)box(white,lx+i*4,.24,lz,.15,.02,9);
-        box(material(0x2b62a8),lx-9,2.4,lz+9.5,1.6,1.6,.15);box(white,lx-9,2.4,lz+9.6,.9,1.0,.04);box(trunk,lx-9,.8,lz+9.5,.14,1.6,.14);
+      const downtown=ix>=2&&ix<=4&&iz>=1&&iz<=3,coastal=ix===6;
+      const gapX=2.6,gapZ=2.4,colW=(cellW-gapX)/2,rowD=(cellD-gapZ*2)/3;
+      const buildW=colW-.2,buildD=rowD-.8;
+      let slot=0;
+      for(let col=0;col<2;col++)for(let row=0;row<3;row++,slot++){
+        const key=ix+':'+iz+':'+slot;
+        if(reservedSlots.has(key))continue;
+        const x=minX+colW/2+col*(colW+gapX),z=minZ+rowD/2+row*(rowD+gapZ);
+        const parking=(ix*5+iz*3)%11===0&&slot===5;
+        if(parking){
+          lots.push({x,z});box(asphalt,x,.2,z,buildW,.05,buildD);
+          for(let line=-buildW/2+2;line<buildW/2;line+=3.4)box(white,x+line,.24,z,.12,.02,buildD*.76);
+          box(material(0x2b62a8),x-buildW/2+.7,2.1,z+buildD/2-.2,1.3,1.4,.12);
+          continue;
+        }
+        const tower=towerSlots.has(key);
+        const h=tower?86+((ix*17+iz*11+slot*7)%40):downtown?32+rand()*39:coastal?20+rand()*42:10+rand()*25;
+        const style=tower?3:Math.floor(rand()*3);
+        building(x,z,buildW,buildD,h,colors[(ix*3+iz+slot)%colors.length],style);
       }
-      if(rand()<.4)bench(cx-20,cz+26);
+      if(downtown&&(ix+iz)%2===0){
+        alleys.push({x:cx,z:cz,half:cellD/2});
+        box(material(0x2f4046),cx,.2,cz,gapX,.05,cellD);
+        for(const s of [-1,1]){box(material(0xe7b53c),cx-1.55,.5,cz+s*(cellD/2-.7),.35,1,.35);box(material(0xe7b53c),cx+1.55,.5,cz+s*(cellD/2-.7),.35,1,.35);}
+      }
     }
     for(let z=-280;z<300;z+=22){palm(264,z,7+rand()*3);if(z%44===-16)bench(272,z,Math.PI/2);}
     for(let z=-250;z<300;z+=65){
@@ -377,10 +401,10 @@
       const mesh=new T.Mesh(new T.CircleGeometry(1,20),puddleMaterial);mesh.rotation.x=-Math.PI/2;mesh.position.set(x,.205,z);mesh.scale.set(sx,sz,1);scene.add(mesh);puddles.push(mesh);
     });
     // Bus shelters and planters create recognizable corners without blocking the roadway.
-    [[-229,-149],[91,171],[171,-69],[251,91]].forEach(([x,z],i)=>{
+    [[-230,-149],[91,171],[170,-69],[251,91]].forEach(([x,z],i)=>{
       prop(x,z,1.2);box(material(0x34515b),x,1.5,z,4,.18,2.2,i%2?Math.PI/2:0);box(windowDark,x,2.3,z,4,2.2,.10,i%2?Math.PI/2:0);box(cream,x,3.5,z,4.5,.25,2.6,i%2?Math.PI/2:0);
     });
-    [[-213,-67],[13,93],[173,13],[253,-227]].forEach(([x,z])=>{prop(x,z,.7);inst(k.cylinder,material(0xc9896b),x,.55,z,.75,1.1,.75);bush(x,z,1.05);});
+    [[-229,-110],[91,110],[171,30],[253,-227]].forEach(([x,z])=>{prop(x,z,.7);inst(k.cylinder,material(0xc9896b),x,.55,z,.75,1.1,.75);bush(x,z,1.05);});
     for(const b of batches.values()){
       const mesh=new T.InstancedMesh(b.geo,b.mat,b.items.length),tmp=new T.Object3D();
       b.items.forEach((o,i)=>{tmp.position.set(o.x,o.y,o.z);tmp.rotation.set(o.rx,o.ry,o.rz);tmp.scale.set(o.sx,o.sy,o.sz);tmp.updateMatrix();mesh.setMatrixAt(i,tmp.matrix);});
@@ -403,7 +427,7 @@
       if(x+r>106&&x-r<132&&!roads.some(a=>Math.abs(z-a)<8-r))return true;
       if(buildings.some(b=>x+r>b.minX&&x-r<b.maxX&&z+r>b.minZ&&z-r<b.maxZ))return true;
       // Anything as wide as a car stops at the park bollards.
-      if(r>=1&&parks.some(p=>Math.abs(x-p.x)<26&&Math.abs(z-p.z)<27))return true;
+      if(r>=1&&parks.some(p=>Math.abs(x-p.x)<p.halfX-1&&Math.abs(z-p.z)<p.halfZ-1))return true;
       const gx=Math.floor(x/16),gz=Math.floor(z/16);
       for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){
         const list=props.get((gx+i)*1000+gz+j);if(!list)continue;
@@ -454,6 +478,6 @@
       }
     }
     function getDistrict(x,z){return x>250?'Praia Aurora':x>85&&x<150?'Canal das Garças':x<70&&z<0?'Centro Solar':z>60&&x<0?'Jardim Maré':'Costa Coral';}
-    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,parks,alleys,lots,counts:{buildings:buildings.length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
+    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,parks,alleys,lots,solidProps,counts:{buildings:buildings.length,skyscrapers:buildings.filter(b=>b.tower).length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
   };
 })();

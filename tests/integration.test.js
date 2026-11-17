@@ -30,7 +30,7 @@ function up(code){listeners.keyup({code});}
 function tap(code){down(code);up(code);}
 let passed=0;function test(name,fn){fn();passed++;console.log('OK '+name);}
 test('initial cinematic reaches the menu before play',()=>{assert.equal(d.getState().mode,'intro');step(18.2);assert.equal(d.getState().mode,'menu');});
-test('play starts with valid geometry and a walkable spawn',()=>{element('play').onclick();step(.05);assert.equal(d.getState().mode,'play');assert.ok(!d.world.isBlocked(d.player.x,d.player.z,.45));assert.equal(d.getState().counts.buildings,84);});
+test('play starts with a dense skyline and a walkable spawn',()=>{element('play').onclick();step(.05);assert.equal(d.getState().mode,'play');assert.ok(!d.world.isBlocked(d.player.x,d.player.z,.45));assert.equal(d.getState().counts.buildings,249);assert.equal(d.getState().counts.skyscrapers,12);});
 test('movement follows the camera and the starter car can be entered',()=>{const x=d.player.x;down('KeyD');step(.75);up('KeyD');assert.ok(d.player.x<x-2);tap('KeyE');assert.equal(d.getState().player.driving,true);assert.equal(d.getState().police.level,0);});
 test('driving advances, stops and allows a safe exit',()=>{const z=d.player.z;down('KeyW');step(1.4);up('KeyW');assert.ok(d.player.z>z+4);down('Space');step(1.2);up('Space');tap('KeyE');assert.equal(d.getState().player.driving,false);assert.ok(!d.world.isBlocked(d.player.x,d.player.z,.45));});
 test('a parked foreign car reports theft',()=>{d.teleport(-9,88);const before=d.getState().crimes;tap('KeyE');assert.equal(d.getState().player.driving,true);assert.equal(d.getState().crimes,before+1);tap('KeyE');d.clearPolice();});
@@ -98,6 +98,12 @@ test('alleys take only the narrow car, parks take only people, props are solid',
   for(const q of d.peds)if(!q.dead)assert.ok(!w.isBlocked(q.x,q.z,.5),'no pedestrian starts inside something');
   for(const m of scope.BN.CONFIG.deliveries){assert.ok(!w.isBlocked(m.x,m.z,1.6),'destination blocked: '+m.id);assert.ok(!w.isBlocked(m.px,m.pz,1.6),'pickup blocked: '+m.id);}
   for(const landmark of Object.values(scope.BN.CONFIG.landmarks))assert.ok(!w.isBlocked(landmark.x,landmark.z,1.1),'landmark blocked: '+landmark.id);
+  for(let i=0;i<w.buildings.length;i++)for(let j=i+1;j<w.buildings.length;j++){
+    const a=w.buildings[i],b=w.buildings[j],overlapX=Math.min(a.maxX,b.maxX)-Math.max(a.minX,b.minX),overlapZ=Math.min(a.maxZ,b.maxZ)-Math.max(a.minZ,b.minZ);
+    assert.ok(overlapX<=0||overlapZ<=0,'buildings overlap: '+i+' and '+j);
+  }
+  for(const p of w.parks)for(const b of w.buildings)assert.ok(b.maxX<=p.x-p.halfX||b.minX>=p.x+p.halfX||b.maxZ<=p.z-p.halfZ||b.minZ>=p.z+p.halfZ,'building overlaps park');
+  for(const q of w.solidProps)for(const b of w.buildings){const nx=Math.max(b.minX,Math.min(q.x,b.maxX)),nz=Math.max(b.minZ,Math.min(q.z,b.maxZ));assert.ok(Math.hypot(q.x-nx,q.z-nz)>=q.r,'street prop overlaps building');}
   assert.ok(!w.isBlocked(scope.BN.CONFIG.garage.x,scope.BN.CONFIG.garage.z,1.6));assert.ok(!w.isBlocked(w.spawn.x,w.spawn.z,.5));
 });
 test('focus loss pauses motion and resume restores input',()=>{down('KeyW');listeners.blur();const state=d.getState();step(.5);assert.equal(d.getState().mode,'pause');assert.equal(d.player.x,state.player.x);assert.equal(d.player.z,state.player.z);element('resume').onclick();assert.equal(d.getState().mode,'play');});

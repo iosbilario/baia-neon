@@ -693,7 +693,16 @@
       }
     }
     function updateCamera(dt){
-      if(captureScene){const nightShot=captureScene==='night';camera.position.set(nightShot?330:310,nightShot?24:26,nightShot?-95:85);lookGoal.set(nightShot?286:253,nightShot?4:3,nightShot?-160:145);camera.lookAt(lookGoal);return;}
+      if(captureScene){
+        const shots={
+          'city-aerial':{position:[255,155,215],look:[-45,28,-55]},
+          'city-street':{position:[7,7,52],look:[0,18,-95]},
+          'city-night':{position:[175,92,135],look:[-45,28,-55]},
+          day:{position:[310,26,85],look:[253,3,145]},
+          night:{position:[330,24,-95],look:[286,4,-160]}
+        },shot=shots[captureScene]||shots.day;
+        camera.position.set(...shot.position);lookGoal.set(...shot.look);camera.lookAt(lookGoal);return;
+      }
       if(mode==='intro'){
         const t=clamp(introTime/cfg.introDuration,0,1);
         if(t<.34){const q=t/.34;cameraGoal.set(365-q*75,100-q*28,210-q*90);lookGoal.set(70,15,10);}
@@ -860,7 +869,7 @@
       keepFocus:false,step:(seconds,dt=1/60)=>{for(let t=0;t<seconds;t+=dt)tick(dt);},press:(code,down=true)=>{if(down)keys.add(code);else keys.delete(code);},enterExit,getMode:()=>mode,skipIntro:endIntro,world,police,player,cars,peds,renderer,scene,camera
     };
     const params=new URLSearchParams(location.search),captureScene=params.get('capture'),acceptanceScene=params.get('acceptance');
-    if(captureScene&&BN.debug){tutorialSeen=true;endIntro();play();$('toast').classList.remove('show');toastTime=0;if(captureScene==='night'){hour=22;rain=rainTarget=1;BN.debug.teleport(280,-110);orbitYaw=0;}else{hour=17.5;rain=rainTarget=0;BN.debug.teleport(240,80);orbitYaw=Math.PI;}for(let i=0;i<180;i++)tick(1/60);}
+    if(captureScene&&BN.debug){tutorialSeen=true;endIntro();play();$('toast').classList.remove('show');toastTime=0;const cityShot=captureScene.startsWith('city-'),nightShot=captureScene.includes('night');hour=nightShot?22:17.5;rain=rainTarget=captureScene==='night'?1:0;BN.debug.teleport(cityShot?0:nightShot?280:240,cityShot?0:nightShot?-110:80);if(cityShot)show('hud',false);for(let i=0;i<180;i++)tick(1/60);}
     if(acceptanceScene&&BN.debug){
       tutorialSeen=true;endIntro();play();BN.debug.teleport(starterCar.x,starterCar.z+3);enterExit();
       const go=id=>{const place=Object.values(cfg.landmarks).find(item=>item.id===id);BN.debug.teleport(place.x,place.z);if(player.car)player.car.speed=player.car.lat=0;missionCooldown=0;applyCampaignEvent(campaign.arrive(id,{hasCar:Boolean(player.car),balance}));missionCooldown=0;};
