@@ -123,13 +123,15 @@ jobs:
           tag="${{ needs.build-and-validate.outputs.tag }}"
           notes="docs/release-notes/${{ inputs.version }}.md"
           test -f "$notes"
+          title="$(sed -n '1s/^# //p' "$notes")"
+          test -n "$title"
           assets=(dist/baia-neon-*-web.zip dist/baia-neon-*-offline.html dist/baia-neon-*-offline.zip dist/SHA256SUMS.txt dist/build-info.json)
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             mkdir verify
             gh release download "$tag" --repo "$GITHUB_REPOSITORY" --dir verify
             for asset in "${assets[@]}"; do cmp "$asset" "verify/$(basename "$asset")"; done
           else
-            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --draft --verify-tag --title "Baía Neon $tag — Última Frequência" --notes-file "$notes" "${assets[@]}"
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --draft --verify-tag --title "$title" --notes-file "$notes" "${assets[@]}"
           fi
           count="$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets | length')"
           test "$count" -eq 5
