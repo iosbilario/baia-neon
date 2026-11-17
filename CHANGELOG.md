@@ -1,5 +1,23 @@
 # Histórico de versões
 
+## [0.4.0] — Cidade Viva
+
+### Em desenvolvimento
+
+- Cidade reconstruída com 249 prédios, 12 arranha-céus de até 125 metros, lotes sem sobreposição e skyline por bairros.
+- Personagens articulados e carros com volumes arredondados, rodas e iluminação mais detalhadas.
+- Mira acompanha o ponteiro e calcula o disparo por raycast no mundo 3D; botão direito gira a câmera.
+- Parques com árvores, grama, aves, cães, pessoas brincando e lendo.
+- Ciclistas, trabalhadores, fumantes, pessoas descansando, lixo urbano e aviões.
+- Ocorrências autônomas com resposta visual de uma viatura, sem atribuir o crime ao jogador.
+- Canteiro de obras, túnel dirigível e parque elevado com ladeira para pedestres.
+- Companhia adulta opcional e não explícita, com pagamento único e encontro implícito em local reservado.
+
+### Compatibilidade
+
+- O schema de save continua na versão 2 e preserva o progresso da v0.3.0.
+- Todo o conteúdo continua local e disponível no pacote offline.
+
 ## [0.3.0] — Última Frequência
 
 ### Para quem joga

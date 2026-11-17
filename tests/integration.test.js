@@ -20,7 +20,7 @@ const scope={console:{log:console.log,warn(){},error(e){fatalError=e;}},document
 scope.window=scope;vm.createContext(scope);
 vm.runInContext(fs.readFileSync(path.join(root,'vendor/three.min.js'),'utf8'),scope);
 scope.THREE.WebGLRenderer=class{constructor(){this.shadowMap={};this.info={render:{calls:0,triangles:0}};}setPixelRatio(){}setSize(){}render(scene,camera){assert.ok(Number.isFinite(camera.position.x));scene.updateMatrixWorld();}};
-for(const file of ['config','build-info','save','navigation','campaign','world','audio','police','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
+for(const file of ['config','build-info','save','navigation','campaign','world','audio','police','city-life','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
 assert.equal(fatalError,null,'initialization error');
 assert.ok(scope.BN.debug,'test helpers available');
 const d=scope.BN.debug;
@@ -30,8 +30,12 @@ function up(code){listeners.keyup({code});}
 function tap(code){down(code);up(code);}
 let passed=0;function test(name,fn){fn();passed++;console.log('OK '+name);}
 test('initial cinematic reaches the menu before play',()=>{assert.equal(d.getState().mode,'intro');step(18.2);assert.equal(d.getState().mode,'menu');});
-test('play starts with valid geometry and a walkable spawn',()=>{element('play').onclick();step(.05);assert.equal(d.getState().mode,'play');assert.ok(!d.world.isBlocked(d.player.x,d.player.z,.45));assert.equal(d.getState().counts.buildings,84);});
+test('play starts with a dense skyline and a walkable spawn',()=>{element('play').onclick();step(.05);assert.equal(d.getState().mode,'play');assert.ok(!d.world.isBlocked(d.player.x,d.player.z,.45));assert.equal(d.getState().counts.buildings,249);assert.equal(d.getState().counts.skyscrapers,12);});
+test('mouse position controls the world-space shot ray',()=>{d.setAimPointer(180,240);const left=d.resolveAim();d.setAimPointer(1100,560);const right=d.resolveAim();assert.ok(Math.hypot(left.ex-right.ex,left.ez-right.ez)>8,'aim endpoints must diverge');});
+test('city life adds cyclists workers park activities companions and planes',()=>{const counts=d.getState().counts;assert.equal(counts.cyclists,8);assert.equal(counts.workers,7);assert.ok(counts.parkActivities>=16);assert.equal(counts.companions,4);assert.equal(counts.planes,2);assert.equal(counts.streetDetails,18);for(const actor of d.cityLife.actors)if(!actor.park)assert.ok(!d.world.isBlocked(actor.x,actor.z,.35),'city-life actor blocked: '+actor.role+' '+actor.x+','+actor.z);});
 test('movement follows the camera and the starter car can be entered',()=>{const x=d.player.x;down('KeyD');step(.75);up('KeyD');assert.ok(d.player.x<x-2);tap('KeyE');assert.equal(d.getState().player.driving,true);assert.equal(d.getState().police.level,0);});
+test('adult companion ride charges once and ends privately without explicit content',()=>{const companion=d.cityLife.companions[0];d.setBalance(500);d.teleport(companion.x,companion.z);d.player.speed=0;d.cityLife.update(.1,{time:1,focus:d.player,night:1,rain:0});assert.ok(d.tryCompanionRide());assert.equal(d.getState().balance,380);const lot=d.world.lots[0];d.teleport(lot.x,lot.z);d.player.speed=0;for(let i=0;i<80;i++)d.updateCompanionRide(.1);assert.equal(d.getCompanionRide(),null);});
+test('an autonomous neighborhood incident starts without player input',()=>{const before=d.cityLife.incident.count;d.cityLife.update(60,{time:61,focus:d.player,night:0,rain:0});assert.equal(d.cityLife.incident.count,before+1);assert.ok(d.cityLife.incident.route.length>0);});
 test('driving advances, stops and allows a safe exit',()=>{const z=d.player.z;down('KeyW');step(1.4);up('KeyW');assert.ok(d.player.z>z+4);down('Space');step(1.2);up('Space');tap('KeyE');assert.equal(d.getState().player.driving,false);assert.ok(!d.world.isBlocked(d.player.x,d.player.z,.45));});
 test('a parked foreign car reports theft',()=>{d.teleport(-9,88);const before=d.getState().crimes;tap('KeyE');assert.equal(d.getState().player.driving,true);assert.equal(d.getState().crimes,before+1);tap('KeyE');d.clearPolice();});
 test('a pedestrian collision reports an actual offense',()=>{d.teleport(4,14);const c=d.cars[0];c.x=4;c.z=14;c.heading=0;c.speed=0;c.mesh.position.set(4,0,14);tap('KeyE');assert.ok(d.player.car);d.putPedestrianAhead();const crimes=d.getState().crimes;down('KeyW');step(1.8);up('KeyW');assert.ok(d.getState().crimes>crimes);assert.ok(d.peds[0].down>0||d.peds[0].dead);d.player.car.speed=0;tap('KeyE');d.clearPolice();});
@@ -92,12 +96,22 @@ test('alleys take only the narrow car, parks take only people, props are solid',
     assert.ok(!w.isBlocked(a.x,z,.5),'people fit the alley');
   }
   const a=w.alleys[0];assert.ok(w.isBlocked(a.x,a.z,V.sedan.radius));assert.ok(w.isBlocked(a.x,a.z,V.sport.radius));assert.ok(w.isBlocked(a.x,a.z,1.55),'cruisers do not fit');
-  const p=w.parks[0];assert.ok(w.isBlocked(p.x+12,p.z+12,V.compact.radius),'no cars in the park');assert.ok(!w.isBlocked(p.x+12,p.z+12,.5),'people walk in the park');
+  const p=w.parks[0];assert.ok(w.isBlocked(p.x+Math.min(12,p.halfX-2),p.z+Math.min(12,p.halfZ-2),V.compact.radius),'no cars in the park');assert.ok(!w.isBlocked(p.x+Math.min(12,p.halfX-2),p.z+Math.min(12,p.halfZ-2),.5),'people walk in the park');
+  const tunnel=w.tunnels[0];assert.ok(!w.isBlocked(40,tunnel.z,1.6),'cars cross the tunnel');assert.ok(w.isBlocked(40,tunnel.minZ+.6,1.1),'tunnel wall is solid');assert.ok(!w.isBlocked(0,tunnel.minZ+.6,1.6),'tunnel cannot block the crossing at x=0');assert.ok(!w.isBlocked(80,tunnel.maxZ-.6,1.6),'tunnel cannot block the crossing at x=80');
+  const hill=w.hills[0];assert.ok(w.getElevation(hill.x,hill.z)>5.5,'hill has elevation');assert.equal(w.getElevation(hill.x+hill.rx+2,hill.z),0);
   assert.ok(w.isBlocked(p.x,p.z,.5),'the fountain is solid');
   for(const c of d.cars)assert.ok(!w.isBlocked(c.x,c.z,1),'no car starts inside something');
   for(const q of d.peds)if(!q.dead)assert.ok(!w.isBlocked(q.x,q.z,.5),'no pedestrian starts inside something');
   for(const m of scope.BN.CONFIG.deliveries){assert.ok(!w.isBlocked(m.x,m.z,1.6),'destination blocked: '+m.id);assert.ok(!w.isBlocked(m.px,m.pz,1.6),'pickup blocked: '+m.id);}
   for(const landmark of Object.values(scope.BN.CONFIG.landmarks))assert.ok(!w.isBlocked(landmark.x,landmark.z,1.1),'landmark blocked: '+landmark.id);
+  const garageBuilding=w.buildings.find(b=>b.landmark==='garage');assert.ok(garageBuilding,'garage building registered');assert.ok(w.roads.every(road=>garageBuilding.maxX<road-7||garageBuilding.minX>road+7),'garage cannot occupy a vertical road');assert.ok(w.roads.every(road=>garageBuilding.maxZ<road-7||garageBuilding.minZ>road+7),'garage cannot occupy a horizontal road');
+  for(let i=0;i<w.buildings.length;i++)for(let j=i+1;j<w.buildings.length;j++){
+    const a=w.buildings[i],b=w.buildings[j],overlapX=Math.min(a.maxX,b.maxX)-Math.max(a.minX,b.minX),overlapZ=Math.min(a.maxZ,b.maxZ)-Math.max(a.minZ,b.minZ);
+    assert.ok(overlapX<=0||overlapZ<=0,'buildings overlap: '+i+' and '+j);
+  }
+  for(const p of w.parks)for(const b of w.buildings)assert.ok(b.maxX<=p.x-p.halfX||b.minX>=p.x+p.halfX||b.maxZ<=p.z-p.halfZ||b.minZ>=p.z+p.halfZ,'building overlaps park');
+  for(const q of w.solidProps)for(const b of w.buildings){const nx=Math.max(b.minX,Math.min(q.x,b.maxX)),nz=Math.max(b.minZ,Math.min(q.z,b.maxZ));assert.ok(Math.hypot(q.x-nx,q.z-nz)>=q.r,'street prop overlaps building');}
+  for(const tree of w.solidProps.filter(q=>q.kind==='tree')){assert.ok(w.roads.every(road=>Math.abs(tree.x-road)>=8&&Math.abs(tree.z-road)>=8),'tree overlaps road: '+tree.x+','+tree.z);}
   assert.ok(!w.isBlocked(scope.BN.CONFIG.garage.x,scope.BN.CONFIG.garage.z,1.6));assert.ok(!w.isBlocked(w.spawn.x,w.spawn.z,.5));
 });
 test('focus loss pauses motion and resume restores input',()=>{down('KeyW');listeners.blur();const state=d.getState();step(.5);assert.equal(d.getState().mode,'pause');assert.equal(d.player.x,state.player.x);assert.equal(d.player.z,state.player.z);element('resume').onclick();assert.equal(d.getState().mode,'play');});

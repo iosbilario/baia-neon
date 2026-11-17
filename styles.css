@@ -6,7 +6,7 @@
 .wasted-text h2{margin:0;font-size:clamp(54px,13vw,170px);line-height:.9;letter-spacing:.04em;font-style:italic;font-weight:900;color:#e2343f;text-shadow:0 4px 0 #3a0508,0 0 42px rgba(226,52,63,.55)}
 .wasted-text p{margin:18px 0 0;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--cream);opacity:.85}
 #aim{position:absolute;left:50%;top:40%;width:14px;height:14px;margin:-7px 0 0 -7px;border:1.5px solid #fff9;border-radius:50%;pointer-events:none;transition:opacity .2s}
-#aim::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:2px;margin:-1px;background:#fff;border-radius:50%}
+#aim::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:2px;margin:-1px;background:#fff;border-radius:50%}#aim.target{border-color:var(--coral);box-shadow:0 0 0 2px #101d2688,0 0 12px #ff805b88}#aim.target::after{background:var(--coral)}
 .arsenal{font-size:8px;letter-spacing:.12em;color:var(--mint);margin:-6px 0 12px}
 #wasted.busted .wasted-text h2{color:#4d9dff;text-shadow:0 4px 0 #06203f,0 0 42px rgba(77,157,255,.55)}
 .shop{display:flex;flex-direction:column;gap:6px;margin:10px 0 16px;max-height:46vh;overflow:auto}
