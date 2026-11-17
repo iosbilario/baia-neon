@@ -111,6 +111,7 @@ test('alleys take only the narrow car, parks take only people, props are solid',
   }
   for(const p of w.parks)for(const b of w.buildings)assert.ok(b.maxX<=p.x-p.halfX||b.minX>=p.x+p.halfX||b.maxZ<=p.z-p.halfZ||b.minZ>=p.z+p.halfZ,'building overlaps park');
   for(const q of w.solidProps)for(const b of w.buildings){const nx=Math.max(b.minX,Math.min(q.x,b.maxX)),nz=Math.max(b.minZ,Math.min(q.z,b.maxZ));assert.ok(Math.hypot(q.x-nx,q.z-nz)>=q.r,'street prop overlaps building');}
+  for(const tree of w.solidProps.filter(q=>q.kind==='tree')){assert.ok(w.roads.every(road=>Math.abs(tree.x-road)>=8&&Math.abs(tree.z-road)>=8),'tree overlaps road: '+tree.x+','+tree.z);}
   assert.ok(!w.isBlocked(scope.BN.CONFIG.garage.x,scope.BN.CONFIG.garage.z,1.6));assert.ok(!w.isBlocked(w.spawn.x,w.spawn.z,.5));
 });
 test('focus loss pauses motion and resume restores input',()=>{down('KeyW');listeners.blur();const state=d.getState();step(.5);assert.equal(d.getState().mode,'pause');assert.equal(d.player.x,state.player.x);assert.equal(d.player.z,state.player.z);element('resume').onclick();assert.equal(d.getState().mode,'play');});

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#101d26">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'sha256-QOCV7FZ6UsCB3p05v5odTrUH0P3g/IeqtP54rUIBrPo=' 'sha256-W/WbR6LzsI0YWtFCI/Ia+pC9uPWQtjYW2J4g9MbYs8I=' 'sha256-tlQw8h7PJ8zXsVsFO7ZkU02eEjVQygErFno2TXZAKlA=' 'sha256-xd1Bgdgg09lYIBNxJ/MhCPfeqgUI4WeAMubQXTEHLqc=' 'sha256-MTmro2rD8wq8QxmOQhbSVmJ3Z7Es/2WVCt49vRF9Oio=' 'sha256-ZJVt0fMf+AO2CjuCJ89TU5nAdaZjtCxHX8nCl7zrBME=' 'sha256-vI0TiL7H1GF4QssNBmpCRStA7Cl5htJLUKI69xBOuW0=' 'sha256-6mqGqBopmyjZ3GHRas0v/xhgFRlJLVl8aF7pDx5WAiM=' 'sha256-aogUOImSoureDwfYrY4Damr3DWulkva8YzRw7MIZ/Vg=' 'sha256-fIepNQsrlKKR6zbz5lzkJbllKJyS0dvfkswuRHYopPA=' 'sha256-1QeDumpRzzpA1lZwJ8/qfr2z5tuqus9srtWnAoH7ics='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'sha256-QOCV7FZ6UsCB3p05v5odTrUH0P3g/IeqtP54rUIBrPo=' 'sha256-W/WbR6LzsI0YWtFCI/Ia+pC9uPWQtjYW2J4g9MbYs8I=' 'sha256-tlQw8h7PJ8zXsVsFO7ZkU02eEjVQygErFno2TXZAKlA=' 'sha256-xd1Bgdgg09lYIBNxJ/MhCPfeqgUI4WeAMubQXTEHLqc=' 'sha256-MTmro2rD8wq8QxmOQhbSVmJ3Z7Es/2WVCt49vRF9Oio=' 'sha256-ZJVt0fMf+AO2CjuCJ89TU5nAdaZjtCxHX8nCl7zrBME=' 'sha256-eMcXb5oDoU7KWnAXcQIziQRmzkMVTI01Rbkfj34a1Q8=' 'sha256-6mqGqBopmyjZ3GHRas0v/xhgFRlJLVl8aF7pDx5WAiM=' 'sha256-aogUOImSoureDwfYrY4Damr3DWulkva8YzRw7MIZ/Vg=' 'sha256-fIepNQsrlKKR6zbz5lzkJbllKJyS0dvfkswuRHYopPA=' 'sha256-1QeDumpRzzpA1lZwJ8/qfr2z5tuqus9srtWnAoH7ics='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'">
   <title>Baía Neon</title>
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE0IiBmaWxsPSIjMTMyNzM0Ii8+CjxjaXJjbGUgY3g9IjM0IiBjeT0iMzAiIHI9IjE3IiBmaWxsPSIjZjBhMTdmIi8+CjxwYXRoIGQ9Ik04IDM4aDQ4djE3SDh6IiBmaWxsPSIjMmM3ODdhIi8+CjxwYXRoIGQ9Ik0xMyA0M2gzOE0xOSA0OGgyNyIgc3Ryb2tlPSIjNzNiYmIwIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTIwIDU0YzQtMTIgNS0yMiAzLTMxIiBmaWxsPSJub25lIiBzdHJva2U9IiMxMjI5MzQiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNMjMgMjNDMTQgMTIgOCAyMCA4IDI2YzUtNSAxMC01IDE1LTMgMS0xMyAxMS0xMyAxOC04LTggMC0xMyA0LTE4IDggMTEtNSAxOSAyIDE5IDgtOC02LTEyLTctMTktOC00IDYtOSA4LTE0IDggMy00IDctNyAxNC04eiIgZmlsbD0iIzEyMjkzNCIvPgo8L3N2Zz4K" type="image/svg+xml">
   <style>
@@ -566,7 +566,7 @@ BN.BUILD_INFO = Object.freeze({
     const buildings=[], batches=new Map(), signs=[], animals=[], parks=[], alleys=[], lots=[], solidProps=[],tunnels=[],hills=[];
     // Small solid objects (trunks, benches, fountains) live in a coarse grid so the check stays cheap.
     const props=new Map();
-    function prop(x,z,r){const item={x,z,r};solidProps.push(item);const key=Math.floor(x/16)*1000+Math.floor(z/16);if(!props.has(key))props.set(key,[]);props.get(key).push(item);}
+    function prop(x,z,r,kind='prop'){const item={x,z,r,kind};solidProps.push(item);const key=Math.floor(x/16)*1000+Math.floor(z/16);if(!props.has(key))props.set(key,[]);props.get(key).push(item);}
     let seed=631842;
     function rand(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;}
     const bounds={minX:-300,maxX:300,minZ:-300,maxZ:300};
@@ -590,13 +590,14 @@ BN.BUILD_INFO = Object.freeze({
     }
     function box(mat,x,y,z,sx,sy,sz,ry=0){inst(k.box,mat,x,y,z,sx,sy,sz,0,ry,0);}
     function palm(x,z,h=7,base=0){
-      prop(x,z,.35);
+      const roadMargin=8;if(roads.some(road=>Math.abs(x-road)<roadMargin||Math.abs(z-road)<roadMargin))return false;
+      prop(x,z,.35,'tree');
       inst(k.cylinder,trunk,x,base+h*.48,z,.24,h,.24,0,0,.04);
       for(let a=0;a<7;a++) {
         const angle=a*Math.PI*2/7;
         inst(k.cone,a%2?palmMat:palmLight,x+Math.sin(angle)*1.4,base+h-.2,z+Math.cos(angle)*1.4,.65,4.7,.22,Math.cos(angle)*1.14,0,-Math.sin(angle)*1.14);
       }
-      inst(k.sphere,shadowMat,x,base+h-.5,z,.55,.55,.55);
+      inst(k.sphere,shadowMat,x,base+h-.5,z,.55,.55,.55);return true;
     }
     function bush(x,z,size=1.4,base=0){inst(k.sphere,palmLight,x,base+size*.65,z,size,size*.8,size);}
     function bench(x,z,angle=0,base=0){

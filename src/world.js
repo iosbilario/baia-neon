@@ -162,7 +162,7 @@
     const buildings=[], batches=new Map(), signs=[], animals=[], parks=[], alleys=[], lots=[], solidProps=[],tunnels=[],hills=[];
     // Small solid objects (trunks, benches, fountains) live in a coarse grid so the check stays cheap.
     const props=new Map();
-    function prop(x,z,r){const item={x,z,r};solidProps.push(item);const key=Math.floor(x/16)*1000+Math.floor(z/16);if(!props.has(key))props.set(key,[]);props.get(key).push(item);}
+    function prop(x,z,r,kind='prop'){const item={x,z,r,kind};solidProps.push(item);const key=Math.floor(x/16)*1000+Math.floor(z/16);if(!props.has(key))props.set(key,[]);props.get(key).push(item);}
     let seed=631842;
     function rand(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;}
     const bounds={minX:-300,maxX:300,minZ:-300,maxZ:300};
@@ -186,13 +186,14 @@
     }
     function box(mat,x,y,z,sx,sy,sz,ry=0){inst(k.box,mat,x,y,z,sx,sy,sz,0,ry,0);}
     function palm(x,z,h=7,base=0){
-      prop(x,z,.35);
+      const roadMargin=8;if(roads.some(road=>Math.abs(x-road)<roadMargin||Math.abs(z-road)<roadMargin))return false;
+      prop(x,z,.35,'tree');
       inst(k.cylinder,trunk,x,base+h*.48,z,.24,h,.24,0,0,.04);
       for(let a=0;a<7;a++) {
         const angle=a*Math.PI*2/7;
         inst(k.cone,a%2?palmMat:palmLight,x+Math.sin(angle)*1.4,base+h-.2,z+Math.cos(angle)*1.4,.65,4.7,.22,Math.cos(angle)*1.14,0,-Math.sin(angle)*1.14);
       }
-      inst(k.sphere,shadowMat,x,base+h-.5,z,.55,.55,.55);
+      inst(k.sphere,shadowMat,x,base+h-.5,z,.55,.55,.55);return true;
     }
     function bush(x,z,size=1.4,base=0){inst(k.sphere,palmLight,x,base+size*.65,z,size,size*.8,size);}
     function bench(x,z,angle=0,base=0){
