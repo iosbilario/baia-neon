@@ -4,7 +4,7 @@
 
 ### Em desenvolvimento
 
-- Cidade reconstruída com 248 prédios, 12 arranha-céus de até 125 metros, lotes sem sobreposição e skyline por bairros.
+- Cidade reconstruída com 249 prédios, 12 arranha-céus de até 125 metros, lotes sem sobreposição e skyline por bairros.
 - Personagens articulados e carros com volumes arredondados, rodas e iluminação mais detalhadas.
 - Mira acompanha o ponteiro e calcula o disparo por raycast no mundo 3D; botão direito gira a câmera.
 - Parques com árvores, grama, aves, cães, pessoas brincando e lendo.

@@ -11,7 +11,7 @@ BN.CONFIG = Object.freeze({
   landmarks: Object.freeze({
     radio: {id:'radio', name:'Rádio Caju', x:40, z:0},
     market: {id:'market', name:'Mercado Maré Alta', x:240, z:145},
-    garage: {id:'garage', name:'Oficina do Canal', x:-74.3, z:40},
+    garage: {id:'garage', name:'Oficina do Canal', x:-67, z:40},
     pier: {id:'pier', name:'Píer Farol', x:286, z:-160},
     presenter: {id:'presenter', name:'Dora Dendê', x:240, z:-120},
     technician: {id:'technician', name:'Nando Hertz', x:-160, z:80},
@@ -27,8 +27,8 @@ BN.CONFIG = Object.freeze({
     {id:'cafe', family:'delivery', name:'Café depois das seis', kind:'smooth', px:160, pz:120, x:-160, z:-225, reward:240, rep:0, text:'Xícaras cheias. Freada brusca e derrapagem derramam o bônus.'},
     {id:'passageira-orla', family:'passenger', name:'Carona para a Aurora', kind:'smooth', px:-80, pz:160, x:240, z:80, reward:290, rep:2, text:'Passageira a bordo. Condução suave preserva a gorjeta.'},
     {id:'turista-radio', family:'passenger', name:'Ouvinte perdido', kind:'smooth', px:240, pz:-80, x:40, z:0, reward:320, rep:3, text:'O passageiro quer chegar à Rádio Caju sem virar notícia.'},
-    {id:'recupera-seda', family:'recovery', name:'Sedã fora de hora', kind:'fragile', px:-9, pz:84, x:-74.3, z:40, reward:360, rep:4, text:'Leve o sedã recuperado à oficina com o mínimo de dano.'},
-    {id:'recupera-brisa', family:'recovery', name:'Brisa desaparecido', kind:'fragile', px:244, pz:14, x:-74.3, z:40, reward:430, rep:6, text:'Recupere o esportivo e entregue inteiro. A polícia reage se alguém perceber.'}
+    {id:'recupera-seda', family:'recovery', name:'Sedã fora de hora', kind:'fragile', px:-9, pz:84, x:-67, z:40, reward:360, rep:4, text:'Leve o sedã recuperado à oficina com o mínimo de dano.'},
+    {id:'recupera-brisa', family:'recovery', name:'Brisa desaparecido', kind:'fragile', px:244, pz:14, x:-67, z:40, reward:430, rep:6, text:'Recupere o esportivo e entregue inteiro. A polícia reage se alguém perceber.'}
   ]),
   races: Object.freeze([
     {id:'volta-centro', name:'Volta do Centro', medals:[58,72,92], points:[[-80,-240],[0,-240],[80,-160],[80,-80],[0,0],[-80,-80],[-80,-240]]},
@@ -58,5 +58,5 @@ BN.CONFIG = Object.freeze({
       {target:'pier', text:'Conclua a mudança no estúdio provisório do Píer Farol.', requiresCar:true}
     ]}
   ]),
-  garage: {x:-74.3, z:40}
+  garage: {x:-67, z:40}
 });

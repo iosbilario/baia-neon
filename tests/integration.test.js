@@ -30,7 +30,7 @@ function up(code){listeners.keyup({code});}
 function tap(code){down(code);up(code);}
 let passed=0;function test(name,fn){fn();passed++;console.log('OK '+name);}
 test('initial cinematic reaches the menu before play',()=>{assert.equal(d.getState().mode,'intro');step(18.2);assert.equal(d.getState().mode,'menu');});
-test('play starts with a dense skyline and a walkable spawn',()=>{element('play').onclick();step(.05);assert.equal(d.getState().mode,'play');assert.ok(!d.world.isBlocked(d.player.x,d.player.z,.45));assert.equal(d.getState().counts.buildings,248);assert.equal(d.getState().counts.skyscrapers,12);});
+test('play starts with a dense skyline and a walkable spawn',()=>{element('play').onclick();step(.05);assert.equal(d.getState().mode,'play');assert.ok(!d.world.isBlocked(d.player.x,d.player.z,.45));assert.equal(d.getState().counts.buildings,249);assert.equal(d.getState().counts.skyscrapers,12);});
 test('mouse position controls the world-space shot ray',()=>{d.setAimPointer(180,240);const left=d.resolveAim();d.setAimPointer(1100,560);const right=d.resolveAim();assert.ok(Math.hypot(left.ex-right.ex,left.ez-right.ez)>8,'aim endpoints must diverge');});
 test('city life adds cyclists workers park activities companions and planes',()=>{const counts=d.getState().counts;assert.equal(counts.cyclists,8);assert.equal(counts.workers,7);assert.ok(counts.parkActivities>=16);assert.equal(counts.companions,4);assert.equal(counts.planes,2);assert.equal(counts.streetDetails,18);for(const actor of d.cityLife.actors)if(!actor.park)assert.ok(!d.world.isBlocked(actor.x,actor.z,.35),'city-life actor blocked: '+actor.role+' '+actor.x+','+actor.z);});
 test('movement follows the camera and the starter car can be entered',()=>{const x=d.player.x;down('KeyD');step(.75);up('KeyD');assert.ok(d.player.x<x-2);tap('KeyE');assert.equal(d.getState().player.driving,true);assert.equal(d.getState().police.level,0);});
@@ -97,13 +97,14 @@ test('alleys take only the narrow car, parks take only people, props are solid',
   }
   const a=w.alleys[0];assert.ok(w.isBlocked(a.x,a.z,V.sedan.radius));assert.ok(w.isBlocked(a.x,a.z,V.sport.radius));assert.ok(w.isBlocked(a.x,a.z,1.55),'cruisers do not fit');
   const p=w.parks[0];assert.ok(w.isBlocked(p.x+Math.min(12,p.halfX-2),p.z+Math.min(12,p.halfZ-2),V.compact.radius),'no cars in the park');assert.ok(!w.isBlocked(p.x+Math.min(12,p.halfX-2),p.z+Math.min(12,p.halfZ-2),.5),'people walk in the park');
-  const tunnel=w.tunnels[0];assert.ok(!w.isBlocked(0,tunnel.z,1.6),'cars cross the tunnel');assert.ok(w.isBlocked(0,tunnel.minZ+.6,1.1),'tunnel wall is solid');
+  const tunnel=w.tunnels[0];assert.ok(!w.isBlocked(40,tunnel.z,1.6),'cars cross the tunnel');assert.ok(w.isBlocked(40,tunnel.minZ+.6,1.1),'tunnel wall is solid');assert.ok(!w.isBlocked(0,tunnel.minZ+.6,1.6),'tunnel cannot block the crossing at x=0');assert.ok(!w.isBlocked(80,tunnel.maxZ-.6,1.6),'tunnel cannot block the crossing at x=80');
   const hill=w.hills[0];assert.ok(w.getElevation(hill.x,hill.z)>5.5,'hill has elevation');assert.equal(w.getElevation(hill.x+hill.rx+2,hill.z),0);
   assert.ok(w.isBlocked(p.x,p.z,.5),'the fountain is solid');
   for(const c of d.cars)assert.ok(!w.isBlocked(c.x,c.z,1),'no car starts inside something');
   for(const q of d.peds)if(!q.dead)assert.ok(!w.isBlocked(q.x,q.z,.5),'no pedestrian starts inside something');
   for(const m of scope.BN.CONFIG.deliveries){assert.ok(!w.isBlocked(m.x,m.z,1.6),'destination blocked: '+m.id);assert.ok(!w.isBlocked(m.px,m.pz,1.6),'pickup blocked: '+m.id);}
   for(const landmark of Object.values(scope.BN.CONFIG.landmarks))assert.ok(!w.isBlocked(landmark.x,landmark.z,1.1),'landmark blocked: '+landmark.id);
+  const garageBuilding=w.buildings.find(b=>b.landmark==='garage');assert.ok(garageBuilding,'garage building registered');assert.ok(w.roads.every(road=>garageBuilding.maxX<road-7||garageBuilding.minX>road+7),'garage cannot occupy a vertical road');assert.ok(w.roads.every(road=>garageBuilding.maxZ<road-7||garageBuilding.minZ>road+7),'garage cannot occupy a horizontal road');
   for(let i=0;i<w.buildings.length;i++)for(let j=i+1;j<w.buildings.length;j++){
     const a=w.buildings[i],b=w.buildings[j],overlapX=Math.min(a.maxX,b.maxX)-Math.max(a.minX,b.minX),overlapZ=Math.min(a.maxZ,b.maxZ)-Math.max(a.minZ,b.minZ);
     assert.ok(overlapX<=0||overlapZ<=0,'buildings overlap: '+i+' and '+j);

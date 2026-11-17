@@ -299,13 +299,13 @@
       }
     }
     // A covered arterial segment creates a real drivable tunnel without blocking the road graph.
-    const tunnel={minX:-58,maxX:58,minZ:230,maxZ:250,z:240};tunnels.push(tunnel);
+    const tunnel={minX:12,maxX:68,minZ:230,maxZ:250,z:240};tunnels.push(tunnel);
     const tunnelConcrete=material(0x6f8584),tunnelDark=material(0x263b42);
-    box(tunnelConcrete,0,6.5,240,116,1.0,20);
-    box(tunnelConcrete,0,3.2,230.8,116,6.4,1.6);
-    box(tunnelConcrete,0,3.2,249.2,116,6.4,1.6);
-    box(tunnelDark,0,6.0,240,112,.12,16);
-    for(let x=-50;x<=50;x+=12){box(lightMat,x,5.65,240,2.8,.10,.55);}
+    box(tunnelConcrete,40,6.5,240,56,1.0,20);
+    box(tunnelConcrete,40,3.2,230.8,56,6.4,1.6);
+    box(tunnelConcrete,40,3.2,249.2,56,6.4,1.6);
+    box(tunnelDark,40,6.0,240,52,.12,16);
+    for(let x=16;x<=64;x+=8){box(lightMat,x,5.65,240,2.8,.10,.55);}
     for(const x of roads)for(const z of roads){
       for(const sign of [-1,1]) {
         for(let s=-5;s<=5;s+=1.5){box(white,x+s,.195,z+sign*9.2,.7,.025,2.8);box(white,x+sign*9.2,.20,z+s,2.8,.025,.7);}
@@ -418,11 +418,12 @@
     box(cream,market.x,4.7,market.z,15,.6,12);
     for(let x=market.x-5;x<=market.x+5;x+=5)box(windowDark,x,2.2,market.z+5.1,3.5,2.6,.1);
     sign('MERCADO MARÉ ALTA',market.x,6.2,market.z+6.1,16,Math.PI,'#286260');
-    const workshop={x:-74.3,z:40};
-    box(material(0x254d55),workshop.x,3,workshop.z,18,6,12);
-    box(material(0xff9b67),workshop.x,5.8,workshop.z+6.3,20,.45,1.2);
-    box(windowDark,workshop.x,2.7,workshop.z+6.1,10,4.4,.12);
-    sign('OFICINA DO CANAL',workshop.x,7.2,workshop.z+6.5,17,0,'#a84f3f');
+    const workshop={x:-52,z:40};
+    box(material(0x254d55),workshop.x,3,workshop.z,20,6,14);
+    box(material(0xff9b67),workshop.x-10.3,5.8,workshop.z,1.2,.45,16,Math.PI/2);
+    box(windowDark,workshop.x-10.1,2.7,workshop.z,.12,4.4,10);
+    sign('OFICINA DO CANAL',workshop.x-10.5,7.2,workshop.z,17,-Math.PI/2,'#a84f3f');
+    buildings.push({minX:workshop.x-10,maxX:workshop.x+10,minZ:workshop.z-7,maxZ:workshop.z+7,height:6,landmark:'garage'});
     const pier={x:286,z:-160};
     box(trunk,pier.x,.65,pier.z,24,1.1,8);
     for(const x of [pier.x-10,pier.x, pier.x+10])for(const z of [pier.z-3,pier.z+3])box(trunk,x,-1.2,z,.45,4,.45);
