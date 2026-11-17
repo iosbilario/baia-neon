@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: MIT */
 window.BN = window.BN || {};
 BN.CONFIG = Object.freeze({
-  title: 'Baía Neon', seed: 5216, version: '0.5.0',
+  title: 'Baía Neon', seed: 5216, version: '0.6.0',
   citySize: 600, dayLength: 720, introDuration: 18,
   startHour: 17.4, walkSpeed: 5.2, runSpeed: 8.7,
   carSpeed: 32, carReverse: 10, carAcceleration: 14,
@@ -12,7 +12,7 @@ BN.CONFIG = Object.freeze({
     radio: {id:'radio', name:'Rádio Caju', x:40, z:0},
     market: {id:'market', name:'Mercado Maré Alta', x:240, z:145},
     garage: {id:'garage', name:'Oficina do Canal', x:-67, z:40},
-    pier: {id:'pier', name:'Píer Farol', x:286, z:-160},
+    pier: {id:'pier', name:'Píer Farol', x:240, z:-40},
     presenter: {id:'presenter', name:'Dora Dendê', x:240, z:-120},
     technician: {id:'technician', name:'Nando Hertz', x:-160, z:80},
     antenna: {id:'antenna', name:'Antena da Caju', x:80, z:-240},
