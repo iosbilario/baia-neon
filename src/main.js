@@ -82,10 +82,19 @@
     const raceRecords=saved.raceRecords||{};
     let tutorialSeen=saved.tutorialSeen,cameraMotion=saved.cameraMotion,audioVolume=saved.audioVolume;audio.volume=audioVolume;
     let routeDestination=null,routePoints=[],dialogueTime=0,activeRace=null,raceIndex=0,photoReturn='play',mapReturn='play',photoClean=false,adultRide=null;
+    let objectiveSignature='',objectivePopupTime=0,objectiveExpanded=false,objectiveManual=false;
     function progressData(){return {schemaVersion:BN.Save.SCHEMA_VERSION,balance,completed,reputation,upgrades,owned:[...garageOwned],car:starterCar.type,ammo:loadout.mags.pistol.ammo,reserve:loadout.mags.pistol.reserve,arsenal:loadout.serialize(),grenades:player.grenades,health:Math.max(25,Math.round(player.health)),campaign:campaign.state,interiors:interiors.serialize(),raceRecords,tutorialSeen,cameraMotion,audioVolume};}
     // Progress writes only at meaningful events. The untouched v1 key remains available to older builds.
     function save(){try{BN.Save.persist(localStorage,progressData());}catch(e){toast('Não foi possível salvar neste navegador.');}}
     function toast(text){$('toast').textContent=text;$('toast').classList.add('show');toastTime=4.5;}
+    const compactObjective=()=>Boolean(document.body&&(document.body.classList.contains('touch-device')||document.body.classList.contains('touch-preview')));
+    function setObjectiveExpanded(expanded,duration=0){objectiveExpanded=Boolean(expanded);objectivePopupTime=objectiveExpanded?Math.max(0,duration):0;$('objective').classList.toggle('expanded',objectiveExpanded);$('objectiveToggle').setAttribute('aria-expanded',String(objectiveExpanded));$('objectiveToggle').setAttribute('aria-label',objectiveExpanded?'Recolher detalhes do serviço':'Abrir detalhes do serviço');$('objectiveAction').textContent=objectiveExpanded?'FECHAR⌃':'VER⌄';}
+    function showObjectivePopup(duration=4.5){if(compactObjective()&&!objectiveManual)setObjectiveExpanded(true,duration);}
+    function objectiveCopy(text){if(!compactObjective())return text;return text.replace('Entre no carro coral com E','Use INTERAGIR para entrar no carro coral').replace(' ou pressione X para assumir o risco','.').replace('Pressione Y para tentar de novo','Use INTERAGIR para tentar de novo');}
+    function syncObjectiveUi(){
+      const title=$('missionTitle').textContent,signature=title+'|'+$('missionText').textContent,changed=Boolean(objectiveSignature&&objectiveSignature!==signature);
+      $('missionCompact').textContent=title.replace(/^Capítulo\s+(\d+)\s+·\s+/,'CAP. $1 · ');objectiveSignature=signature;if(changed)showObjectivePopup();
+    }
     function dialogue(speaker,text){$('dialogueSpeaker').textContent=speaker;$('dialogueText').textContent=text;show('dialogue',true);dialogueTime=6;}
     if(loaded.migrated)setTimeout(()=>toast('Progresso v0.2 preservado e migrado com cópia de recuperação.'),0);
     function setMode(next){mode=next;show('intro',next==='intro');show('menu',next==='menu');show('hud',(next==='play'||next==='pause'||next==='garage'||next==='map')&&!photoClean);show('pause',next==='pause');show('help',next==='help');show('wasted',next==='dead');show('garage',next==='garage');show('cityMap',next==='map');show('photoMode',next==='photo');show('touchControls',next==='play');keys.clear();clearTouch();dragging=false;aiming=false;mouseFire=false;if(next!=='play')releasePointer();}
@@ -94,7 +103,7 @@
     const versionLabel='v'+build.version+(build.tag==='development'?' dev':'');
     $('menuVersion').textContent=versionLabel;$('pauseVersion').textContent=versionLabel;$('play').innerHTML=(hasProgress?'CONTINUAR':'JOGAR')+' <span>↗</span>';
     function endIntro(){menuStats();setMode('menu');introTime=cfg.introDuration;}
-    function play(){setMode('play');centerAim();requestPointer();audio.beep(587,.16);if(!tutorialSeen){tutorialSeen=true;dialogue('DORA DENDÊ · APRESENTADORA DA RÁDIO CAJU','Eu falo, você dirige. Entre no carro coral com E e me busque na Praia Aurora. M abre o mapa.');toast('O progresso é salvo automaticamente neste navegador.');save();}else toast('Progresso retomado · M abre o mapa.');updateMission();}
+    function play(){setMode('play');centerAim();requestPointer();audio.beep(587,.16);if(!tutorialSeen){tutorialSeen=true;dialogue('DORA DENDÊ · APRESENTADORA DA RÁDIO CAJU',compactObjective()?'Eu falo, você dirige. Use INTERAGIR para entrar no carro coral e siga o marcador até a Praia Aurora.':'Eu falo, você dirige. Entre no carro coral com E e me busque na Praia Aurora. M abre o mapa.');toast('O progresso é salvo automaticamente neste navegador.');save();}else toast(compactObjective()?'Progresso retomado · mapa e opções ficam na pausa.':'Progresso retomado · M abre o mapa.');updateMission();showObjectivePopup(6);}
     function primaryAction(){if(player.car){if(!tryCompanionRide()){audio.horn();peds.forEach(p=>{if(!p.dead&&!p.frozen&&dist(p,player)<18){p.panic=3;p.fear=null;p.cower=false;}});}}else fire();}
     function togglePause(){if(mode==='play')setMode('pause');else if(mode==='pause'){setMode('play');centerAim();requestPointer();}}
     function help(){helpReturn=mode;setMode('help');}
@@ -198,7 +207,7 @@
       }else if(ev.message)toast(ev.message);
     }
     function leaveInterior(){const was=interiors.def(),spawn=interiors.forceExit();if(was&&interiorRooms[was.id])interiorRooms[was.id].visible=false;return spawn;}
-    function contextAction(){if(interiorAction())return;if(interiors.active)return;if(nearGarage()){openGarage();return;}if(!player.car&&cityLife.interact(player))return;enterExit();}
+    function contextAction(){const objective=campaign.objective();if(objective&&objective.failed){applyCampaignEvent(campaign.retry());return;}if(interiorAction())return;if(interiors.active)return;if(nearGarage()){openGarage();return;}if(!player.car&&cityLife.interact(player))return;enterExit();}
     function tryCompanionRide(){
       if(!player.car||adultRide)return false;
       const companion=cityLife.nearestCompanion(player,13);if(!companion)return false;
@@ -416,12 +425,12 @@
       const t=target();missionGroup.visible=Boolean(t);if(t)missionGroup.position.set(t.x,0,t.z);
       const campaignActive=!job&&!activeRace&&campaign.state.status!=='finished';markerMaterial.color.setHex(campaignActive?0xff805b:0x8de3cf);diamond.material.color.setHex(campaignActive?0xff805b:0x8de3cf);diamond.material.emissive.setHex(campaignActive?0xff805b:0x8de3cf);
       $('balance').textContent='R$ '+balance;
-      if(job){$('missionTitle').textContent=job.def.name;$('missionText').textContent=job.stage==='pickup'?(job.def.family==='passenger'?'Busque o passageiro e pare para o embarque.':job.def.family==='recovery'?'Entre no veículo indicado.':'Retire a carga no marcador. Pare o carro dentro do círculo.'):job.def.text;return;}
-      if(activeRace){$('missionTitle').textContent=activeRace.def.name;$('missionText').textContent='Checkpoint '+(activeRace.checkpoint+1)+' de '+activeRace.def.points.length+' · '+activeRace.time.toFixed(1)+' s';return;}
+      if(job){$('missionTitle').textContent=job.def.name;$('missionText').textContent=job.stage==='pickup'?(job.def.family==='passenger'?'Busque o passageiro e pare para o embarque.':job.def.family==='recovery'?'Entre no veículo indicado.':'Retire a carga no marcador. Pare o carro dentro do círculo.'):job.def.text;syncObjectiveUi();return;}
+      if(activeRace){$('missionTitle').textContent=activeRace.def.name;$('missionText').textContent='Checkpoint '+(activeRace.checkpoint+1)+' de '+activeRace.def.points.length+' · '+activeRace.time.toFixed(1)+' s';syncObjectiveUi();return;}
       const objective=campaign.objective();
-      if(objective){const firstStep=objective.mission.number===1&&campaign.state.step===0;$('missionTitle').textContent=objective.failed?'Missão interrompida':'Capítulo '+objective.mission.number+' · '+objective.mission.title;$('missionText').innerHTML='<b>'+objective.text+'</b><br><span class="route-note">'+(firstStep?'M abre o mapa · o marcador coral mostra o destino':'Reputação '+reputation+' · M mapa · L corridas · P foto')+'</span>';return;}
+      if(objective){const firstStep=objective.mission.number===1&&campaign.state.step===0,routeNote=compactObjective()?(firstStep?'O marcador coral mostra o destino':'Reputação '+reputation+' · mapa e opções na pausa'):(firstStep?'M abre o mapa · o marcador coral mostra o destino':'Reputação '+reputation+' · M mapa · L corridas · P foto');$('missionTitle').textContent=objective.failed?'Missão interrompida':'Capítulo '+objective.mission.number+' · '+objective.mission.title;$('missionText').innerHTML='<b>'+objectiveCopy(objective.text)+'</b><br><span class="route-note">'+routeNote+'</span>';syncObjectiveUi();return;}
       const offers=contractOffers();$('missionTitle').textContent='Mundo aberto · quadro de serviços';
-      $('missionText').innerHTML=(lastResult?'<b>'+lastResult+'</b><br>':'')+offers.map((d,i)=>'<kbd>'+(i+1)+'</kbd> '+d.name+' · até R$ '+d.reward+' · '+RULES[d.kind]).join('<br>');
+      $('missionText').innerHTML=(lastResult?'<b>'+lastResult+'</b><br>':'')+offers.map((d,i)=>'<kbd>'+(i+1)+'</kbd> '+d.name+' · até R$ '+d.reward+' · '+RULES[d.kind]).join('<br>');syncObjectiveUi();
     }
     // ---- Garage: repairs, upgrades with a trade-off, supplies and other cars ----
     const garageMark=new THREE.Group();scene.add(garageMark);garageMark.position.set(cfg.garage.x,0,cfg.garage.z);
@@ -962,13 +971,14 @@
       const wDef=loadout.def(),wText=player.reload>0?wDef.name+' · RECARREGANDO':wDef.name+' '+player.ammo+'/'+player.reserve,zs=player.car&&player.car.zones;
       $('arsenal').textContent=player.car?'CARRO '+Math.round(Math.min(100,player.car.damage))+'% · F'+Math.round(zs.front)+' T'+Math.round(zs.rear)+' E'+Math.round(zs.left)+' D'+Math.round(zs.right)+' · '+wText:wText+' · GRANADAS '+player.grenades;$('aim').style.opacity=aiming||player.aimTime>0?1:(player.car?.45:.28);
       $('touchWeapon').textContent=wDef.name.slice(0,5)+'\n'+player.ammo;show('touchFire',Boolean(player.car));
-      $('touchPrimary').textContent=player.car?'ACELERAR':'ATIRAR';$('touchSecondary').textContent=player.car?'FREAR':'CORRER';$('touchThird').textContent=player.car?'FREIO\nDE MÃO':'MIRA';$('touchContext').textContent=nearGarage()?'OFICINA':player.car?'SAIR DO CARRO':cars.some(c=>!c.wreck&&dist(c,player)<6)?'ENTRAR NO CARRO':'INTERAGIR';
+      $('touchPrimary').textContent=player.car?'ACELERAR':'ATIRAR';$('touchSecondary').textContent=player.car?'FREAR':'CORRER';$('touchThird').textContent=player.car?'FREIO\nDE MÃO':'MIRA';$('touchContext').textContent=campaign.objective()&&campaign.objective().failed?'REPETIR':nearGarage()?'OFICINA':player.car?'SAIR DO CARRO':cars.some(c=>!c.wreck&&dist(c,player)<6)?'ENTRAR NO CARRO':'INTERAGIR';
       $('healthValue').textContent=Math.max(0,Math.ceil(player.health));$('healthFill').style.width=clamp(player.health,0,100)+'%';
       const m=target(),distance=m?dist(player,m):Infinity;
       if(job)$('missionDistance').textContent=job.stage==='pickup'?'Retirada a '+Math.round(distance)+' m':'Destino a '+Math.round(distance)+' m · '+({perishable:'qualidade',fragile:'integridade',smooth:'conforto'}[job.def.kind])+' '+Math.round(job.cargo)+'%'+(job.def.kind==='perishable'?' · '+Math.max(0,Math.ceil(job.limit*(job.cargo/100)*(upgrades.cargo?1.25:1)))+' s':'');
       else if(activeRace)$('missionDistance').textContent='Checkpoint a '+Math.round(distance)+' m · recorde salvo por veículo';
       else if(campaign.objective())$('missionDistance').textContent=(campaign.objective().failed?'Y para repetir':'Próxima ação a '+Math.round(distance)+' m')+' · reputação '+reputation;
       else $('missionDistance').textContent='Oficina a '+Math.round(dist(player,cfg.garage))+' m · L inicia um contrarrelógio';
+      $('missionCompactDistance').textContent=Math.round(Number.isFinite(distance)?distance:dist(player,cfg.garage))+' m';
       let interaction='';if(player.car&&Math.abs(player.car.speed)<4)interaction='E para sair do carro';else if(!player.car&&cars.some(c=>!c.wreck&&dist(c,player)<6&&Math.abs(c.speed)<5))interaction='E para entrar no carro';
       if(distance<10&&job)interaction=!player.car?'Este serviço exige um carro':job.stage==='pickup'?'Pare dentro do círculo para embarcar ou carregar':player.car!==job.car?'O serviço está no outro carro':police.level>0?'Despiste a polícia antes da conclusão':'Pare dentro do círculo para concluir';
       else if(distance<10&&activeRace)interaction='Atravesse o checkpoint na ordem indicada';
@@ -993,6 +1003,7 @@
     $('exportSave').onclick=exportSave;$('menuExport').onclick=exportSave;$('importSave').onclick=()=>$('importSaveFile').click();$('menuImport').onclick=()=>$('importSaveFile').click();$('importSaveFile').onchange=e=>importSaveFile(e.target.files&&e.target.files[0]);
     $('closeGarage').onclick=()=>{setMode('play');centerAim();requestPointer();};$('garageList').onclick=e=>{const b=e.target&&e.target.closest?e.target.closest('button'):null;if(b)garageBuy(Number(b.getAttribute('data-i')));};
     $('closeHelp').onclick=()=>{setMode(helpReturn);if(helpReturn==='play'){centerAim();requestPointer();}};$('sound').onclick=()=>{$('sound').textContent=audio.toggle()?'SOM LIGADO':'SOM DESLIGADO';};
+    $('objectiveToggle').addEventListener('click',e=>{if(!compactObjective())return;e.preventDefault();objectiveManual=!objectiveExpanded;setObjectiveExpanded(!objectiveExpanded);});
     window.addEventListener('keydown',e=>{
       if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
       inputMode.note('keyboard');
@@ -1124,6 +1135,7 @@
       updateCamera(dt);
       audio.update(dt,{driving:Boolean(player.car),speed:player.car?player.car.speed:0,siren:police.level>0&&police.units.some(p=>dist(p,player)<80),playing:mode==='play',rain:mode==='pause'?0:rain,cinematic:mode==='intro'||mode==='menu'});
       if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('toast').classList.remove('show');}
+      if(objectivePopupTime>0&&mode==='play'){objectivePopupTime-=dt;if(objectivePopupTime<=0)setObjectiveExpanded(false);}
       if(dialogueTime>0){dialogueTime-=dt;if(dialogueTime<=0)show('dialogue',false);}
       renderer.render(scene,camera);
       frameCount++;fpsAccum+=dt;if(fpsAccum>3){measuredFPS=frameCount/fpsAccum;frameCount=0;fpsAccum=0;const changed=qualityCtl.evaluate(measuredFPS);if(changed!==null)applyQuality();}
@@ -1136,12 +1148,14 @@
       setHour:h=>hour=h,setRain:r=>{rain=rainTarget=r;weatherTimer=100;},crime:()=>crime('test',true),witnessCrime:()=>crime('test'),clearPolice:()=>{police.reset();peds.concat(cars).forEach(w=>w.call=null);},
       fire,loadout,switchWeapon,damageZone,startRollover,resetZones,resolveAim,setAimPointer,throwGrenade,explode,hurt,touch,getControls:()=>({aimPointer:{...aimPointer},orbitYaw,orbitPitch,aiming}),requestPointer,contextAction,tryCompanionRide,updateCompanionRide,getCompanionRide:()=>adultRide,setYaw:a=>orbitYaw=a,setPitch:a=>{orbitPitch=clamp(a,.1,1.1);},acceptJob,getJob:()=>job,getResult:()=>lastResult,openGarage,garageBuy,garageItems:()=>garageList,upgrades,VEHICLES,setCarType,setBalance:v=>{balance=v;},setReputation:v=>{reputation=v;},reload,campaign,interiors,interiorRooms,handleInteriorEvent,interiorAction,leaveInterior,updateCampaign,startRace,updateRace,getRoute:()=>routePoints,chooseRoute,save,progressData,
       putPedestrianAhead:()=>{const p=peds[0],c=player.car||player;p.frozen=true;p.dead=false;p.health=100;p.panic=0;p.mesh.rotation.set(0,0,0);p.x=c.x+Math.sin(c.heading)*9;p.z=c.z+Math.cos(c.heading)*9;p.speed=0;p.down=0;p.hitCooldown=0;p.mesh.position.set(p.x,world.getElevation(p.x,p.z),p.z);return {x:p.x,z:p.z};},
-      gamepad,inputMode,qualityCtl,roadblocks,streets,applyQuality,pollGamepad,softCrowd,keepFocus:false,step:(seconds,dt=1/60)=>{for(let t=0;t<seconds;t+=dt)tick(dt);},press:(code,down=true)=>{if(down)keys.add(code);else keys.delete(code);},enterExit,getMode:()=>mode,skipIntro:endIntro,world,cityLife,police,player,human,cars,peds,renderer,scene,camera
+      gamepad,inputMode,qualityCtl,roadblocks,streets,applyQuality,pollGamepad,softCrowd,showObjectivePopup,updateMission,getObjectiveUi:()=>({expanded:objectiveExpanded,popupTime:objectivePopupTime,manual:objectiveManual,summary:$('missionCompact').textContent,distance:$('missionCompactDistance').textContent}),keepFocus:false,step:(seconds,dt=1/60)=>{for(let t=0;t<seconds;t+=dt)tick(dt);},press:(code,down=true)=>{if(down)keys.add(code);else keys.delete(code);},enterExit,getMode:()=>mode,skipIntro:endIntro,world,cityLife,police,player,human,cars,peds,renderer,scene,camera
     };
     const params=new URLSearchParams(location.search),captureScene=params.get('capture'),acceptanceScene=params.get('acceptance');
     if(params.get('touch')==='1'&&document.body)document.body.classList.add('touch-preview');
     if(params.get('hill')==='1'&&BN.debug){tutorialSeen=true;endIntro();play();const hill=world.hills[0];BN.debug.teleport(hill.x+hill.rx*.55,hill.z+6);BN.debug.setYaw(0);$('toast').classList.remove('show');toastTime=0;for(let i=0;i<180;i++)tick(1/60);}
     if(captureScene&&BN.debug){tutorialSeen=true;endIntro();play();if(params.get('vehicle')==='1'){BN.debug.teleport(starterCar.x,starterCar.z+3);enterExit();}$('toast').classList.remove('show');toastTime=0;const cityShot=captureScene.startsWith('city-'),islandShot=captureScene.startsWith('island-'),modelShot=captureScene.startsWith('model-'),nightShot=captureScene.includes('night');hour=nightShot?22:17.5;rain=rainTarget=(captureScene==='night'||captureScene==='island-horizon')?1:0;if(!modelShot)BN.debug.teleport(captureScene==='city-life'?-160:captureScene==='city-hill'?-275:captureScene==='city-cyclist'?-157:cityShot||islandShot?0:nightShot?280:240,captureScene==='city-life'?128:captureScene==='city-hill'?275:captureScene==='city-cyclist'?-225:cityShot||islandShot?0:nightShot?-110:80);if(cityShot||islandShot||modelShot)show('hud',false);if(captureScene==='city-cyclist')human.visible=false;for(let i=0;i<180;i++)tick(1/60);}
+    if(BN.debug&&params.get('objective')==='expanded')showObjectivePopup(999);
+    if(BN.debug&&params.get('objective')==='collapsed')setObjectiveExpanded(false);
     if(acceptanceScene&&BN.debug){
       tutorialSeen=true;endIntro();play();BN.debug.teleport(starterCar.x,starterCar.z+3);enterExit();
       const go=id=>{const place=Object.values(cfg.landmarks).find(item=>item.id===id);BN.debug.teleport(place.x,place.z);if(player.car)player.car.speed=player.car.lat=0;missionCooldown=0;applyCampaignEvent(campaign.arrive(id,{hasCar:Boolean(player.car),balance}));missionCooldown=0;};
