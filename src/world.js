@@ -186,7 +186,7 @@
     }
     function box(mat,x,y,z,sx,sy,sz,ry=0){inst(k.box,mat,x,y,z,sx,sy,sz,0,ry,0);}
     function palm(x,z,h=7,base=0){
-      const roadMargin=8;if(roads.some(road=>Math.abs(x-road)<roadMargin||Math.abs(z-road)<roadMargin))return false;
+      const roadMargin=8;if(!island.containsCircle(x,z,2)||roads.some(road=>Math.abs(x-road)<roadMargin||Math.abs(z-road)<roadMargin))return false;
       prop(x,z,.35,'tree');
       inst(k.cylinder,trunk,x,base+h*.48,z,.24,h,.24,0,0,.04);
       for(let a=0;a<7;a++) {
@@ -273,30 +273,18 @@
       }
     }
     const waterMat=new T.MeshStandardMaterial({color:0x2ba7af,roughness:.28,metalness:.28,transparent:true,opacity:.94});
-    const waterGeo=new T.PlaneGeometry(1800,1800,30,30);waterGeo.rotateX(-Math.PI/2);
-    const water=new T.Mesh(waterGeo,waterMat);water.position.set(0,-.5,0);scene.add(water);
-    const land=part(T,k.box,material(0x83a68c),0,-.4,0,600,.7,600,scene);land.receiveShadow=true;
-    box(material(0xe9d4a6),280,.025,0,40,.10,600);
-    box(material(0x96b49b),-280,.02,0,40,.09,600);
-    box(material(0x348f9a),119,.065,0,26,.05,600);
+    const island=BN.createIsland(T,scene,{water:waterMat,land:material(0x83a68c),sand:material(0xe9d4a6),road:asphalt,cream});
+    const water=island.water;
+    // Canal and streets are clipped by the island instead of exposing a square slab.
+    for(let z=-285;z<286;z+=10)if(island.containsCircle(119,z,13))box(material(0x348f9a),119,.065,z,26,.05,10.5);
     for(const r of roads){
-      box(material(0xb5c4b3),r,.065,0,24,.10,600);
-      box(asphalt,r,.13,0,14,.07,600);
-      box(material(0xb5c4b3),0,.072,r,600,.11,24);
-      box(asphalt,0,.14,r,600,.07,14);
-      for(let z=-294;z<300;z+=13){
-        if(roads.some(v=>Math.abs(z-v)<13))continue;
-        box(material(0xe7cf80),r,.185,z,.18,.02,5);
+      for(let t=-285;t<286;t+=10){
+        if(island.containsCircle(r,t,13)){box(material(0xb5c4b3),r,.065,t,24,.10,10.5);box(asphalt,r,.13,t,14,.07,10.5);if(!roads.some(v=>Math.abs(t-v)<13))box(material(0xe7cf80),r,.185,t,.18,.02,5);}
+        if(island.containsCircle(t,r,13)){box(material(0xb5c4b3),t,.072,r,10.5,.11,24);box(asphalt,t,.14,r,10.5,.07,14);if(!roads.some(v=>Math.abs(t-v)<13))box(material(0xe7cf80),t,.19,r,5,.02,.18);}
       }
-      for(let x=-294;x<300;x+=13){
-        if(roads.some(v=>Math.abs(x-v)<13))continue;
-        box(material(0xe7cf80),x,.19,r,5,.02,.18);
-      }
-      box(material(0x9db8b6),119,.22,r,29,.22,20);
-      box(asphalt,119,.35,r,29,.03,14);
-      for(const s of [-1,1]){
-        box(cream,119,1,r+s*9.2,29,.45,.3);
-        for(let x=107;x<133;x+=4)box(cream,x,.65,r+s*9.2,.25,1.0,.25);
+      if(island.containsCircle(119,r,15)){
+        box(material(0x9db8b6),119,.22,r,29,.22,20);box(asphalt,119,.35,r,29,.03,14);
+        for(const s of [-1,1]){box(cream,119,1,r+s*9.2,29,.45,.3);for(let x=107;x<133;x+=4)box(cream,x,.65,r+s*9.2,.25,1.0,.25);}
       }
     }
     // A covered arterial segment creates a real drivable tunnel without blocking the road graph.
@@ -308,6 +296,7 @@
     box(tunnelDark,40,6.0,240,52,.12,16);
     for(let x=16;x<=64;x+=8){box(lightMat,x,5.65,240,2.8,.10,.55);}
     for(const x of roads)for(const z of roads){
+      if(!island.containsCircle(x,z,14))continue;
       for(const sign of [-1,1]) {
         for(let s=-5;s<=5;s+=1.5){box(white,x+s,.195,z+sign*9.2,.7,.025,2.8);box(white,x+sign*9.2,.20,z+s,2.8,.025,.7);}
       }
@@ -322,7 +311,7 @@
       }
     }
     const colors=[0xebad98,0x9fcac1,0xe9cf9b,0xe6c3b5,0x91bbc8,0xc0b5cc,0xe9ded0,0xc5cbb9];
-    const towerSlots=new Set(['2:1:1','2:2:4','2:3:2','3:1:4','3:3:4','3:4:4','4:1:1','4:2:4','4:3:1','6:1:4','6:3:1','6:5:4']);
+    const towerSlots=new Set(['2:1:1','2:1:7','2:2:4','2:3:2','2:3:8','3:1:4','3:1:7','3:3:4','3:3:8','3:4:4','4:1:1','4:2:4','4:2:7','4:3:1','6:1:4','6:3:1','6:5:4']);
     const reservedSlots=new Set(['1:5:5','4:3:2','4:3:5','3:4:1','4:4:0']);
     for(let ix=0;ix<8;ix++)for(let iz=0;iz<8;iz++){
       const minX=ix===0?-298:roads[ix-1]+12,maxX=ix===7?298:roads[ix]-12;
@@ -335,9 +324,9 @@
         for(let z=minZ+7;z<maxZ-3;z+=13)palm(94,z,6+rand()*2);
         continue;
       }
-      const park=(ix===2&&iz===5)||(ix===3&&iz===2)||(ix===0&&iz%3===1);
+      const park=(ix===2&&iz===5)||(ix===3&&iz===2)||(ix===1&&iz===4)||(ix===4&&iz===5);
       if(park){
-        const halfX=cellW/2,halfZ=cellD/2,hill=ix===0&&iz===7;
+        const halfX=cellW/2,halfZ=cellD/2,hill=ix===1&&iz===4;
         if(hill){hills.push({x:cx,z:cz,rx:halfX-3,rz:halfZ-3,height:6});inst(k.round,material(0x5c956f),cx,0,cz,halfX-3,6,halfZ-3);}
         box(material(0x639e79),cx,.18,cz,cellW,.18,cellD);
         parks.push({x:cx,z:cz,halfX,halfZ});prop(cx,cz,3.7);
@@ -365,14 +354,15 @@
         const centerY=getElevation(cx,cz);inst(k.cylinder,cream,cx,centerY+.5,cz,3.6,.7,3.6);inst(k.cylinder,waterMat,cx,centerY+.9,cz,3.1,.06,3.1);inst(k.cone,cream,cx,centerY+1.9,cz,.5,2.3,.5);
         continue;
       }
-      const downtown=ix>=2&&ix<=4&&iz>=1&&iz<=3,coastal=ix===6;
-      const gapX=2.6,gapZ=2.4,colW=(cellW-gapX)/2,rowD=(cellD-gapZ*2)/3;
+      const downtown=ix>=2&&ix<=4&&iz>=1&&iz<=3,coastal=ix===6,alleyCell=downtown&&(ix+iz)%2===0,columns=alleyCell?2:downtown?3:2;
+      const gapX=2.2,gapZ=2.4,colW=(cellW-gapX*(columns-1))/columns,rowD=(cellD-gapZ*2)/3;
       const buildW=colW-.2,buildD=rowD-.8;
       let slot=0;
-      for(let col=0;col<2;col++)for(let row=0;row<3;row++,slot++){
+      for(let col=0;col<columns;col++)for(let row=0;row<3;row++,slot++){
         const key=ix+':'+iz+':'+slot;
         if(reservedSlots.has(key))continue;
         const x=minX+colW/2+col*(colW+gapX),z=minZ+rowD/2+row*(rowD+gapZ);
+        if(!island.containsCircle(x,z,Math.hypot(buildW/2,buildD/2)+1)||island.distanceToCoastRoad(x,z)<Math.hypot(buildW/2,buildD/2)+6)continue;
         const parking=(ix*5+iz*3)%11===0&&slot===5;
         if(parking){
           lots.push({x,z});box(asphalt,x,.2,z,buildW,.05,buildD);
@@ -385,19 +375,21 @@
         const style=tower?3:Math.floor(rand()*3);
         building(x,z,buildW,buildD,h,colors[(ix*3+iz+slot)%colors.length],style);
       }
-      if(downtown&&(ix+iz)%2===0){
+      if(alleyCell){
         alleys.push({x:cx,z:cz,half:cellD/2});
         box(material(0x2f4046),cx,.2,cz,gapX,.05,cellD);
         for(const s of [-1,1]){box(material(0xe7b53c),cx-1.55,.5,cz+s*(cellD/2-.7),.35,1,.35);box(material(0xe7b53c),cx+1.55,.5,cz+s*(cellD/2-.7),.35,1,.35);}
       }
     }
-    for(let z=-280;z<300;z+=22){palm(264,z,7+rand()*3);if(z%44===-16)bench(272,z,Math.PI/2);}
+    for(let z=-280;z<300;z+=22){palm(264,z,7+rand()*3);if(z%44===-16&&island.containsCircle(272,z,2))bench(272,z,Math.PI/2);}
     for(let z=-250;z<300;z+=65){
+      if(!island.containsPoint(283,z))continue;
       inst(k.cylinder,trunk,283,1.3,z,.06,2.6,.06);
       inst(k.cone,material(z%2===0?0xe99383:0xa6d1bc),283,2.8,z,2.4,.7,2.4);
       box(white,283,.3,z+3,2,.15,3);
     }
     for(let z=-270;z<300;z+=80){
+      if(!island.containsPoint(291,z))continue;
       prop(291,z,2.6);
       box(material(0xefb3a1),291,2,z,3.6,2.5,4.4);
       box(cream,291,3.45,z,4.6,.25,5.0);
@@ -425,7 +417,7 @@
     box(windowDark,workshop.x-10.1,2.7,workshop.z,.12,4.4,10);
     sign('OFICINA DO CANAL',workshop.x-10.5,7.2,workshop.z,17,-Math.PI/2,'#a84f3f');
     buildings.push({minX:workshop.x-10,maxX:workshop.x+10,minZ:workshop.z-7,maxZ:workshop.z+7,height:6,landmark:'garage'});
-    const pier={x:286,z:-160};
+    const pier={x:260,z:-40};
     box(trunk,pier.x,.65,pier.z,24,1.1,8);
     for(const x of [pier.x-10,pier.x, pier.x+10])for(const z of [pier.z-3,pier.z+3])box(trunk,x,-1.2,z,.45,4,.45);
     box(material(0xf0dfbf),pier.x+7,5.2,pier.z,5,9.5,5);
@@ -441,14 +433,14 @@
     facadeSign('CALOR & CAOS',200,7,145.5,14,'#755a71');
     const puddleMaterial=new T.MeshStandardMaterial({color:0x6caab0,roughness:.18,metalness:.35,transparent:true,opacity:0,depthWrite:false});
     const puddles=[];
-    [[-80,-205,5,2.2],[0,115,4,1.8],[80,-45,6,2.1],[160,205,5,2.4],[240,-110,7,2.2],[-240,35,4,1.7]].forEach(([x,z,sx,sz])=>{
+    [[-80,-205,5,2.2],[0,115,4,1.8],[80,-45,6,2.1],[160,205,5,2.4],[240,-110,7,2.2],[-240,35,4,1.7]].filter(([x,z])=>island.containsCircle(x,z,3)).forEach(([x,z,sx,sz])=>{
       const mesh=new T.Mesh(new T.CircleGeometry(1,20),puddleMaterial);mesh.rotation.x=-Math.PI/2;mesh.position.set(x,.205,z);mesh.scale.set(sx,sz,1);scene.add(mesh);puddles.push(mesh);
     });
     // Bus shelters and planters create recognizable corners without blocking the roadway.
-    [[-230,-149],[91,171],[170,-69],[251,91]].forEach(([x,z],i)=>{
+    [[-230,-149],[91,171],[170,-69],[251,91]].filter(([x,z])=>island.containsCircle(x,z,3)).forEach(([x,z],i)=>{
       prop(x,z,1.2);box(material(0x34515b),x,1.5,z,4,.18,2.2,i%2?Math.PI/2:0);box(windowDark,x,2.3,z,4,2.2,.10,i%2?Math.PI/2:0);box(cream,x,3.5,z,4.5,.25,2.6,i%2?Math.PI/2:0);
     });
-    [[-229,-110],[91,110],[171,30],[253,-227]].forEach(([x,z])=>{prop(x,z,.7);inst(k.cylinder,material(0xc9896b),x,.55,z,.75,1.1,.75);bush(x,z,1.05);});
+    [[-229,-110],[91,110],[171,30],[253,-227]].filter(([x,z])=>island.containsCircle(x,z,2)).forEach(([x,z])=>{prop(x,z,.7);inst(k.cylinder,material(0xc9896b),x,.55,z,.75,1.1,.75);bush(x,z,1.05);});
     for(const b of batches.values()){
       const mesh=new T.InstancedMesh(b.geo,b.mat,b.items.length),tmp=new T.Object3D();
       b.items.forEach((o,i)=>{tmp.position.set(o.x,o.y,o.z);tmp.rotation.set(o.rx,o.ry,o.rz);tmp.scale.set(o.sx,o.sy,o.sz);tmp.updateMatrix();mesh.setMatrixAt(i,tmp.matrix);});
@@ -468,7 +460,7 @@
     const fireMat=new T.PointsMaterial({color:0xeaff98,size:.22,transparent:true,opacity:0,depthWrite:false});
     const fireflies=new T.Points(fireGeo,fireMat);scene.add(fireflies);
     function isBlocked(x,z,r=1){
-      if(x-r<bounds.minX||x+r>bounds.maxX||z-r<bounds.minZ||z+r>bounds.maxZ)return true;
+      if(!island.containsCircle(x,z,r))return true;
       if(x+r>106&&x-r<132&&!roads.some(a=>Math.abs(z-a)<8-r))return true;
       if(buildings.some(b=>x+r>b.minX&&x-r<b.maxX&&z+r>b.minZ&&z-r<b.maxZ))return true;
       if(tunnels.some(t=>x+r>t.minX&&x-r<t.maxX&&((z-r<t.minZ+1.6&&z+r>t.minZ)||(z-r<t.maxZ&&z+r>t.maxZ-1.6))))return true;
@@ -498,7 +490,7 @@
       puddleMaterial.opacity=rain*.48;
       puddles.forEach((mesh,i)=>{mesh.visible=rain>.06;mesh.scale.z=1+Math.sin(time*.8+i)*.03;});
       signs.forEach(m=>m.emissiveIntensity=.32+night*1.6);
-      waterMat.color.setHex(night>.65?0x153f59:0x2ba7af);
+      waterMat.color.setHex(night>.65?0x153f59:0x2ba7af);island.update(time,night,rain);
       for(const a of animals){
         const t=time*a.speed+a.phase;
         if(a.type==='dog'){
@@ -518,12 +510,12 @@
       if((frame++%3)===0){
         fireBase.forEach((p,i)=>{firePos[i*3]=p.x+Math.sin(time+p.phase)*.6;firePos[i*3+1]=p.y+Math.sin(time*1.7+p.phase)*.4;firePos[i*3+2]=p.z+Math.cos(time*.8+p.phase)*.6;});
         fireGeo.attributes.position.needsUpdate=true;
-        const v=waterGeo.attributes.position;
+        const v=island.water.geometry.attributes.position;
         for(let i=0;i<v.count;i++)v.setY(i,Math.sin(v.getX(i)*.05+time)*.14+Math.cos(v.getZ(i)*.045+time*.7)*.11);
         v.needsUpdate=true;
       }
     }
     function getDistrict(x,z){return x>250?'Praia Aurora':x>85&&x<150?'Canal das Garças':x<70&&z<0?'Centro Solar':z>60&&x<0?'Jardim Maré':'Costa Coral';}
-    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,getElevation,parks,alleys,lots,tunnels,hills,solidProps,counts:{buildings:buildings.length,skyscrapers:buildings.filter(b=>b.tower).length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
+    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,getElevation,island,parks,alleys,lots,tunnels,hills,solidProps,counts:{buildings:buildings.length,skyscrapers:buildings.filter(b=>b.tower).length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
   };
 })();

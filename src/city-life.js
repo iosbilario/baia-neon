@@ -18,13 +18,17 @@
       const actor={role,x,z,mesh,phase:actors.length*1.7,home:{x,z},state:'idle'};actors.push(actor);return actor;
     }
     function bicycle(x,z,index){
-      const group=new T.Group(),wheelGeo=new T.TorusGeometry(.43,.055,7,16);
-      for(const zz of [-.72,.72]){const wheel=add(wheelGeo,materials.dark,group,0,.54,zz);wheel.rotation.y=Math.PI/2;}
-      const frame=add(new T.BoxGeometry(.08,.08,1.18),index%2?materials.coral:materials.mint,group,0,.75,0);frame.rotation.x=.55;
-      add(new T.BoxGeometry(.65,.07,.07),materials.dark,group,0,1.03,-.52);
-      const rider=BN.createHuman(T,index%2?0x6fa4c7:0xe6b56f,[0x68483b,0xb88460,0xe6bd96][index%3]);rider.scale.setScalar(.72);rider.position.y=.88;rider.rotation.y=Math.PI/2;group.add(rider);
+      const group=new T.Group(),wheelGeo=new T.TorusGeometry(.43,.055,7,20),wheels=[];
+      for(const zz of [-.76,.76]){const wheel=add(wheelGeo,materials.dark,group,0,.54,zz);wheel.rotation.y=Math.PI/2;wheels.push(wheel);}
+      const tube=(a,b,material=materials.coral,r=.045)=>{const delta=new T.Vector3().subVectors(b,a),mid=new T.Vector3().addVectors(a,b).multiplyScalar(.5),piece=add(new T.CylinderGeometry(r,r,delta.length(),8),material,group,mid.x,mid.y,mid.z);piece.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());return piece;};
+      const color=index%2?materials.coral:materials.mint;
+      tube(new T.Vector3(0,.54,-.76),new T.Vector3(0,1.02,-.08),color);tube(new T.Vector3(0,1.02,-.08),new T.Vector3(0,.54,.76),color);tube(new T.Vector3(0,.54,-.76),new T.Vector3(0,.66,.18),color);tube(new T.Vector3(0,.66,.18),new T.Vector3(0,.54,.76),color);tube(new T.Vector3(0,.66,.18),new T.Vector3(0,1.02,-.08),color);
+      add(new T.BoxGeometry(.42,.08,.22),materials.dark,group,0,1.06,-.16);tube(new T.Vector3(0,.54,.76),new T.Vector3(0,1.18,.62),materials.metal,.035);add(new T.BoxGeometry(.62,.055,.055),materials.dark,group,0,1.18,.62);
+      const crank=add(new T.CylinderGeometry(.14,.14,.05,10),materials.metal,group,0,.66,.18);crank.rotation.z=Math.PI/2;
+      const rider=BN.createHuman(T,index%2?0x6fa4c7:0xe6b56f,[0x68483b,0xb88460,0xe6bd96][index%3]);rider.scale.setScalar(.72);rider.position.set(0,.55,-.18);rider.rotation.x=-.25;group.add(rider);
+      rider.userData.arms.forEach(arm=>arm.rotation.x=-1.48);
       scene.add(group);const vertical=index%2===0,road=world.roads[(index*2+1)%world.roads.length],line=road+(index%3===0?2.7:-2.7);
-      const cyclist={group,rider,x:vertical?line:-250,z:vertical?-250:line,vertical,dir:1,speed:4.3+index*.25};group.position.set(cyclist.x,0,cyclist.z);cyclists.push(cyclist);
+      const cyclist={group,rider,wheels,crank,x:vertical?line:-240,z:vertical?-240:line,vertical,dir:1,speed:4.3+index*.25,down:0,hitCooldown:0,pause:0,phase:index*.8};group.position.set(cyclist.x,0,cyclist.z);cyclists.push(cyclist);
     }
     for(let i=0;i<8;i++)bicycle(0,0,i);
     // Park parcels contain distinct activities rather than generic walkers only.
@@ -43,7 +47,7 @@
     const smokers=[];[[-229,-118],[91,118],[171,38],[-149,-38]].forEach((p,i)=>{const actor=human('smoker',p[0],p[1],0x7f91b7,.8);actor.smoke=i*.8;smokers.push(actor);});
     [[-229,175],[-149,95]].forEach((p,i)=>{const actor=human('resting',p[0],p[1],0x81766e,.78);actor.mesh.rotation.z=.08;});
     const smokeCount=24,smokeData=new Float32Array(smokeCount*3),smokeGeo=new T.BufferGeometry();smokeGeo.setAttribute('position',new T.BufferAttribute(smokeData,3));const smokeCloud=new T.Points(smokeGeo,materials.smoke);scene.add(smokeCloud);
-    [[-229,-205],[91,-125],[171,115],[251,-45]].forEach((p,i)=>{const actor=human('companion',p[0],p[1],[0xd85b7d,0x8e68b0,0xe28b62,0x5fa7a0][i],.84);actor.adult=true;companions.push(actor);});
+    [[-229,-205],[91,-125],[171,115],[229,-45]].forEach((p,i)=>{const actor=human('companion',p[0],p[1],[0xd85b7d,0x8e68b0,0xe28b62,0x5fa7a0][i],.84);actor.adult=true;companions.push(actor);});
     const streetDetails=[];
     for(let i=0;i<18;i++){
       const vertical=i%2===0,road=world.roads[(i*3)%world.roads.length],along=-210+(i%6)*72,x=vertical?road+11:along,z=vertical?along:road+11,g=new T.Group();g.position.set(x,0,z);scene.add(g);
@@ -68,8 +72,30 @@
     function animateHuman(actor,time,amount){const data=actor.mesh.userData;(data.legs||[]).forEach((leg,i)=>leg.rotation.x=Math.sin(time+i*Math.PI)*amount);(data.arms||[]).forEach((arm,i)=>arm.rotation.x=-Math.sin(time+i*Math.PI)*amount*.75);}
     function update(dt,state){
       const time=state.time||0,focus=state.focus||{x:0,z:0},night=state.night||0,rain=state.rain||0;
-      cyclists.forEach((cyclist,i)=>{const axis=cyclist.vertical?'z':'x';cyclist[axis]+=cyclist.dir*cyclist.speed*dt;if(cyclist[axis]>260||cyclist[axis]<-260){cyclist.dir*=-1;cyclist[axis]=Math.max(-260,Math.min(260,cyclist[axis]));}cyclist.group.position.set(cyclist.x,0,cyclist.z);cyclist.group.rotation.y=cyclist.vertical?(cyclist.dir>0?0:Math.PI):(cyclist.dir>0?Math.PI/2:-Math.PI/2);animateHuman({mesh:cyclist.rider},time*7+i,.38);cyclist.group.visible=dist(cyclist,focus)<180;});
-      actors.forEach((actor,i)=>{let amount=.04;if(actor.role==='player'){amount=.28;actor.mesh.userData.arms[0].rotation.z=Math.sin(time*2+actor.phase)*.8;}else if(actor.role==='worker'){amount=.18;actor.mesh.userData.arms[actor.work%2].rotation.x=-1.2+Math.sin(time*3+actor.phase)*.65;}else if(actor.role==='smoker'){amount=.03;actor.mesh.userData.arms[0].rotation.x=-2.25;}else if(actor.role==='resting'){actor.mesh.scale.y=.64;}else if(actor.role==='companion'){amount=.08;actor.mesh.rotation.y=Math.sin(time*.7+actor.phase)*.25;}else if(actor.state==='flee'){amount=.65;actor.x+=Math.sin(actor.phase)*dt*3.8;actor.z+=Math.cos(actor.phase)*dt*3.8;actor.mesh.position.set(actor.x,0,actor.z);}else if(actor.state==='cower'){actor.mesh.scale.y=.62;actor.mesh.userData.arms.forEach(a=>a.rotation.x=-2.5);}actor.mesh.position.y=world.getElevation(actor.x,actor.z);animateHuman(actor,time*(actor.role==='worker'?5:3)+actor.phase,amount);actor.mesh.visible=actor.state!=='riding'&&(actor.role!=='companion'||night>.45)&&(!(actor.role||'').startsWith('incident-')||incident.active>0)&&dist(actor,focus)<145;});
+      cyclists.forEach((cyclist,i)=>{
+        cyclist.hitCooldown=Math.max(0,cyclist.hitCooldown-dt);cyclist.pause=Math.max(0,cyclist.pause-dt);
+        if(cyclist.down>0){cyclist.down-=dt;cyclist.group.rotation.z=Math.PI/2;cyclist.group.position.y=.42;if(cyclist.down<=0){cyclist.group.rotation.z=0;cyclist.hitCooldown=3;}return;}
+        const axis=cyclist.vertical?'z':'x';if(cyclist.pause<=0)cyclist[axis]+=cyclist.dir*cyclist.speed*dt;
+        if(cyclist[axis]>240||cyclist[axis]<-240||!world.island.containsCircle(cyclist.x,cyclist.z,3)){cyclist.dir*=-1;cyclist[axis]=Math.max(-240,Math.min(240,cyclist[axis]));cyclist[axis]+=cyclist.dir*2;}
+        cyclist.group.position.set(cyclist.x,world.getElevation(cyclist.x,cyclist.z),cyclist.z);cyclist.group.rotation.y=cyclist.vertical?(cyclist.dir>0?0:Math.PI):(cyclist.dir>0?Math.PI/2:-Math.PI/2);
+        const pedal=time*cyclist.speed*1.6+cyclist.phase;cyclist.rider.userData.legs.forEach((leg,n)=>leg.rotation.x=.45+Math.sin(pedal+n*Math.PI)*.72);cyclist.rider.userData.arms.forEach(arm=>arm.rotation.x=-1.48);cyclist.crank.rotation.x=pedal;cyclist.wheels.forEach(wheel=>wheel.rotation.x-=cyclist.dir*cyclist.speed*dt*2.2);cyclist.group.visible=dist(cyclist,focus)<180;
+      });
+      actors.forEach((actor,i)=>{
+        let amount=.04;
+        if(actor.state==='down'){
+          actor.down-=dt;actor.mesh.rotation.z=Math.PI/2;actor.mesh.scale.y=.72;if(actor.down<=0){actor.state='idle';actor.mesh.rotation.z=0;actor.mesh.scale.setScalar(actor.role==='companion'?.84:actor.park?.78:.8);}
+        }else if(actor.role==='player'){
+          amount=.28;actor.mesh.userData.arms[0].rotation.z=Math.sin(time*2+actor.phase)*.8;
+        }else if(actor.role==='worker'){
+          amount=.18;actor.mesh.userData.arms[actor.work%2].rotation.x=-1.2+Math.sin(time*3+actor.phase)*.65;
+        }else if(actor.role==='smoker'){
+          amount=.03;actor.mesh.userData.arms[0].rotation.x=-2.25;
+        }else if(actor.role==='resting')actor.mesh.scale.y=.64;
+        else if(actor.role==='companion'){amount=.08;actor.mesh.rotation.y=Math.sin(time*.7+actor.phase)*.25;}
+        else if(actor.state==='flee'){amount=.65;actor.x+=Math.sin(actor.phase)*dt*3.8;actor.z+=Math.cos(actor.phase)*dt*3.8;actor.mesh.position.set(actor.x,0,actor.z);}
+        else if(actor.state==='cower'){actor.mesh.scale.y=.62;actor.mesh.userData.arms.forEach(a=>a.rotation.x=-2.5);}
+        actor.mesh.position.y=world.getElevation(actor.x,actor.z);if(actor.state!=='down')animateHuman(actor,time*(actor.role==='worker'?5:3)+actor.phase,amount);actor.mesh.visible=actor.state!=='riding'&&(actor.role!=='companion'||night>.45)&&(!(actor.role||'').startsWith('incident-')||incident.active>0)&&dist(actor,focus)<145;
+      });
       scene.children.forEach(object=>{if(object.userData&&object.userData.park){const park=object.userData.park,phase=object.userData.phase;object.position.set(park.x+Math.sin(time*.8+phase)*5,world.getElevation(park.x+Math.sin(time*.8+phase)*5,park.z+Math.cos(time*.8+phase)*4)+1+Math.abs(Math.sin(time*1.6+phase))*2.4,park.z+Math.cos(time*.8+phase)*4);}});
       for(let i=0;i<smokeCount;i++){const smoker=smokers[i%smokers.length],age=(time*.24+i*.173)%1;smokeData[i*3]=smoker.x+Math.sin(time+i)*age*.22;smokeData[i*3+1]=1.65+age*1.8;smokeData[i*3+2]=smoker.z+Math.cos(time*.7+i)*age*.22;}smokeGeo.attributes.position.needsUpdate=true;smokeCloud.visible=rain<.45;
       streetDetails.forEach(detail=>detail.group.visible=dist(detail,focus)<135);
@@ -77,9 +103,20 @@
       incident.timer-=dt;if(incident.active<=0&&incident.timer<=0){startIncident(focus);incident.timer=85+incident.count%3*24;}
       if(incident.active>0){incident.active-=dt;const goal=incident.route[Math.min(incident.waypoint,incident.route.length-1)];if(goal){const dx=goal.x-ambientCruiser.position.x,dz=goal.z-ambientCruiser.position.z,d=Math.hypot(dx,dz);if(d<1.5)incident.waypoint++;else{ambientCruiser.position.x+=dx/d*13*dt;ambientCruiser.position.z+=dz/d*13*dt;ambientCruiser.rotation.y=Math.atan2(dx,dz);}}if(incident.active<=0){ambientCruiser.visible=false;incidentActors.forEach(a=>{a.mesh.visible=false;a.state='idle';a.mesh.scale.y=.8;});}}
     }
+    function interact(point){
+      const cyclist=cyclists.filter(c=>c.down<=0&&c.group.visible&&dist(c,point)<3.2).sort((a,b)=>dist(a,point)-dist(b,point))[0];
+      if(cyclist){cyclist.pause=5;onMessage(['Ciclista: “A ciclovia acaba justamente onde começa a aventura.”','Ciclista: “Se encontrar meu recorde, devolve na oficina.”','Ciclista: “Hoje eu chego antes da chuva.”'][cyclists.indexOf(cyclist)%3]);return true;}
+      const actor=actors.filter(a=>a.mesh.visible&&a.state==='idle'&&dist(a,point)<2.8).sort((a,b)=>dist(a,point)-dist(b,point))[0];if(!actor)return false;
+      const lines={player:'“A bola sempre cai perto da fonte.”',reader:'“Esse capítulo tem mais perseguição que o jornal.”',walker:'“O parque fica melhor quando a cidade desacelera.”',worker:'“A obra termina assim que alguém achar a planta certa.”',smoker:'“Cinco minutos de paz antes do próximo ônibus.”',resting:'“Hoje o banco é meu escritório.”',companion:'“Buzine quando estiver de carro.”'};onMessage(lines[actor.role]||'A pessoa cumprimenta você.');return true;
+    }
+    function checkVehicleHit(car,speed){
+      if(!car||speed<=4)return null;
+      const cyclist=cyclists.find(c=>c.down<=0&&c.hitCooldown<=0&&dist(c,car)<2.35);if(cyclist){cyclist.down=7;cyclist.hitCooldown=10;cyclist.group.rotation.z=Math.PI/2;return {kind:'cyclist',x:cyclist.x,z:cyclist.z};}
+      const actor=actors.find(a=>a.park&&a.state==='idle'&&dist(a,car)<2.2);if(actor){actor.state='down';actor.down=6;actor.mesh.rotation.z=Math.PI/2;return {kind:'park',x:actor.x,z:actor.z};}return null;
+    }
     function nearestCompanion(point,max=13){return companions.filter(a=>a.mesh.visible&&dist(a,point)<max).sort((a,b)=>dist(a,point)-dist(b,point))[0]||null;}
     function boardCompanion(actor){actor.mesh.visible=false;actor.state='riding';}
     function releaseCompanion(actor){actor.state='idle';actor.x=actor.home.x;actor.z=actor.home.z;actor.mesh.position.set(actor.x,0,actor.z);actor.mesh.visible=true;}
-    return {update,actors,cyclists,planes,companions,incident,nearestCompanion,boardCompanion,releaseCompanion,counts:{cyclists:cyclists.length,workers:actors.filter(a=>a.role==='worker').length,parkActivities:actors.filter(a=>a.park).length,companions:companions.length,planes:planes.length,streetDetails:streetDetails.length}};
+    return {update,interact,checkVehicleHit,actors,cyclists,planes,companions,incident,nearestCompanion,boardCompanion,releaseCompanion,counts:{cyclists:cyclists.length,workers:actors.filter(a=>a.role==='worker').length,parkActivities:actors.filter(a=>a.park).length,companions:companions.length,planes:planes.length,streetDetails:streetDetails.length}};
   };
 })();

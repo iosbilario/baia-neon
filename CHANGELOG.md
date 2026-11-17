@@ -1,5 +1,19 @@
 # Histórico de versões
 
+## [0.6.0] — Ilha no Horizonte
+
+### Em desenvolvimento
+
+- Mapa redesenhado como Ilha Ferradura, com costa irregular e limite jogável orgânico.
+- Avenida de orla acompanha a maior parte da costa; ruas terminam em praças, mirantes, marina e construções.
+- Grade viária, tráfego, polícia e rotas permanecem sobre terra firme.
+- Horizonte cenográfico com ilha distante, farol, cargueiro, boias e tempestade animada.
+- Destinos escolhidos sobre o mar retornam ao ponto seguro mais próximo da ilha.
+- Píer Farol reposicionado dentro da nova baía.
+- Bicicletas ganharam quadro completo, selim, guidão, pedais, rodas animadas e ciclista sentado.
+- Ciclistas e visitantes dos parques agora conversam por ação contextual e reagem a atropelamentos.
+- Save da v0.5.0 continua compatível no schema 2.
+
 ## [0.5.0] — Na Mão
 
 ### Para quem joga

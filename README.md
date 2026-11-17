@@ -81,7 +81,7 @@ Fica no marcador laranja do mapa e abre com `Enter`.
 | --- | --- |
 | `W` `A` `S` `D` ou setas | Caminhar ou dirigir |
 | `Shift` | Correr |
-| `E` | Entrar ou sair de um carro próximo |
+| `E` | Entrar, sair, conversar ou interagir |
 | `Espaço` | Freio de mão |
 | `1` `2` `3` | Aceitar uma oferta do quadro |
 | `Enter` | Ação contextual ou oficina |
@@ -104,22 +104,23 @@ Fica no marcador laranja do mapa e abre com `Enter`.
 
 ## A cidade
 
-Uma miniatura imaginária de litoral, com cerca de 600 por 600 metros, gerada
-sempre igual a partir de uma semente fixa.
+Uma ilha litorânea fictícia com cerca de 600 por 600 metros, costa irregular
+e geração determinística.
 
-- **Centro Solar.** Torres, trânsito e três vielas de 3 metros com marcos
-  amarelos. Só o compacto passa por elas.
-- **Canal das Garças.** Sete pontes. Fora delas, a água não se atravessa.
-- **Praia Aurora.** Avenida aberta para ganhar velocidade, com pouco abrigo.
-- **Parques.** Cinco áreas só para pedestres. Carros e viaturas param nos
-  balizadores.
-- **Estacionamentos.** Nove pátios com carros parados, bons para trocar de
-  veículo longe de testemunhas.
+- **Centro Solar.** Núcleo vertical protegido no interior, com arranha-céus,
+  trânsito e vielas exclusivas para o compacto.
+- **Avenida da Orla.** Acompanha a maior parte da costa e recebe as ruas
+  principais antes que elas alcancem o mar.
+- **Canal das Garças.** Sete pontes e ligação com a baía interna.
+- **Praia Aurora.** Avenida panorâmica, hotéis, marina e acesso ao Píer Farol.
+- **Parques.** Quatro áreas para pedestres, incluindo um parque elevado.
+- **Horizonte.** Ilha distante, farol, navio cargueiro, boias e tempestade
+  continuam além do limite jogável como cenário sem colisão.
 
-A cidade tem 64 pedestres com rotina (esperam o semáforo, viram esquinas,
-conversam, passeiam, correm e fogem do perigo), trânsito que freia para o
-que está na faixa, cães, gaivotas, borboletas e vagalumes. O dia dura 12
-minutos, as janelas acendem à noite e a chuva chega de vez em quando.
+A cidade tem pedestres com rotina, ciclistas sentados e pedalando, trabalhadores,
+atividades nos parques, trânsito, cães, gaivotas, borboletas e vagalumes. Ciclistas
+e visitantes dos parques respondem à ação contextual e reagem a colisões. O dia
+dura 12 minutos, as janelas acendem à noite e a chuva chega de vez em quando.
 
 ## Polícia
 
