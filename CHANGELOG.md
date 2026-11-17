@@ -1,5 +1,17 @@
 # Histórico de versões
 
+## [0.5.0] — Na Mão
+
+### Em desenvolvimento
+
+- Controle de PC inspirado no padrão de jogos de mundo aberto: câmera pelo mouse com pointer lock, mira central e visão sobre o ombro.
+- Clique esquerdo atira, botão direito segura a mira e `Esc` libera o ponteiro e pausa.
+- Câmera de direção retorna suavemente para trás do veículo.
+- Controles móveis em paisagem com analógico, área de câmera, ações contextuais, aceleração, freio e freio de mão.
+- HUD reorganizado no celular para separar mapa, objetivo, status e botões.
+- Orientação em retrato mostra instrução para girar o aparelho.
+- Save da v0.4.0 permanece compatível no schema 2.
+
 ## [0.4.0] — Cidade Viva
 
 ### Para quem joga
