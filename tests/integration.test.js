@@ -20,7 +20,7 @@ const scope={console:{log:console.log,warn(){},error(e){fatalError=e;}},document
 scope.window=scope;vm.createContext(scope);
 vm.runInContext(fs.readFileSync(path.join(root,'vendor/three.min.js'),'utf8'),scope);
 scope.THREE.WebGLRenderer=class{constructor(){this.shadowMap={};this.info={render:{calls:0,triangles:0}};}setPixelRatio(){}setSize(){}render(scene,camera){assert.ok(Number.isFinite(camera.position.x));scene.updateMatrixWorld();}};
-for(const file of ['config','build-info','save','navigation','city-systems','campaign','island','world','audio','police','city-life','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
+for(const file of ['config','build-info','save','navigation','city-systems','arsenal','campaign','island','world','audio','police','city-life','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
 assert.equal(fatalError,null,'initialization error');
 assert.ok(scope.BN.debug,'test helpers available');
 const d=scope.BN.debug;
@@ -176,5 +176,66 @@ test('gamepad moves the player, adapts prompts and pauses when unplugged',()=>{
   tap('KeyA');assert.equal(d.inputMode.mode,'keyboard');pad.axes=[0,-1,0,0];step(.05);assert.equal(d.inputMode.mode,'gamepad');pad.axes=[0,0,0,0];
   pad.connected=false;step(.05);assert.equal(d.getState().mode,'pause','unplugging pauses a gamepad session');element('resume').onclick();step(.05);
   assert.equal(d.getState().mode,'play');scope.navigator=undefined;
+});
+test('arsenal: three weapons switch by key, wheel, gamepad bumpers and touch, and persist in the save',()=>{
+  if(d.player.car){d.player.car.speed=0;tap('KeyE');}assert.ok(!d.player.car);d.teleport(-9.4,-60);d.clearPolice();
+  assert.equal(d.getState().player.weapon,'pistol');tap('KeyQ');assert.equal(d.getState().player.weapon,'pistol','nothing to switch to yet');
+  d.loadout.unlock('smg');d.loadout.unlock('shotgun');
+  tap('KeyQ');assert.equal(d.getState().player.weapon,'smg');step(.4);listeners.wheel({deltaY:100});assert.equal(d.getState().player.weapon,'shotgun');step(.4);
+  listeners.wheel({deltaY:-100});assert.equal(d.getState().player.weapon,'smg');step(.4);tap('Digit4');assert.equal(d.getState().player.weapon,'pistol');step(.4);
+  const buttons=Array.from({length:17},()=>({pressed:false,value:0})),pad={index:0,id:'Arsenal Pad',connected:true,axes:[0,0,0,0],buttons};scope.navigator={getGamepads:()=>[pad]};
+  buttons[5]={pressed:true,value:1};step(.05);buttons[5]={pressed:false,value:0};step(.3);assert.equal(d.getState().player.weapon,'smg','RB next');
+  buttons[4]={pressed:true,value:1};step(.05);buttons[4]={pressed:false,value:0};step(.3);assert.equal(d.getState().player.weapon,'pistol','LB previous');
+  scope.navigator=undefined;step(.05);if(d.getState().mode==='pause'){element('resume').onclick();step(.05);}assert.equal(d.getState().mode,'play');
+  listeners['touchWeapon:pointerdown']({preventDefault(){}});assert.equal(d.getState().player.weapon,'smg','touch button');step(.4);
+  assert.ok(element('touchWeapon').textContent.includes('SUBME'));assert.ok(element('arsenal').textContent.includes('SUBMETRALHADORA'));
+  const saved=d.progressData();assert.equal(JSON.stringify(saved.arsenal.owned),'["pistol","smg","shotgun"]');assert.equal(saved.arsenal.current,'smg');assert.equal(saved.schemaVersion,2);assert.equal(typeof saved.ammo,'number');
+});
+test('arsenal: the smg sprays while the button is held, the shotgun fires several tracers per shot',()=>{
+  d.teleport(-9.4,-60);d.loadout.select('smg');step(.4);const before=d.player.ammo;
+  listeners['game:pointerdown']({button:0});step(.5);listeners['game:pointerup']({button:0});const used=before-d.player.ammo;assert.ok(used>=4&&used<=7,'held smg uses several rounds in half a second: '+used);
+  const after=d.player.ammo;step(.5);assert.equal(d.player.ammo,after,'releasing the button stops the spray');
+  d.loadout.select('shotgun');step(.4);const sg=d.player.ammo;listeners['game:pointerdown']({button:0});listeners['game:pointerup']({button:0});step(.05);assert.equal(d.player.ammo,sg-1,'one shell per pull');
+  const visible=d.scene.children.filter(o=>o.isLine&&o.material&&o.material.opacity>0).length;assert.ok(visible>=5,'pellet tracers: '+visible);
+  d.loadout.select('pistol');step(.4);d.player.ammo=0;tap('KeyR');assert.ok(d.player.reload>0,'empty magazine reloads');step(1.5);assert.equal(d.player.ammo,12);
+});
+test('arsenal: shooting from inside the car follows the reticle and damages the target zone',()=>{
+  d.loadout.select('pistol');step(.4);const car=d.cars.find(o=>o.owned&&!o.wreck);d.teleport(car.x+1.5,car.z);tap('KeyE');assert.ok(d.player.car,'inside the car');
+  const c=d.player.car;d.teleport(0,-230);c.heading=0;c.speed=0;c.lat=0;d.clearPolice();d.resetZones(c);
+  const target=d.cars.find(o=>o!==c&&!o.wreck);target.traffic=false;target.speed=0;target.x=c.x;target.z=c.z+14;target.heading=Math.PI/2;target.mesh.position.set(target.x,0,target.z);target.mesh.rotation.y=target.heading;target.damage=0;target.zones=scope.BN.newZones();target.mesh.visible=true;
+  d.setYaw(Math.PI);step(.8);d.teleport(0,-230);c.speed=0;target.x=c.x;target.z=c.z+14;target.mesh.position.set(target.x,0,target.z);
+  let aimed=null;for(let pitch=.1;pitch<=1.1&&!aimed;pitch+=.05){d.setPitch(pitch);step(.3);d.teleport(0,-230);c.speed=0;target.x=c.x;target.z=c.z+14;target.mesh.position.set(target.x,0,target.z);const probe=d.resolveAim();if(probe.best&&probe.best.o===target)aimed=pitch;}
+  assert.ok(aimed!==null,'the player can put the reticle on the car ahead');
+  const ammo=d.player.ammo;d.fire();assert.equal(d.player.ammo,ammo-1,'the pistol works from the car');assert.ok(d.player.aimTime>0);
+  assert.ok(target.damage>0,'the car ahead is hit: '+target.damage);const hit=Object.values(target.zones).reduce((a,b)=>a+b,0);assert.ok(hit>0,'a zone records the hit');assert.equal(target.zones.rear+target.zones.front,0,'shot from the side of a crossing car');
+  step(.1);assert.ok(element('arsenal').textContent.includes('CARRO'));assert.ok(element('arsenal').textContent.includes('PISTOLA'));
+  target.damage=0;target.x=-200;target.z=-200;target.mesh.position.set(-200,0,-200);
+});
+test('arsenal: localized damage dents the car and changes its handling',()=>{
+  const c=d.player.car;assert.ok(c);d.teleport(0,-230);c.heading=0;c.lat=0;d.resetZones(c);c.damage=0;const kids=c.mesh.children.length;
+  const topSpeed=()=>{d.teleport(0,-230);c.heading=0;c.lat=0;c.speed=60;down('KeyW');step(.05);up('KeyW');const v=c.speed;c.speed=0;return v;};
+  const top=topSpeed();d.resetZones(c);d.damageZone(c,'front',70);assert.equal(c.mesh.children.length,kids+1,'a dent mesh appears');assert.equal(d.getState().player.zones.front,70);
+  d.damageZone(c,'front',10);assert.equal(c.mesh.children.length,kids+1,'same level, same mesh');d.damageZone(c,'right',30);assert.equal(c.mesh.children.length,kids+2);
+  const damaged=topSpeed();assert.ok(damaged<top*.8,'front damage lowers top speed: '+damaged+' vs '+top);
+  d.resetZones(c);assert.equal(c.mesh.children.length,kids);assert.equal(d.getState().player.zones.front,0);c.speed=0;c.lat=0;
+});
+test('arsenal: the car rolls over on a sustained slide, locks the controls and recovers',()=>{
+  const c=d.player.car;d.teleport(0,-230);c.heading=0;c.speed=0;c.lat=0;c.roll.reset();c.damage=0;
+  d.resetZones(c);let rolled=false;for(let i=0;i<60&&!rolled;i++){c.speed=26;c.lat=18;step(1/60);rolled=c.roll.active;}
+  assert.ok(rolled,'slide over the limit starts a rollover');assert.equal(d.getState().player.roll,'rolling');
+  const before=c.speed;down('KeyW');step(.3);up('KeyW');assert.ok(c.speed<=before,'throttle is ignored while rolling');assert.ok(Math.abs(c.mesh.rotation.z)>.1,'the body is tilted');
+  const zones=d.getState().player.zones;assert.ok(zones.left+zones.right>=18,'side takes the damage');assert.ok(c.damage>0);
+  tap('KeyE');assert.ok(d.player.car,'cannot leave the car while it is overturned');
+  step(4);assert.equal(c.roll.active,false);assert.equal(c.mesh.rotation.z,0);assert.equal(c.mesh.position.y,0);
+  down('KeyW');c.speed=0;step(1);up('KeyW');assert.ok(c.speed>3,'driving again after recovery');c.speed=0;c.lat=0;
+  d.resetZones(c);c.damage=0;
+});
+test('arsenal: garage sells weapons and ammo for the weapon in hand, and old saves load',()=>{
+  const c=d.player.car;if(c){c.speed=0;d.teleport(12,14);tap('KeyE');}
+  const fresh=scope.BN.Save.normalize({balance:50,ammo:7,reserve:20},{vehicles:['compact','sedan','sport'],upgrades:['brakes','tires','cargo'],campaignIds:[],weapons:['pistol','smg','shotgun']});
+  assert.equal(fresh.schemaVersion,2);assert.equal(JSON.stringify(fresh.arsenal.owned),'["pistol"]');
+  d.loadout.select('smg');d.setBalance(5000);d.teleport(scope.BN.CONFIG.garage.x,scope.BN.CONFIG.garage.z);step(.2);d.openGarage();assert.equal(d.getState().mode,'garage');
+  const labels=d.garageItems().map(i=>i.label);assert.ok(labels.some(l=>l.startsWith('Munição · SUBMETRALHADORA')),labels.join('|'));assert.ok(!labels.some(l=>l.startsWith('Comprar ESPINGARDA')),'owned weapons are not for sale');
+  element('closeGarage').onclick();step(.1);
 });
 console.log(passed+' integration checks passed with a stub renderer. No visual or FPS claim.');

@@ -22,7 +22,7 @@
     return a > d ? Math.sign(value) * Math.min(1, (a - d) / (1 - d)) : 0;
   }
   // Standard-mapping button indexes.
-  const PAD = Object.freeze({interact: 0, handbrake: 1, fire: 2, retry: 3, reload: 4, grenade: 5, lt: 6, rt: 7, map: 8, pause: 9, run: 10, up: 12, down: 13, left: 14, right: 15});
+  const PAD = Object.freeze({interact: 0, handbrake: 1, fire: 2, retry: 3, reload: 3, prev: 4, next: 5, lt: 6, rt: 7, map: 8, pause: 9, run: 10, grenade: 10, horn: 11, up: 12, down: 13, left: 14, right: 15});
   const PAD_DEFAULTS = Object.freeze({stickDead: .18, lookDead: .15, triggerDead: .06, lookSpeed: 2.6, vibration: true});
   const clean = {x: 0, y: 0};
   function neutralState() {
@@ -116,8 +116,8 @@
   }
   const HINTS = {
     keyboard: [['WASD', 'mover'], ['E', 'veículo'], ['M', 'mapa'], ['H', 'ajuda'], ['ESC', 'pausa']],
-    gamepad: [['L', 'mover'], ['R', 'câmera'], ['A', 'interagir'], ['RT', 'acelerar/atirar'], ['SELECT', 'mapa'], ['START', 'pausa']],
-    touch: [['ANALÓGICO', 'mover'], ['INTERAGIR', 'veículo']]
+    gamepad: [['L', 'mover'], ['R', 'câmera'], ['A', 'interagir'], ['RT', 'acelerar/atirar'], ['X', 'atirar no carro'], ['LB/RB', 'trocar arma'], ['SELECT', 'mapa'], ['START', 'pausa']],
+    touch: [['ANALÓGICO', 'mover'], ['INTERAGIR', 'veículo'], ['ARMA', 'trocar']]
   };
   const Prompts = {
     hints(mode) { return (HINTS[mode] || HINTS.keyboard).map(([key, text]) => ({key, text})); },

@@ -21,6 +21,16 @@
     const selected = vehicles.includes(source.car) && owned.includes(source.car) ? source.car : 'compact';
     const upgradeState = {};
     upgrades.forEach(key => { upgradeState[key] = Boolean(source.upgrades && source.upgrades[key]); });
+    // Additive since v1.0: weapons the player owns and their magazines. Older saves simply have none.
+    const weaponIds = catalogues.weapons || ['pistol'];
+    const rawArsenal = source.arsenal && typeof source.arsenal === 'object' ? source.arsenal : {};
+    const weaponOwned = cleanStrings(rawArsenal.owned, weaponIds);
+    if (!weaponOwned.includes('pistol')) weaponOwned.unshift('pistol');
+    const weaponMags = {};
+    weaponIds.forEach(id => {
+      const m = rawArsenal.mags && rawArsenal.mags[id] && typeof rawArsenal.mags[id] === 'object' ? rawArsenal.mags[id] : {};
+      weaponMags[id] = {ammo: finite(m.ammo, id === 'pistol' ? finite(source.ammo, 12, 0, 12) : 0, 0, 99), reserve: finite(m.reserve, id === 'pistol' ? finite(source.reserve, 36, 0, 240) : 0, 0, 300)};
+    });
     const campaign = source.campaign && typeof source.campaign === 'object' ? source.campaign : {};
     return {
       schemaVersion: SCHEMA_VERSION,
@@ -31,6 +41,7 @@
       car: selected,
       ammo: finite(source.ammo, 12, 0, 12),
       reserve: finite(source.reserve, 36, 0, 240),
+      arsenal: {owned: weaponOwned, current: weaponOwned.includes(rawArsenal.current) ? rawArsenal.current : 'pistol', mags: weaponMags},
       grenades: finite(source.grenades, 2, 0, 9),
       health: finite(source.health, 100, 25, 100),
       reputation: finite(source.reputation, 0, 0, 999),
@@ -80,7 +91,7 @@
   function exportProgress(data, build) {
     return JSON.stringify({format: 'baia-neon-progress', schemaVersion: SCHEMA_VERSION, build, progress: normalize(data, {
       vehicles: ['compact', 'sedan', 'sport'], upgrades: ['brakes', 'tires', 'cargo'],
-      campaignIds: ['voz-atrasada', 'carro-radio', 'acervo-ambulante', 'sinal-por-um-fio', 'ultima-frequencia']
+      weapons: ['pistol', 'smg', 'shotgun'], campaignIds: ['voz-atrasada', 'carro-radio', 'acervo-ambulante', 'sinal-por-um-fio', 'ultima-frequencia']
     })}, null, 2);
   }
   function importProgress(text, catalogues) {

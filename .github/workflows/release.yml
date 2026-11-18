@@ -66,6 +66,7 @@ jobs:
           node tests/integration.test.js
           node tests/v03.test.js
           node tests/city-physics.test.js
+          node tests/arsenal.test.js
           python3 tools/package.py
           python3 tools/audit_offline.py
           python3 tests/release.test.py
