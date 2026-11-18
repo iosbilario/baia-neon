@@ -150,7 +150,7 @@
               goal={x:clamp(x+[80,0,-80,0][k],-240,240),z:clamp(z+[0,80,0,-80][k],-240,240)};
             }
           } else { const r=this.world.roads;p.patrolStep++;goal={x:r[(p.patrolStep*3)%r.length],z:r[(p.patrolStep*5+1)%r.length]}; }
-          p.path=BN.roadRoute(this.world.roads,p,goal);p.routeTimer=p.respond?2.5:18;
+          p.path=this.world.streets&&this.world.streets.route?this.world.streets.route(p,goal):BN.roadRoute(this.world.roads,p,goal);p.routeTimer=p.respond?2.5:18;
           while(p.path.length&&dist(p,p.path[0])<3)p.path.shift();
         }
         let goal=p.path[0];

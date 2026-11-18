@@ -178,6 +178,10 @@ test('gamepad moves the player, adapts prompts and pauses when unplugged',()=>{
   pad.connected=false;step(.05);assert.equal(d.getState().mode,'pause','unplugging pauses a gamepad session');element('resume').onclick();step(.05);
   assert.equal(d.getState().mode,'play');scope.navigator=undefined;
 });
+test('gamepad can navigate and activate menu buttons',()=>{
+  let focused=-1,clicked=-1;const buttons=[0,1,2].map(i=>({focus(){focused=i;},click(){clicked=i;}}));element('garage').querySelectorAll=()=>buttons;
+  assert.equal(d.padMenu('garage',1,false),true);assert.equal(focused,1);assert.equal(d.padMenu('garage',0,true),true);assert.equal(clicked,1);
+});
 test('arsenal: three weapons switch by key, wheel, gamepad bumpers and touch, and persist in the save',()=>{
   if(d.player.car){d.player.car.speed=0;tap('KeyE');}assert.ok(!d.player.car);d.teleport(-9.4,-60);d.clearPolice();
   assert.equal(d.getState().player.weapon,'pistol');tap('KeyQ');assert.equal(d.getState().player.weapon,'pistol','nothing to switch to yet');
@@ -240,11 +244,11 @@ test('arsenal: garage sells weapons and ammo for the weapon in hand, and old sav
   element('closeGarage').onclick();step(.1);
 });
 test('interiors: doors open on free ground outside and every exit spawn is walkable',()=>{
-  const I=scope.BN.Interiors;for(const id of I.ORDER){const def=I.DEFS[id];assert.ok(!d.world.isBlocked(def.outside.x,def.outside.z,.42),id+' exit spawn blocked');assert.ok(!d.world.isBlocked(def.door.x,def.door.z,.42),id+' door blocked');}
+  const I=scope.BN.Interiors;assert.equal(d.interiorDoorMarkers.length,I.ORDER.length,'every interior has a visible door marker');for(const id of I.ORDER){const def=I.DEFS[id];assert.ok(!d.world.isBlocked(def.outside.x,def.outside.z,.42),id+' exit spawn blocked');assert.ok(!d.world.isBlocked(def.door.x,def.door.z,.42),id+' door blocked');}
 });
 test('interiors: E at the door enters on foot, collides inside, and E at the exit goes back',()=>{
   const I=scope.BN.Interiors,def=I.DEFS.radio;d.teleport(def.door.x,def.door.z);step(.1);assert.ok(d.getState().player.driving===false);
-  tap('KeyE');step(.7);const s=d.getState();assert.equal(s.interior,'radio');assert.ok(d.interiorRooms.radio&&d.interiorRooms.radio.visible);
+  tap('KeyE');step(.7);const s=d.getState();assert.equal(s.interior,'radio');assert.ok(d.interiorRooms.radio&&d.interiorRooms.radio.visible);assert.equal(element('district').textContent,'Rádio Caju');assert.doesNotMatch(element('missionDistance').textContent,/Infinity/);assert.ok(element('minimapWrap').classList.contains('hidden'),'city minimap hidden indoors');
   const local=I.toLocal(def,d.player);assert.ok(Math.abs(local.x)<def.hx&&Math.abs(local.z)<def.hz);
   down('KeyW');step(4);up('KeyW');const after=I.toLocal(def,d.player);assert.ok(Math.abs(after.x)<=def.hx-.4&&Math.abs(after.z)<=def.hz-.4,'walls hold');assert.ok(!I.blocked(def,d.player.x,d.player.z,.4));
   assert.ok(Number.isFinite(d.camera?d.camera.position.x:0));

@@ -85,11 +85,12 @@
   }
   // Interior camera: third person like the street camera, but pulled inside the walls and under the ceiling.
   function cameraFor(def, player, yaw, pitch = .48) {
-    const local = toLocal(def, player), dist = 4.4, margin = .55;
-    const cx = clamp(local.x + Math.sin(yaw) * dist, -def.hx + margin, def.hx - margin), cz = clamp(local.z + Math.cos(yaw) * dist, -def.hz + margin, def.hz - margin);
-    const cy = clamp(2.6 + (pitch - .48) * 3, 1.8, WALL - .45);
-    const pos = toWorld(def, {x: cx, z: cz});
-    return {position: {x: pos.x, y: cy, z: pos.z}, look: {x: player.x, y: 1.3, z: player.z}};
+    const local = toLocal(def, player), dist = 6, margin = .55;
+    const place = angle => ({x: clamp(local.x + Math.sin(angle) * dist, -def.hx + margin, def.hx - margin), z: clamp(local.z + Math.cos(angle) * dist, -def.hz + margin, def.hz - margin)});
+    let camera = place(yaw);
+    if (Math.hypot(camera.x - local.x, camera.z - local.z) < 3.4) camera = place(yaw + Math.PI);
+    const cy = clamp(3.2 + (pitch - .48) * 3, 2.3, WALL - .4), pos = toWorld(def, camera);
+    return {position: {x: pos.x, y: cy, z: pos.z}, look: {x: player.x, y: 1.25, z: player.z}};
   }
   // Campaign targets that live in interiors: "in-<id>" is entering, "do-<id>" is finishing a task inside.
   const isInteriorTarget = id => /^(in|do)-/.test(String(id)) && ORDER.includes(String(id).slice(3));
@@ -201,6 +202,28 @@
     const e = exitDoor(def); add(mat(0x1a1f22), e.x, 1.2, hz - .05, 2, 2.4, .12); add(mat(c.accent, c.accent), e.x, 2.55, hz - .08, 2.4, .12, .1);
     for (const s of def.solids) add(mat(s.glass ? 0x9fd6d8 : c.accent, 0, !!s.glass), s.x, s.h / 2, s.z, s.hx * 2, s.h, s.hz * 2);
     for (const s of def.stations) add(mat(0x8de3cf, 0x8de3cf), s.x, .06, s.z, s.r * .8, .04, s.r * .8);
+    // Readable low-poly furniture: each room keeps its own silhouette instead of looking like an empty coloured box.
+    if (def.id === 'radio') {
+      add(mat(0x172a31), 0, 1.08, -2.15, 5.2, .16, .9);
+      for (const x of [-1.8, 0, 1.8]) add(mat(0x8de3cf, 0x8de3cf), x, 1.45, -2.55, 1.1, .65, .08);
+      for (let x = -2.2; x <= 2.2; x += .55) add(mat(x % 1.1 ? 0xff805b : 0xffd26f, 0xff805b), x, 1.22, -1.85, .16, .06, .16);
+      add(mat(0x26343a), -5, 1.05, 2, 1.4, .28, 2.5);
+    } else if (def.id === 'garage') {
+      for (const x of [-2.2, 2.2]) add(mat(0x334a50), x, 1.7, -1, .24, 3.4, 3.1);
+      add(mat(0xffc45f, 0xff9b67), 0, 3.25, -1, 4.8, .18, .3);
+      for (let z = -5; z <= 4; z += 1.1) add(mat(z % 2.2 ? 0x20282b : 0xff9b67), -6.1, 1.2, z, .35, .28, .7);
+      for (const x of [4.4, 5.5, 6.6]) add(mat(0x20282b), x, .45, -5.1, .7, .7, .45);
+    } else if (def.id === 'market') {
+      for (const x of [-4.5, 4.5]) for (const y of [.45, 1.05, 1.65]) add(mat(0xf2dfb5), x, y, -1.2, 5.1, .1, 1.15);
+      const product = [0xff805b, 0x8de3cf, 0xffd26f];
+      for (const [xi, x] of [-5.8, -4.5, -3.2, 3.2, 4.5, 5.8].entries()) for (const [yi, y] of [.7, 1.25].entries()) add(mat(product[(xi + yi) % 3]), x, y, -1.15, .55, .35, .65);
+      add(mat(0x172a31), 5.5, 1.15, 3, 3.2, .18, 1.1);
+    } else if (def.id === 'pier') {
+      add(mat(0xffd88a, 0xffd88a), 0, 2.2, -2, .7, 1.7, .7);
+      for (const x of [-4, -2, 0, 2, 4]) add(mat(0x9fd6d8, 0, true), x, 2.4, -hz + .08, 1.4, 1.3, .08);
+      add(mat(0x3f6d79), -4.3, 1.08, -4.05, 2.2, .12, 1.5);
+      for (const z of [-1.4, 0, 1.4]) add(mat(0xffd88a, 0xffd88a), 4.6, 1.2, z, .18, 2.2, .18);
+    }
     // Interior lighting: emissive ceiling lamps. The scene lights are re-tinted by the game while inside (no extra
     // lights are added, so entering never recompiles the city materials).
     for (const x of [-hx / 2, hx / 2]) for (const z of [-hz / 2, hz / 2]) add(mat(def.light.lamp, def.light.lamp), x, WALL - .1, z, 1.2, .1, .5);

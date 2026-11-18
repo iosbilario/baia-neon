@@ -115,7 +115,7 @@ Fica no marcador laranja do mapa e abre com `Enter`.
 
 `Esc` também libera o ponteiro. Em celulares, use o aparelho na horizontal: analógico esquerdo para movimento ou direção, deslize do lado direito para olhar e use os botões contextuais de ação, corrida, mira, aceleração, freio e freio de mão.
 
-**Controle (gamepad).** Analógico esquerdo move ou dirige, direito olha, `RT` acelera ou atira, `LT` freia, `A` interage, `B` freio de mão, `X` atira de dentro do carro, `Y` recarrega, `LB` e `RB` trocam de arma, `SELECT` abre o mapa e `START` pausa. Os prompts da tela mudam conforme o último dispositivo usado.
+**Controle (gamepad).** Analógico esquerdo move ou dirige, direito olha, `RT` acelera ou atira, `LT` freia, `A` interage ou confirma, `B` volta ou usa o freio de mão, `X` atira de dentro do carro, `Y` recarrega, `LB` e `RB` trocam de arma, o direcional navega nos menus, `SELECT` abre o mapa e `START` pausa. Os prompts da tela mudam conforme o último dispositivo usado.
 
 **Interiores.** Entre a pé pelas portas da Rádio Caju, da Oficina do Canal, do Mercado Maré Alta e do Píer Farol. **Ruas de sentido único** têm setas no asfalto e o GPS respeita a mão.
 

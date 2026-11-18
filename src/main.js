@@ -58,6 +58,13 @@
     function savePadSettings(){try{localStorage.setItem('baia-neon-gamepad',JSON.stringify(gamepad.settings));}catch(_){}}
     function padLabels(){$('toggleVibration').textContent='VIBRAÇÃO DO CONTROLE: '+(gamepad.settings.vibration?'LIGADA':'DESLIGADA');$('cycleDeadzone').textContent='ZONA MORTA DO ANALÓGICO: '+Math.round(gamepad.settings.stickDead*100)+'%';}
     function rumble(strong,weak,ms){return gamepad.rumble(strong,weak,ms);}
+    let padMenuIndex=0;
+    function padMenu(containerId,delta,activate){
+      const root=$(containerId);if(!root||!root.querySelectorAll)return false;
+      const buttons=[...root.querySelectorAll('button:not([disabled])')];if(!buttons.length)return false;
+      if(delta)padMenuIndex=(padMenuIndex+delta+buttons.length)%buttons.length;else padMenuIndex=Math.min(padMenuIndex,buttons.length-1);
+      const button=buttons[padMenuIndex];if(button.focus)button.focus({preventScroll:false});if(activate&&button.click)button.click();return true;
+    }
     // Three cars that answer the first corner differently: grip, steering, brakes and toughness.
     const VEHICLES={
       compact:{radius:1.1,name:'MARÉ COMPACTO',accel:14,top:30,grip:9,steer:1.75,brake:5,tough:.75,scale:[1,1,1],roll:[13,16],price:0,note:'Curva rápido, cabe nas vielas, amassa fácil'},
@@ -78,7 +85,12 @@
     const campaign=new BN.Campaign(cfg.campaign,saved.campaign);
     if(campaign.state.completed.includes('ultima-frequencia')&&world.setFinale)world.setFinale(true);
     // v1.0 interiors: rooms are built the first time the player walks in, then reused.
-    const interiors=new BN.Interiors.Session(saved.interiors),interiorRooms={};let fadeApplied=false;
+    const interiors=new BN.Interiors.Session(saved.interiors),interiorRooms={},interiorDoorMarkers=[];let fadeApplied=false;
+    for(const def of Object.values(BN.Interiors.DEFS)){
+      const group=new THREE.Group(),mat=new THREE.MeshBasicMaterial({color:0x8de3cf,transparent:true,opacity:.78,side:THREE.DoubleSide,depthWrite:false});
+      const ring=new THREE.Mesh(new THREE.TorusGeometry(1.25,.09,6,28),mat);ring.rotation.x=Math.PI/2;ring.position.y=.24;group.add(ring);
+      const sign=new THREE.Mesh(new THREE.OctahedronGeometry(.28),mat);sign.position.y=2.15;group.add(sign);group.position.set(def.door.x,0,def.door.z);group.userData.interior=def.id;scene.add(group);interiorDoorMarkers.push(group);
+    }
     const raceRecords=saved.raceRecords||{};
     let tutorialSeen=saved.tutorialSeen,cameraMotion=saved.cameraMotion,audioVolume=saved.audioVolume;audio.volume=audioVolume;
     let routeDestination=null,routePoints=[],dialogueTime=0,activeRace=null,raceIndex=0,photoReturn='play',mapReturn='play',photoClean=false,adultRide=null;
@@ -97,7 +109,7 @@
     }
     function dialogue(speaker,text){$('dialogueSpeaker').textContent=speaker;$('dialogueText').textContent=text;show('dialogue',true);dialogueTime=6;}
     if(loaded.migrated)setTimeout(()=>toast('Progresso v0.2 preservado e migrado com cópia de recuperação.'),0);
-    function setMode(next){mode=next;show('intro',next==='intro');show('menu',next==='menu');show('hud',(next==='play'||next==='pause'||next==='garage'||next==='map')&&!photoClean);show('pause',next==='pause');show('help',next==='help');show('wasted',next==='dead');show('garage',next==='garage');show('cityMap',next==='map');show('photoMode',next==='photo');show('touchControls',next==='play');keys.clear();clearTouch();dragging=false;aiming=false;mouseFire=false;if(next!=='play')releasePointer();}
+    function setMode(next){mode=next;padMenuIndex=0;show('intro',next==='intro');show('menu',next==='menu');show('hud',(next==='play'||next==='pause'||next==='garage'||next==='map')&&!photoClean);show('pause',next==='pause');show('help',next==='help');show('wasted',next==='dead');show('garage',next==='garage');show('cityMap',next==='map');show('photoMode',next==='photo');show('touchControls',next==='play');keys.clear();clearTouch();dragging=false;aiming=false;mouseFire=false;if(next!=='play')releasePointer();}
     function menuStats(){$('statMoney').textContent='R$ '+balance;$('statJobs').textContent=completed;$('statCars').textContent=garageOwned.size+'/'+Object.keys(VEHICLES).length;$('statUps').textContent=Object.values(upgrades).filter(Boolean).length+'/'+Object.keys(upgrades).length;}
     const build=BN.BUILD_INFO||{version:cfg.version,tag:'development',sha:'development'};
     const versionLabel='v'+build.version+(build.tag==='development'?' dev':'');
@@ -962,7 +974,7 @@
     function openMap(){if(!['play','pause'].includes(mode))return;mapReturn=mode==='pause'?'pause':'play';setMode('map');drawLargeMap();}
     function chooseRoute(x,z){const safe=world.island.clampPoint(clamp(x,-295,295),clamp(z,-295,295),4);routeDestination=safe;routePoints=BN.Navigation.route(player,routeDestination,world.roads,streets);toast('Destino marcado · rota pelas ruas e pontes');drawLargeMap();}
     function updateHud(){
-      $('district').textContent=world.getDistrict?world.getDistrict(player.x,player.z):'Baía Neon';
+      $('district').textContent=interiors.active?interiors.def().name:(world.getDistrict?world.getDistrict(player.x,player.z):'Baía Neon');show('minimapWrap',!interiors.active);
       $('clock').textContent=String(Math.floor(hour)).padStart(2,'0')+'h'+String(Math.floor(hour%1*60)).padStart(2,'0')+' · '+(rain>.35?'Chuva tropical':night>.5?'Noite na baía':'Céu aberto');
       const blink=police.state==='search'&&Math.floor(elapsed*3)%2===0;$('heatPips').innerHTML=Array.from({length:5},(_,i)=>'<i class="'+(i<police.level&&!blink?'on':'')+'"></i>').join('');
       $('policeState').textContent=police.capture>0?'PARE E SERÁ DETIDO':police.level===0&&callers.length?'TESTEMUNHA AO TELEFONE':({patrol:'CIDADE TRANQUILA',dispatch:'VIATURAS A CAMINHO',chase:police.visible&&player.car?'SEU CARRO FOI IDENTIFICADO':'EM PERSEGUIÇÃO',search:police.disguise?'PROCURAM O VEÍCULO ANTERIOR':'FORA DE VISTA · SAIA DA REGIÃO'}[police.state]);
@@ -976,9 +988,9 @@
       const m=target(),distance=m?dist(player,m):Infinity;
       if(job)$('missionDistance').textContent=job.stage==='pickup'?'Retirada a '+Math.round(distance)+' m':'Destino a '+Math.round(distance)+' m · '+({perishable:'qualidade',fragile:'integridade',smooth:'conforto'}[job.def.kind])+' '+Math.round(job.cargo)+'%'+(job.def.kind==='perishable'?' · '+Math.max(0,Math.ceil(job.limit*(job.cargo/100)*(upgrades.cargo?1.25:1)))+' s':'');
       else if(activeRace)$('missionDistance').textContent='Checkpoint a '+Math.round(distance)+' m · recorde salvo por veículo';
-      else if(campaign.objective())$('missionDistance').textContent=(campaign.objective().failed?'Y para repetir':'Próxima ação a '+Math.round(distance)+' m')+' · reputação '+reputation;
+      else if(campaign.objective())$('missionDistance').textContent=interiors.active&&!Number.isFinite(distance)?'Saia do interior para seguir o marcador':(campaign.objective().failed?'Y para repetir':'Próxima ação a '+Math.round(distance)+' m')+' · reputação '+reputation;
       else $('missionDistance').textContent='Oficina a '+Math.round(dist(player,cfg.garage))+' m · L inicia um contrarrelógio';
-      $('missionCompactDistance').textContent=Math.round(Number.isFinite(distance)?distance:dist(player,cfg.garage))+' m';
+      $('missionCompactDistance').textContent=interiors.active&&!Number.isFinite(distance)?'INTERIOR':Math.round(Number.isFinite(distance)?distance:dist(player,cfg.garage))+' m';
       let interaction='';if(player.car&&Math.abs(player.car.speed)<4)interaction='E para sair do carro';else if(!player.car&&cars.some(c=>!c.wreck&&dist(c,player)<6&&Math.abs(c.speed)<5))interaction='E para entrar no carro';
       if(distance<10&&job)interaction=!player.car?'Este serviço exige um carro':job.stage==='pickup'?'Pare dentro do círculo para embarcar ou carregar':player.car!==job.car?'O serviço está no outro carro':police.level>0?'Despiste a polícia antes da conclusão':'Pare dentro do círculo para concluir';
       else if(distance<10&&activeRace)interaction='Atravesse o checkpoint na ordem indicada';
@@ -1080,9 +1092,9 @@
         if(p.left)acceptJob(0);if(p.up)acceptJob(1);if(p.right)acceptJob(2);
         if(p.down)startRace();
       }
-      else if(mode==='pause'){if(p.pause||p.handbrake)togglePause();}
+      else if(mode==='pause'){if(p.pause||p.handbrake)togglePause();else{if(p.up)padMenu('pause',-1);if(p.down)padMenu('pause',1);if(p.interact)padMenu('pause',0,true);}}
       else if(mode==='map'){if(p.handbrake||p.map||p.pause)$('closeMap').onclick();}
-      else if(mode==='garage'){if(p.handbrake||p.pause)$('closeGarage').onclick();}
+      else if(mode==='garage'){if(p.handbrake||p.pause)$('closeGarage').onclick();else{if(p.up)padMenu('garage',-1);if(p.down)padMenu('garage',1);if(p.interact)padMenu('garage',0,true);}}
       else if(mode==='help'){if(p.handbrake||p.interact||p.pause)$('closeHelp').onclick();}
       else if(mode==='photo'){if(p.handbrake||p.pause)closePhoto();}
     }
@@ -1129,7 +1141,7 @@
           updateJob(dt);updateCampaign(dt);updateRace(dt);updateCompanionRide(dt);
           hudTimer-=dt;if(hudTimer<=0){updateHud();hudTimer=.1;}
         }else{updateTraffic(dt,false);updatePeds(dt,false);}
-        garageMark.scale.setScalar(1+Math.sin(elapsed*2+1)*.03);diamond.rotation.y+=dt;diamond.position.y=4+Math.sin(elapsed*2)*.25;ring.scale.setScalar(1+Math.sin(elapsed*2)*.04);
+        garageMark.scale.setScalar(1+Math.sin(elapsed*2+1)*.03);interiorDoorMarkers.forEach((marker,i)=>{const pulse=1+Math.sin(elapsed*2+i)*.08;marker.scale.setScalar(pulse);marker.visible=!interiors.active;marker.children[1].rotation.y+=dt*1.8;});diamond.rotation.y+=dt;diamond.position.y=4+Math.sin(elapsed*2)*.25;ring.scale.setScalar(1+Math.sin(elapsed*2)*.04);
       }
       if(mode!=='dead'&&(interiors.fade>0||fadeApplied)){canvas.style.filter=interiors.fade>0?'brightness('+(1-interiors.fade).toFixed(2)+')':'';fadeApplied=interiors.fade>0;}
       updateCamera(dt);
@@ -1146,9 +1158,9 @@
       getState:()=>({mode,hour,night,rain,rainTarget,quality,fps:measuredFPS,player:{x:player.x,z:player.z,health:player.health,driving:!!player.car,speed:player.speed,grenades:player.grenades,weapon:loadout.current,ammo:player.ammo,reserve:player.reserve,zones:player.car&&player.car.zones?{...player.car.zones}:null,roll:player.car&&player.car.roll?player.car.roll.state:null},police:{state:police.state,level:police.level,visible:police.visible,search:police.search,capture:police.capture,lastSeen:{...police.lastSeen}},missionIndex,balance,completed,reputation,crimes:crimeCount,campaign:{...campaign.state},interior:interiors.current,race:activeRace?{id:activeRace.def.id,checkpoint:activeRace.checkpoint,time:activeRace.time}:null,job:job?{stage:job.stage,cargo:job.cargo,kind:job.def.kind}:null,counts:{cars:cars.length,pedestrians:peds.length,police:police.units.length,...world.counts,...cityLife.counts},render:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles}}),
       teleport:(x,z)=>{player.x=x;player.z=z;if(player.car){player.car.x=x;player.car.z=z;player.car.speed=0;}human.position.set(x,world.getElevation(x,z),z);},
       setHour:h=>hour=h,setRain:r=>{rain=rainTarget=r;weatherTimer=100;},crime:()=>crime('test',true),witnessCrime:()=>crime('test'),clearPolice:()=>{police.reset();peds.concat(cars).forEach(w=>w.call=null);},
-      fire,loadout,switchWeapon,damageZone,startRollover,resetZones,resolveAim,setAimPointer,throwGrenade,explode,hurt,touch,getControls:()=>({aimPointer:{...aimPointer},orbitYaw,orbitPitch,aiming}),requestPointer,contextAction,tryCompanionRide,updateCompanionRide,getCompanionRide:()=>adultRide,setYaw:a=>orbitYaw=a,setPitch:a=>{orbitPitch=clamp(a,.1,1.1);},acceptJob,getJob:()=>job,getResult:()=>lastResult,openGarage,garageBuy,garageItems:()=>garageList,upgrades,VEHICLES,setCarType,setBalance:v=>{balance=v;},setReputation:v=>{reputation=v;},reload,campaign,interiors,interiorRooms,handleInteriorEvent,interiorAction,leaveInterior,updateCampaign,startRace,updateRace,getRoute:()=>routePoints,chooseRoute,save,progressData,
+      fire,loadout,switchWeapon,damageZone,startRollover,resetZones,resolveAim,setAimPointer,throwGrenade,explode,hurt,touch,getControls:()=>({aimPointer:{...aimPointer},orbitYaw,orbitPitch,aiming}),requestPointer,contextAction,tryCompanionRide,updateCompanionRide,getCompanionRide:()=>adultRide,setYaw:a=>orbitYaw=a,setPitch:a=>{orbitPitch=clamp(a,.1,1.1);},acceptJob,getJob:()=>job,getResult:()=>lastResult,openGarage,garageBuy,garageItems:()=>garageList,upgrades,VEHICLES,setCarType,setBalance:v=>{balance=v;},setReputation:v=>{reputation=v;},reload,campaign,interiors,interiorRooms,interiorDoorMarkers,handleInteriorEvent,interiorAction,leaveInterior,updateCampaign,startRace,updateRace,getRoute:()=>routePoints,chooseRoute,save,progressData,
       putPedestrianAhead:()=>{const p=peds[0],c=player.car||player;p.frozen=true;p.dead=false;p.health=100;p.panic=0;p.mesh.rotation.set(0,0,0);p.x=c.x+Math.sin(c.heading)*9;p.z=c.z+Math.cos(c.heading)*9;p.speed=0;p.down=0;p.hitCooldown=0;p.mesh.position.set(p.x,world.getElevation(p.x,p.z),p.z);return {x:p.x,z:p.z};},
-      gamepad,inputMode,qualityCtl,roadblocks,streets,applyQuality,pollGamepad,softCrowd,showObjectivePopup,updateMission,getObjectiveUi:()=>({expanded:objectiveExpanded,popupTime:objectivePopupTime,manual:objectiveManual,summary:$('missionCompact').textContent,distance:$('missionCompactDistance').textContent}),keepFocus:false,step:(seconds,dt=1/60)=>{for(let t=0;t<seconds;t+=dt)tick(dt);},press:(code,down=true)=>{if(down)keys.add(code);else keys.delete(code);},enterExit,getMode:()=>mode,skipIntro:endIntro,world,cityLife,police,player,human,cars,peds,renderer,scene,camera
+      gamepad,inputMode,qualityCtl,roadblocks,streets,applyQuality,pollGamepad,padMenu,softCrowd,showObjectivePopup,updateMission,getObjectiveUi:()=>({expanded:objectiveExpanded,popupTime:objectivePopupTime,manual:objectiveManual,summary:$('missionCompact').textContent,distance:$('missionCompactDistance').textContent}),keepFocus:false,step:(seconds,dt=1/60)=>{for(let t=0;t<seconds;t+=dt)tick(dt);},press:(code,down=true)=>{if(down)keys.add(code);else keys.delete(code);},enterExit,getMode:()=>mode,skipIntro:endIntro,world,cityLife,police,player,human,cars,peds,renderer,scene,camera
     };
     const params=new URLSearchParams(location.search),captureScene=params.get('capture'),acceptanceScene=params.get('acceptance');
     if(params.get('touch')==='1'&&document.body)document.body.classList.add('touch-preview');
