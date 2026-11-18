@@ -1,5 +1,14 @@
 # Histórico de versões
 
+## [0.6.2] — Pé no Chão
+
+### Correções
+
+- A altura física do parque elevado agora usa a mesma curva da geometria 3D.
+- O personagem permanece inteiro sobre a superfície enquanto sobe a ladeira.
+- A câmera acompanha a elevação e não atravessa o terreno.
+- Pedestres, caminhos e efeitos usam a mesma referência vertical do parque.
+
 ## [0.6.1] — Costa Firme
 
 ### Correções
