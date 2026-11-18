@@ -1,8 +1,18 @@
 # Histórico de versões
 
+## [0.6.1] — Costa Firme
+
+### Correções
+
+- Terra e areia agora têm as faces 3D orientadas para cima e permanecem visíveis sobre o oceano.
+- A faixa contínua de areia foi substituída por sete trechos definidos de praia.
+- Guarda-sóis são posicionados e validados pelo polígono real da costa.
+- Palmeiras, bancos, placa, abrigos e vasos costeiros mantêm distância do mar e das ruas.
+- Quiosques que atravessavam a água foram removidos.
+
 ## [0.6.0] — Ilha no Horizonte
 
-### Em desenvolvimento
+### Para quem joga
 
 - Mapa redesenhado como Ilha Ferradura, com costa irregular e limite jogável orgânico.
 - Avenida de orla acompanha a maior parte da costa; ruas terminam em praças, mirantes, marina e construções.
