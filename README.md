@@ -3,28 +3,42 @@
 </p>
 
 <p align="center">
+  <a href="https://iosbilario.github.io/baia-neon/"><img alt="Jogar agora" src="https://img.shields.io/badge/JOGAR-AGORA-ff805b?style=for-the-badge"></a>
+  <a href="https://github.com/iosbilario/baia-neon/releases/latest"><img alt="Baixar versão offline" src="https://img.shields.io/badge/BAIXAR-OFFLINE-8de3cf?style=for-the-badge"></a>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="Licença MIT" src="https://img.shields.io/github/license/iosbilario/baia-neon?style=flat-square"></a>
+  <a href="https://github.com/iosbilario/baia-neon/actions/workflows/ci.yml"><img alt="Validação" src="https://github.com/iosbilario/baia-neon/actions/workflows/ci.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/iosbilario/baia-neon/releases/latest"><img alt="Última versão" src="https://img.shields.io/github/v/release/iosbilario/baia-neon?style=flat-square&label=release"></a>
+  <a href="https://github.com/iosbilario/baia-neon/commits/main"><img alt="Último commit" src="https://img.shields.io/github/last-commit/iosbilario/baia-neon?style=flat-square&label=último%20commit"></a>
+  <a href="https://github.com/iosbilario/baia-neon/stargazers"><img alt="Estrelas" src="https://img.shields.io/github/stars/iosbilario/baia-neon?style=flat-square"></a>
+</p>
+
+<p align="center">
   <a href="https://iosbilario.github.io/baia-neon/"><b>Jogar agora</b></a> ·
   <a href="#como-se-joga">Como se joga</a> ·
   <a href="#controles">Controles</a> ·
   <a href="#a-cidade">A cidade</a> ·
   <a href="#polícia">Polícia</a> ·
   <a href="#por-dentro">Por dentro</a> ·
-  <a href="https://github.com/iosbilario/baia-neon/releases/latest/download/baia-neon-0.3.0-offline.html">Versão offline</a>
+  <a href="https://github.com/iosbilario/baia-neon/releases/latest">Versão offline</a>
 </p>
 
 Baía Neon é um jogo 3D de mundo aberto que roda direto no navegador. Você
 ajuda a Rádio Caju a fazer sua última transmissão em uma campanha curta,
-dirige por uma cidade litorânea inventada, aceita serviços variados, disputa
-contrarrelógios e foge da polícia quando o atalho dá errado. Sem instalação,
-sem cadastro e sem anúncios.
+dirige por uma ilha inventada, aceita serviços, disputa contrarrelógios e
+foge da polícia quando o atalho dá errado. Sem instalação, cadastro, anúncios
+ou telemetria.
 
 **Jogue em [iosbilario.github.io/baia-neon](https://iosbilario.github.io/baia-neon/).**
-Precisa de computador com teclado e mouse e de um navegador com WebGL.
+Funciona no computador com teclado e mouse e no celular em modo paisagem. O
+navegador precisa oferecer WebGL.
 
 <p align="center">
-  <img src="assets/readme/menu.webp" width="100%" alt="Tela inicial do Baía Neon: o título em letras grandes sobre a cidade vista de cima ao anoitecer, com torres, quarteirões, canal e praia, e o botão Jogar.">
+  <a href="https://iosbilario.github.io/baia-neon/"><img src="assets/readme/ilha-v061.png" width="100%" alt="Vista aérea da Ilha Ferradura com centro urbano, avenida costeira, praias e oceano."></a>
 </p>
-<p align="center"><sub>Tela inicial, capturada do jogo publicado em 16/11/2026.</sub></p>
+<p align="center"><sub>Ilha Ferradura na v0.6.1. A imagem vem do jogo real.</sub></p>
 
 ## Como se joga
 
@@ -79,7 +93,7 @@ Fica no marcador laranja do mapa e abre com `Enter`.
 
 | Entrada | Ação |
 | --- | --- |
-| `W` `A` `S` `D` ou setas | Caminhar ou dirigir |
+| `W` `A` `S` `D` | Caminhar ou dirigir |
 | `Shift` | Correr |
 | `E` | Entrar, sair, conversar ou interagir |
 | `Espaço` | Freio de mão |
@@ -148,12 +162,15 @@ política de segurança da página bloqueia qualquer conexão do jogo.
 
 ```mermaid
 flowchart LR
-  A["config.js<br/>parâmetros e contratos"] --> D
-  B["world.js<br/>cidade procedural<br/>e colisores"] --> D
-  C["police.js<br/>rotas, visão,<br/>estrelas e busca"] --> D
-  E["audio.js<br/>síntese sonora"] --> D
-  D["main.js<br/>simulação, câmera,<br/>contratos e interface"] --> F["index.html<br/>GitHub Pages"]
-  D --> G["tools/package.py"] --> H["JOGAR_OFFLINE.html<br/>arquivo único"]
+  A["config.js<br/>parâmetros e contratos"] --> M
+  I["island.js<br/>costa, praias e horizonte"] --> W
+  W["world.js<br/>cidade e colisores"] --> M
+  C["campaign.js + navigation.js<br/>campanha e rotas"] --> M
+  P["police.js + city-life.js<br/>polícia e vida urbana"] --> M
+  S["save.js<br/>progresso local"] --> M
+  U["audio.js<br/>síntese sonora"] --> M
+  M["main.js<br/>simulação, câmera e interface"] --> H["index.html<br/>GitHub Pages"]
+  M --> G["tools/package.py"] --> O["JOGAR_OFFLINE.html<br/>arquivo único"]
 ```
 
 | Caminho | Conteúdo |
@@ -203,8 +220,7 @@ Este é um protótipo compacto, com colisões por volumes e direção arcade.
 - O jogo reduz resolução e desliga sombras quando a média medida cai abaixo de 28 FPS.
 - A campanha foi desenhada para 20 a 30 minutos; o tempo varia com exploração,
   rotas, polícia e experiência de direção.
-- O que foi conferido e o que falta está em
-  [docs/VERIFICACAO_V03.md](docs/VERIFICACAO_V03.md).
+- O histórico das versões e correções fica no [CHANGELOG.md](CHANGELOG.md).
 
 ## Licença e autoria
 
@@ -217,5 +233,5 @@ A cidade, os nomes e os estabelecimentos são fictícios. O jogo não usa
 personagens, mapas, marcas, músicas ou carros de outros jogos. O nome Baía
 Neon é provisório e não passou por pesquisa de registro.
 
-O projeto foi desenvolvido com o Claude Code a partir do pedido registrado em
+O projeto foi desenvolvido de forma iterativa a partir do pedido registrado em
 [PROMPT_FABLE_5_2.md](PROMPT_FABLE_5_2.md).
