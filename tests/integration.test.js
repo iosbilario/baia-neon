@@ -20,7 +20,7 @@ const scope={console:{log:console.log,warn(){},error(e){fatalError=e;}},document
 scope.window=scope;vm.createContext(scope);
 vm.runInContext(fs.readFileSync(path.join(root,'vendor/three.min.js'),'utf8'),scope);
 scope.THREE.WebGLRenderer=class{constructor(){this.shadowMap={};this.info={render:{calls:0,triangles:0}};}setPixelRatio(){}setSize(){}render(scene,camera){assert.ok(Number.isFinite(camera.position.x));scene.updateMatrixWorld();}};
-for(const file of ['config','build-info','save','navigation','city-systems','arsenal','campaign','island','world','audio','police','city-life','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
+for(const file of ['config','build-info','save','navigation','city-systems','arsenal','interiors','campaign','island','world','audio','police','city-life','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
 assert.equal(fatalError,null,'initialization error');
 assert.ok(scope.BN.debug,'test helpers available');
 const d=scope.BN.debug;
@@ -237,5 +237,32 @@ test('arsenal: garage sells weapons and ammo for the weapon in hand, and old sav
   d.loadout.select('smg');d.setBalance(5000);d.teleport(scope.BN.CONFIG.garage.x,scope.BN.CONFIG.garage.z);step(.2);d.openGarage();assert.equal(d.getState().mode,'garage');
   const labels=d.garageItems().map(i=>i.label);assert.ok(labels.some(l=>l.startsWith('Munição · SUBMETRALHADORA')),labels.join('|'));assert.ok(!labels.some(l=>l.startsWith('Comprar ESPINGARDA')),'owned weapons are not for sale');
   element('closeGarage').onclick();step(.1);
+});
+test('interiors: doors open on free ground outside and every exit spawn is walkable',()=>{
+  const I=scope.BN.Interiors;for(const id of I.ORDER){const def=I.DEFS[id];assert.ok(!d.world.isBlocked(def.outside.x,def.outside.z,.42),id+' exit spawn blocked');assert.ok(!d.world.isBlocked(def.door.x,def.door.z,.42),id+' door blocked');}
+});
+test('interiors: E at the door enters on foot, collides inside, and E at the exit goes back',()=>{
+  const I=scope.BN.Interiors,def=I.DEFS.radio;d.teleport(def.door.x,def.door.z);step(.1);assert.ok(d.getState().player.driving===false);
+  tap('KeyE');step(.7);const s=d.getState();assert.equal(s.interior,'radio');assert.ok(d.interiorRooms.radio&&d.interiorRooms.radio.visible);
+  const local=I.toLocal(def,d.player);assert.ok(Math.abs(local.x)<def.hx&&Math.abs(local.z)<def.hz);
+  down('KeyW');step(4);up('KeyW');const after=I.toLocal(def,d.player);assert.ok(Math.abs(after.x)<=def.hx-.4&&Math.abs(after.z)<=def.hz-.4,'walls hold');assert.ok(!I.blocked(def,d.player.x,d.player.z,.4));
+  assert.ok(Number.isFinite(d.camera?d.camera.position.x:0));
+  const ex=I.exitDoor(def),at=I.toWorld(def,{x:ex.x,z:ex.z-.6});d.teleport(at.x,at.z);step(.1);tap('KeyE');step(.7);
+  assert.equal(d.getState().interior,null);assert.ok(Math.hypot(d.player.x-def.outside.x,d.player.z-def.outside.z)<.5);assert.ok(!d.interiorRooms.radio.visible);
+});
+test('interiors: a task inside pays, advances the campaign and persists in the save',()=>{
+  const I=scope.BN.Interiors,def=I.DEFS.radio;d.campaign.state.active='portas-abertas';d.campaign.state.step=0;d.campaign.state.status='active';
+  d.teleport(def.door.x,def.door.z);step(.1);tap('KeyE');step(.7);assert.equal(d.campaign.state.step,1,'entering completes the first step');
+  const before=d.getState().balance,at=I.toWorld(def,I.find(def,'mic'));d.teleport(at.x,at.z);step(.1);tap('KeyE');step(6.6);
+  assert.ok(d.getState().balance>=before+90,'task paid');assert.ok(d.campaign.state.completed.includes('portas-abertas'));
+  const saved=d.progressData();assert.equal(saved.schemaVersion,2);assert.ok(saved.interiors.visited.includes('radio'));assert.equal(saved.interiors.done['radio:mic'],1);
+  const out=I.toWorld(def,{x:I.exitDoor(def).x,z:I.exitDoor(def).z-.6});d.teleport(out.x,out.z);step(.1);tap('KeyE');step(.7);assert.equal(d.getState().interior,null);
+});
+test('interiors: the market sells a medical kit only when needed and weapons are holstered inside',()=>{
+  const I=scope.BN.Interiors,def=I.DEFS.market;d.teleport(def.door.x,def.door.z);step(.1);tap('KeyE');step(.7);assert.equal(d.getState().interior,'market');
+  const before=d.player.ammo;d.fire();assert.equal(d.player.ammo,before,'no shooting indoors');
+  d.setBalance(500);d.player.health=100;const at=I.toWorld(def,I.find(def,'shop-kit'));d.teleport(at.x,at.z);step(.1);tap('KeyE');step(.1);assert.equal(d.getState().balance,500,'full health: no charge');
+  d.player.health=40;tap('KeyE');step(.1);assert.equal(d.getState().balance,440);assert.equal(d.player.health,100);
+  d.leaveInterior();step(.1);
 });
 console.log(passed+' integration checks passed with a stub renderer. No visual or FPS claim.');

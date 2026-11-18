@@ -31,6 +31,11 @@
       const m = rawArsenal.mags && rawArsenal.mags[id] && typeof rawArsenal.mags[id] === 'object' ? rawArsenal.mags[id] : {};
       weaponMags[id] = {ammo: finite(m.ammo, id === 'pistol' ? finite(source.ammo, 12, 0, 12) : 0, 0, 99), reserve: finite(m.reserve, id === 'pistol' ? finite(source.reserve, 36, 0, 240) : 0, 0, 300)};
     });
+    // Additive since v1.0 "Portas Abertas": interiors visited and tasks done. Older saves simply have none.
+    const interiorIds = catalogues.interiorIds || [];
+    const rawInteriors = source.interiors && typeof source.interiors === 'object' ? source.interiors : {};
+    const interiorDone = {};
+    if (rawInteriors.done && typeof rawInteriors.done === 'object') Object.keys(rawInteriors.done).forEach(key => { if (interiorIds.includes(key.split(':')[0]) && /^[a-z]+:[a-z-]+$/.test(key)) interiorDone[key] = finite(rawInteriors.done[key], 0, 0, 9999); });
     const campaign = source.campaign && typeof source.campaign === 'object' ? source.campaign : {};
     return {
       schemaVersion: SCHEMA_VERSION,
@@ -58,6 +63,7 @@
         damage: finite(campaign.damage, 0, 0, 1000),
         delays: finite(campaign.delays, 0, 0, 99)
       },
+      interiors: {visited: cleanStrings(rawInteriors.visited, interiorIds), done: interiorDone},
       raceRecords: source.raceRecords && typeof source.raceRecords === 'object' ? source.raceRecords : {},
       tutorialSeen: Boolean(source.tutorialSeen),
       cameraMotion: source.cameraMotion !== false,
@@ -91,7 +97,7 @@
   function exportProgress(data, build) {
     return JSON.stringify({format: 'baia-neon-progress', schemaVersion: SCHEMA_VERSION, build, progress: normalize(data, {
       vehicles: ['compact', 'sedan', 'sport'], upgrades: ['brakes', 'tires', 'cargo'],
-      weapons: ['pistol', 'smg', 'shotgun'], campaignIds: ['voz-atrasada', 'carro-radio', 'acervo-ambulante', 'sinal-por-um-fio', 'ultima-frequencia']
+      weapons: ['pistol', 'smg', 'shotgun'], campaignIds: ['voz-atrasada', 'carro-radio', 'acervo-ambulante', 'sinal-por-um-fio', 'ultima-frequencia', 'portas-abertas', 'peca-do-canal', 'luz-do-farol'], interiorIds: ['radio', 'garage', 'market', 'pier']
     })}, null, 2);
   }
   function importProgress(text, catalogues) {

@@ -8,6 +8,11 @@
       this.state = saved;
       this.lastEvent = null;
       if (!this.state.active && definitions.length) this.state.active = definitions[0].id;
+      // Additive migration: a save that finished an older, shorter campaign continues into the chapters added later.
+      if (this.state.status === 'finished') {
+        const index = definitions.findIndex(item => item.id === this.state.active);
+        if (index >= 0 && index < definitions.length - 1) Object.assign(this.state, {active: definitions[index + 1].id, status: 'active', step: 0, checkpoint: 0, elapsed: 0, comfort: 100, damage: 0, collected: []});
+      }
     }
     definition() { return this.definitions.find(item => item.id === this.state.active) || null; }
     step() { const mission = this.definition(); return mission && mission.steps[this.state.step] || null; }

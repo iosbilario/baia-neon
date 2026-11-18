@@ -59,6 +59,21 @@ BN.CONFIG = Object.freeze({
       {target:'radio', text:'Encontre Dora e Nando na Rádio Caju.', requiresCar:true, checkpoint:true},
       {target:'market', text:'Recolha a última caixa no Mercado Maré Alta.', requiresCar:true},
       {target:'pier', text:'Conclua a mudança no estúdio provisório do Píer Farol.', requiresCar:true}
+    ]},
+    // v1.0 "Portas Abertas": on-foot chapters that use the walk-in interiors. "in-" enters a building, "do-" finishes a task inside.
+    {id:'portas-abertas', number:6, title:'Portas abertas', reward:540, reputation:6, outro:'Dora agora tem plateia dentro e fora da rádio.', steps:[
+      {target:'in-radio', text:'Entre a pé na Rádio Caju. A porta fica sob a placa, na frente do prédio.', checkpoint:true, done:'Dora aponta a cabine: “Sente e fale. A luz vermelha não morde.”'},
+      {target:'do-radio', text:'Faça o plantão ao vivo no microfone da cabine (E, fique perto).'}
+    ]},
+    {id:'peca-do-canal', number:7, title:'Peça do Canal', reward:600, reputation:7, outro:'Nando testou o transmissor e jurou que foi planejado.', steps:[
+      {target:'in-garage', text:'Nando deixou uma peça na Oficina do Canal. Entre pela porta lateral.', checkpoint:true},
+      {target:'do-garage', text:'Monte o transmissor na bancada da oficina (E, fique perto).', done:'Peça montada. Falta combustível para a equipe.'},
+      {target:'in-market', text:'Leve a equipe ao Mercado Maré Alta.', checkpoint:true},
+      {target:'do-market', text:'Compre qualquer item nas prateleiras do mercado (E).'}
+    ]},
+    {id:'luz-do-farol', number:8, title:'Luz do Farol', reward:780, reputation:9, outro:'O farol acendeu e a cidade ganhou mais portas abertas.', steps:[
+      {target:'in-pier', text:'Entre no prédio do Píer Farol.', checkpoint:true},
+      {target:'do-pier', text:'Acenda a lanterna do farol (E, fique perto).'}
     ]}
   ]),
   garage: {x:-67, z:40}

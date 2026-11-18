@@ -30,6 +30,7 @@ jobs:
           node tests/v03.test.js
           node tests/city-physics.test.js
           node tests/arsenal.test.js
+          node tests/interiors.test.js
       - name: Gerar e auditar pacote offline
         run: |
           python3 tools/package.py

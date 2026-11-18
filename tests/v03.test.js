@@ -51,7 +51,7 @@ test('campaign accepts both collection orders and advances once', () => {
 test('campaign records rewards once and expires timed objectives', () => {
   const state = Save.normalize({campaign:{active:'ultima-frequencia',rewarded:['ultima-frequencia']}}, catalogues).campaign, campaign = new Campaign(CONFIG.campaign, state);
   campaign.arrive('radio',{hasCar:true,balance:0}); campaign.arrive('market',{hasCar:true,balance:0});
-  const repeat = campaign.arrive('pier',{hasCar:true,balance:0}); assert.equal(repeat.reward,0); assert.equal(repeat.firstCompletion,false); assert.equal(state.status,'finished');
+  const repeat = campaign.arrive('pier',{hasCar:true,balance:0}); assert.equal(repeat.reward,0); assert.equal(repeat.firstCompletion,false); assert.equal(state.status,'active'); assert.equal(state.active,'portas-abertas');
   const timedState = Save.normalize({campaign:{active:'sinal-por-um-fio',step:1}}, catalogues).campaign, timed = new Campaign(CONFIG.campaign,timedState);
   const failed = timed.tick(96,{roughness:0,damage:0}); assert.equal(failed.type,'failed'); assert.equal(timedState.status,'failed');
 });
