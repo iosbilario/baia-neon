@@ -96,6 +96,10 @@ test('taking a moving car throws the driver out',()=>{
   assert.ok(d.peds.some(p=>p.panic>8&&Math.hypot(p.x-t.x,p.z-t.z)<4),'driver is on the street');
   d.player.car.speed=0;tap('KeyE');d.clearPolice();
 });
+test('player and camera follow the real hill surface',()=>{
+  const hill=d.world.hills[0],startX=hill.x+hill.rx*.92,z=hill.z,beforeY=d.world.getElevation(startX,z);d.teleport(startX,z);d.setYaw(Math.PI/2);down('KeyW');step(.6);up('KeyW');
+  const ground=d.world.getElevation(d.player.x,d.player.z),expected=hill.height*Math.sqrt(1-Math.pow((d.player.x-hill.x)/hill.rx,2));assert.ok(d.player.x<startX-2,'player climbs toward hill center');assert.ok(ground>beforeY+.5,'hill elevation increases while climbing');assert.ok(Math.abs(ground-expected)<.001,'elevation matches the rendered sphere');assert.ok(Math.abs(d.human.position.y-ground)<.001,'character stands on the hill surface');assert.ok(d.camera.position.y>=d.world.getElevation(d.camera.position.x,d.camera.position.z)+.64,'camera stays above terrain');
+});
 test('alleys take only the narrow car, parks take only people, props are solid',()=>{
   const w=d.world,V=d.VEHICLES;assert.ok(w.alleys.length>=2,'alleys: '+w.alleys.length);assert.ok(w.lots.length>=3,'lots: '+w.lots.length);assert.ok(w.parks.length>=3);
   for(const a of w.alleys)for(let z=a.z-a.half-6;z<=a.z+a.half+6;z+=1){
