@@ -16,7 +16,8 @@
     const nearestZ = roads.reduce((best, value) => Math.abs(value - point.z) < Math.abs(best - point.z) ? value : best, roads[0]);
     return Math.abs(nearestX - point.x) <= Math.abs(nearestZ - point.z) ? {x: nearestX, z: point.z} : {x: point.x, z: nearestZ};
   }
-  function route(start, destination, roads) {
+  function route(start, destination, roads, streets) {
+    if (streets && streets.route) return streets.route(start, destination);
     if (!start || !destination || !Array.isArray(roads) || !roads.length) return [];
     const roadStart = snapToRoad(start, roads), roadEnd = snapToRoad(destination, roads);
     const first = nearestNode(roadStart, roads), last = nearestNode(roadEnd, roads);

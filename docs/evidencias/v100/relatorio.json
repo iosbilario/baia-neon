@@ -1,0 +1,170 @@
+{
+  "target": "index.html",
+  "shots": [
+    {
+      "file": "01-pc-a-pe.png",
+      "note": "PC 1280x800, a pe, HUD de teclado"
+    },
+    {
+      "file": "02-celular-paisagem-a-pe.png",
+      "note": "Celular 844x390 paisagem, controles de toque a pe e objetivo recolhido"
+    },
+    {
+      "file": "03-celular-paisagem-no-carro.png",
+      "note": "Celular paisagem, no carro"
+    },
+    {
+      "file": "04-gamepad-simulado-dirigindo.png",
+      "note": "Gamepad injetado (navigator.getGamepads): RT acelera, prompts de controle. Estado: {\"mode\":\"gamepad\",\"connected\":true,\"speed\":5.010070881136029,\"driving\":true}"
+    },
+    {
+      "file": "05-transito-carro.png",
+      "note": "Transito e ruas de sentido unico (setas no asfalto) vistos do carro"
+    },
+    {
+      "file": "06-bloqueio-policial.png",
+      "note": "Bloqueio policial atravessando a rua. Estado: {\"built\":1,\"level\":4,\"state\":\"chase\",\"forced\":true,\"driving\":true}"
+    },
+    {
+      "file": "07-combate-dentro-do-carro.png",
+      "note": "Tiro de dentro do carro. Estado: {\"weapon\":\"smg\",\"ammo\":26,\"driving\":true}"
+    },
+    {
+      "file": "08-capotamento.png",
+      "note": "Capotamento arcade em andamento. Estado: {\"roll\":\"rolling\"}"
+    },
+    {
+      "file": "09-interior-1-radio.png",
+      "note": "Interior radio. Estado: {\"interior\":\"radio\"}"
+    },
+    {
+      "file": "09-interior-2-garage.png",
+      "note": "Interior garage. Estado: {\"interior\":\"garage\"}"
+    },
+    {
+      "file": "09-interior-3-market.png",
+      "note": "Interior market. Estado: {\"interior\":\"market\"}"
+    },
+    {
+      "file": "09-interior-4-pier.png",
+      "note": "Interior pier. Estado: {\"interior\":\"pier\"}"
+    }
+  ],
+  "notes": [
+    "cena pc: 1280x800",
+    "cena celular: 844x390 toque/paisagem",
+    "cena gamepad: 1280x800",
+    "cena transito: 1280x800",
+    "cena bloqueio: 1280x800",
+    "cena combate-carro: 1280x800",
+    "cena capotamento: 1280x800",
+    "cena interior-radio: 1280x800",
+    "interior radio: {\"interior\":\"radio\"}",
+    "cena interior-garage: 1280x800",
+    "interior garage: {\"interior\":\"garage\"}",
+    "cena interior-market: 1280x800",
+    "interior market: {\"interior\":\"market\"}",
+    "cena interior-pier: 1280x800",
+    "interior pier: {\"interior\":\"pier\"}"
+  ],
+  "network": [],
+  "errors": [],
+  "state_pc": {
+    "mode": "play",
+    "hour": 17.60889222222191,
+    "night": 0.09129089199913443,
+    "rain": 0,
+    "rainTarget": 0,
+    "quality": "normal",
+    "fps": 58.34383080289079,
+    "player": {
+      "x": 12,
+      "z": 14,
+      "health": 100,
+      "driving": false,
+      "speed": 0,
+      "grenades": 2,
+      "weapon": "pistol",
+      "ammo": 12,
+      "reserve": 36,
+      "zones": null,
+      "roll": null
+    },
+    "police": {
+      "state": "patrol",
+      "level": 0,
+      "visible": false,
+      "search": 0,
+      "capture": 0,
+      "lastSeen": {
+        "x": 0,
+        "z": 0
+      }
+    },
+    "missionIndex": 0,
+    "balance": 0,
+    "completed": 0,
+    "reputation": 0,
+    "crimes": 0,
+    "campaign": {
+      "active": "voz-atrasada",
+      "step": 0,
+      "checkpoint": 0,
+      "status": "active",
+      "completed": [],
+      "rewarded": [],
+      "collected": [],
+      "elapsed": 3.266766666666659,
+      "comfort": 100,
+      "damage": 0,
+      "delays": 0
+    },
+    "interior": null,
+    "race": null,
+    "job": null,
+    "counts": {
+      "cars": 58,
+      "pedestrians": 64,
+      "police": 2,
+      "buildings": 161,
+      "skyscrapers": 14,
+      "animals": 36,
+      "insects": 86,
+      "beachProps": 14,
+      "shoreProps": 18,
+      "cyclists": 8,
+      "workers": 7,
+      "parkActivities": 16,
+      "companions": 4,
+      "planes": 2,
+      "streetDetails": 18
+    },
+    "render": {
+      "calls": 304,
+      "triangles": 633336
+    }
+  },
+  "gamepad": {
+    "mode": "gamepad",
+    "connected": true,
+    "speed": 5.010070881136029,
+    "driving": true
+  },
+  "roadblock": {
+    "built": 1,
+    "level": 4,
+    "state": "chase",
+    "forced": true,
+    "driving": true
+  },
+  "combat": {
+    "weapon": "smg",
+    "ammo": 26,
+    "driving": true
+  },
+  "rollover": {
+    "roll": "rolling"
+  },
+  "final_errors": 0,
+  "network_requests": 0
+}

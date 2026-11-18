@@ -10,17 +10,17 @@ const listeners = {}, elements = new Map();
 const context2d = new Proxy({}, {get(target,key) { if(key==='measureText')return text=>({width:String(text).length*12});if(key==='createLinearGradient')return ()=>({addColorStop(){}});return target[key]||(()=>{});},set(target,key,value){target[key]=value;return true;}});
 function element(id='') {
   if(elements.has(id))return elements.get(id);
-  const classes = new Set();
-  const el={id,width:512,height:128,style:{},textContent:'',innerHTML:'',classList:{toggle(c,force){if(force)classes.add(c);else classes.delete(c);},add(c){classes.add(c);},remove(c){classes.delete(c);},contains(c){return classes.has(c);}},getContext:()=>context2d,addEventListener(name,fn){listeners[id+':'+name]=fn;},setPointerCapture(){},requestPointerLock(){scope.document.pointerLockElement=this;const fn=listeners['document:pointerlockchange'];if(fn)fn();},getBoundingClientRect(){return {left:0,top:0,width:this.width,height:this.height};}};
+  const classes = new Set(),attributes={};
+  const el={id,width:512,height:128,style:{},textContent:'',innerHTML:'',classList:{toggle(c,force){if(force)classes.add(c);else classes.delete(c);},add(c){classes.add(c);},remove(c){classes.delete(c);},contains(c){return classes.has(c);}},setAttribute(name,value){attributes[name]=String(value);},getAttribute(name){return attributes[name];},getContext:()=>context2d,addEventListener(name,fn){listeners[id+':'+name]=fn;},setPointerCapture(){},requestPointerLock(){scope.document.pointerLockElement=this;const fn=listeners['document:pointerlockchange'];if(fn)fn();},getBoundingClientRect(){return {left:0,top:0,width:this.width,height:this.height};}};
   elements.set(id,el);return el;
 }
 let scheduled, now=0, fatalError=null;
 const store=new Map();
-const scope={console:{log:console.log,warn(){},error(e){fatalError=e;}},document:{getElementById:element,createElement:type=>element('generated-'+Math.random()),addEventListener:(n,f)=>listeners['document:'+n]=f,hidden:false,pointerLockElement:null,exitPointerLock(){this.pointerLockElement=null;const fn=listeners['document:pointerlockchange'];if(fn)fn();}},innerWidth:1280,innerHeight:800,devicePixelRatio:1,location:{search:'?test=1'},URLSearchParams,performance:{now:()=>now},localStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)},requestAnimationFrame:fn=>scheduled=fn,addEventListener:(n,f)=>listeners[n]=f};
+const scope={console:{log:console.log,warn(){},error(e){fatalError=e;}},document:{body:element('body'),getElementById:element,createElement:type=>element('generated-'+Math.random()),addEventListener:(n,f)=>listeners['document:'+n]=f,hidden:false,pointerLockElement:null,exitPointerLock(){this.pointerLockElement=null;const fn=listeners['document:pointerlockchange'];if(fn)fn();}},innerWidth:1280,innerHeight:800,devicePixelRatio:1,location:{search:'?test=1'},URLSearchParams,performance:{now:()=>now},localStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)},requestAnimationFrame:fn=>scheduled=fn,addEventListener:(n,f)=>listeners[n]=f};
 scope.window=scope;vm.createContext(scope);
 vm.runInContext(fs.readFileSync(path.join(root,'vendor/three.min.js'),'utf8'),scope);
 scope.THREE.WebGLRenderer=class{constructor(){this.shadowMap={};this.info={render:{calls:0,triangles:0}};}setPixelRatio(){}setSize(){}render(scene,camera){assert.ok(Number.isFinite(camera.position.x));scene.updateMatrixWorld();}};
-for(const file of ['config','build-info','save','navigation','campaign','island','world','audio','police','city-life','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
+for(const file of ['config','build-info','save','navigation','city-systems','arsenal','interiors','campaign','island','world','audio','police','city-life','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
 assert.equal(fatalError,null,'initialization error');
 assert.ok(scope.BN.debug,'test helpers available');
 const d=scope.BN.debug;
@@ -37,6 +37,7 @@ test('beach and shoreline props stay on their intended surface',()=>{const islan
 test('city life adds cyclists workers park activities companions and planes',()=>{const counts=d.getState().counts;assert.equal(counts.cyclists,8);assert.equal(counts.workers,7);assert.ok(counts.parkActivities>=16);assert.equal(counts.companions,4);assert.equal(counts.planes,2);assert.equal(counts.streetDetails,18);for(const actor of d.cityLife.actors)if(!actor.park)assert.ok(!d.world.isBlocked(actor.x,actor.z,.35),'city-life actor blocked: '+actor.role+' '+actor.x+','+actor.z);});
 test('cyclists sit, steer and pedal instead of using the walking pose',()=>{const cyclist=d.cityLife.cyclists[0],before=cyclist.z;d.cityLife.update(.25,{time:2,focus:cyclist,night:0,rain:0});assert.notEqual(cyclist.z,before);assert.notEqual(cyclist.rider.userData.legs[0].rotation.x,cyclist.rider.userData.legs[1].rotation.x);assert.ok(cyclist.rider.userData.arms.every(arm=>arm.rotation.x<-1));});
 test('cyclists and park visitors respond to contextual interaction',()=>{const cyclist=d.cityLife.cyclists[0];cyclist.x=d.player.x+1;cyclist.z=d.player.z;cyclist.group.visible=true;d.contextAction();assert.ok(cyclist.pause>0);cyclist.x=-200;cyclist.z=-200;const actor=d.cityLife.actors.find(a=>a.park);actor.x=d.player.x+1;actor.z=d.player.z;actor.mesh.visible=true;actor.state='idle';d.contextAction();actor.x=actor.home.x;actor.z=actor.home.z;});
+test('small touch HUD collapses the objective and keeps manual expansion open',()=>{scope.document.body.classList.add('touch-preview');d.updateMission();assert.match(element('missionText').innerHTML,/INTERAGIR/);d.showObjectivePopup(.08);assert.equal(d.getObjectiveUi().expanded,true);assert.equal(element('objectiveAction').textContent,'FECHAR⌃');step(.15);assert.equal(d.getObjectiveUi().expanded,false);assert.equal(element('objectiveAction').textContent,'VER⌄');assert.match(d.getObjectiveUi().summary,/CAP\. 1/);assert.match(d.getObjectiveUi().distance,/m$/);listeners['objectiveToggle:click']({preventDefault(){}});assert.equal(d.getObjectiveUi().expanded,true);assert.equal(d.getObjectiveUi().manual,true);assert.equal(element('objectiveToggle').getAttribute('aria-label'),'Recolher detalhes do serviço');step(.2);assert.equal(d.getObjectiveUi().expanded,true);listeners['objectiveToggle:click']({preventDefault(){}});assert.equal(d.getObjectiveUi().expanded,false);scope.document.body.classList.remove('touch-preview');d.updateMission();});
 test('touch analogue moves on foot without keyboard events',()=>{const before={x:d.player.x,z:d.player.z};d.touch.y=-1;step(.45);d.touch.y=0;assert.ok(Math.hypot(d.player.x-before.x,d.player.z-before.z)>1);});
 test('movement follows the camera and the starter car can be entered',()=>{const x=d.player.x;down('KeyD');step(.75);up('KeyD');assert.ok(d.player.x<x-2);tap('KeyE');assert.equal(d.getState().player.driving,true);assert.equal(d.getState().police.level,0);});
 test('touch controls steer and accelerate the current car',()=>{const c=d.player.car;c.speed=0;d.touch.primary=true;d.touch.x=.65;step(.6);d.touch.primary=false;d.touch.x=0;assert.ok(c.speed>2);assert.ok(Math.abs(c.heading)>.01);});
@@ -128,4 +129,145 @@ test('alleys take only the narrow car, parks take only people, props are solid',
 test('losing desktop pointer lock pauses and resume captures it again',()=>{scope.document.pointerLockElement=null;listeners['document:pointerlockchange']();assert.equal(d.getState().mode,'pause');element('resume').onclick();assert.equal(d.getState().mode,'play');assert.equal(scope.document.pointerLockElement,element('game'));});
 test('focus loss pauses motion and resume restores input',()=>{down('KeyW');listeners.blur();const state=d.getState();step(.5);assert.equal(d.getState().mode,'pause');assert.equal(d.player.x,state.player.x);assert.equal(d.player.z,state.player.z);element('resume').onclick();assert.equal(d.getState().mode,'play');});
 test('world coordinates remain finite after integrated updates',()=>{d.scene.traverse(o=>{for(const v of [...o.position.toArray(),...o.scale.toArray()])assert.ok(Number.isFinite(v));});assert.equal(fatalError,null);});
+test('traffic follows the one-way graph and every street sign of the island exists',()=>{
+  const streets=d.world.streets;assert.ok(streets.stronglyConnected());d.clearPolice();step(25);
+  const traffic=d.cars.filter(c=>c.traffic&&c.nav);assert.ok(traffic.length>=10,'traffic cars on the graph: '+traffic.length);
+  for(const c of traffic){assert.ok(streets.allowed(c.nav.prev,c.nav.cur),'illegal move '+JSON.stringify([c.nav.prev,c.nav.cur]));assert.ok(Number.isFinite(c.x)&&Number.isFinite(c.z));assert.ok(!d.world.isBlocked(c.x,c.z,.5)||c.speed<1,'traffic car inside a building');}
+});
+test('lamp posts and traffic lights are solid, break at speed and the car pays for it',()=>{
+  const w=d.world;assert.ok(w.fixtures.items.length>=60,'fixtures: '+w.fixtures.items.length);
+  const lamp=w.fixtures.items.find(f=>f.kind==='lamp'&&f.state==='up'&&Math.abs(f.x)<150&&Math.abs(f.z)<150);assert.ok(lamp);
+  assert.ok(w.isBlocked(lamp.x,lamp.z,.4),'an upright post blocks');
+  if(!d.player.car){d.teleport(d.cars[0].x,d.cars[0].z+3);tap('KeyE');}
+  const car=d.player.car;assert.ok(car);const before=car.damage;
+  d.teleport(lamp.x-5,lamp.z);car.heading=Math.PI/2;car.lat=0;car.speed=16;down('KeyW');step(.55);up('KeyW');
+  assert.notEqual(lamp.state,'up','the post fell');assert.ok(car.damage>before,'minor damage');assert.ok(!w.isBlocked(lamp.x,lamp.z,.4),'a fallen post no longer blocks');
+  step(1);assert.equal(lamp.state,'down');
+});
+test('pedestrians give way without pinning the player on foot',()=>{
+  if(d.player.car){d.player.car.speed=0;tap('KeyE');}assert.ok(!d.player.car);d.clearPolice();
+  d.teleport(-9.4,-60);d.setYaw(0);const start={x:d.player.x,z:d.player.z};
+  const crowd=d.peds.slice(0,6);crowd.forEach((p,i)=>{p.dead=false;p.down=0;p.frozen=true;p.speed=0;p.x=start.x+(i%3-1)*.6;p.z=start.z-1.2-Math.floor(i/3)*.5;});
+  d.touch.y=-1;step(1.4);d.touch.y=0;
+  assert.ok(Math.hypot(d.player.x-start.x,d.player.z-start.z)>3,'moved through the crowd: '+Math.hypot(d.player.x-start.x,d.player.z-start.z));
+  assert.ok(crowd.some(p=>p.shoved>0));crowd.forEach(p=>{p.frozen=false;p.shoved=0;});
+});
+test('police roadblocks are built on free asphalt, stay passable and are dismantled',()=>{
+  const info={level:3,state:'chase',driving:true,target:{x:0,z:-100},dir:{x:0,z:1}};
+  d.roadblocks.update(.1,info);const w=d.world;assert.equal(d.roadblocks.blocks.length,1);const block=d.roadblocks.blocks[0];
+  assert.equal(w.dynamicSolids.length,4);assert.ok(w.isBlocked(block.cars[0].x,block.cars[0].z,.4));
+  assert.ok(!w.isBlocked(block.x,block.z,1.5),'the gap lets a car through');assert.ok(!w.buildings.some(b=>block.x>b.minX-2&&block.x<b.maxX+2&&block.z>b.minZ-2&&block.z<b.maxZ+2));
+  d.roadblocks.update(.1,Object.assign({},info,{level:0,state:'patrol'}));assert.equal(d.roadblocks.blocks.length,0);assert.equal(w.dynamicSolids.length,0);assert.ok(!w.isBlocked(block.cars[0].x,block.cars[0].z,.4));
+});
+test('adaptive quality steps down gradually and keeps the 28 FPS fallback',()=>{
+  const q=d.qualityCtl,cam=d.camera;assert.equal(d.getState().quality,'normal');
+  assert.equal(q.evaluate(40),1);d.applyQuality();assert.equal(d.getState().quality,'medio');assert.equal(d.renderer.shadowMap.enabled,true);assert.ok(cam.far<1350&&cam.far>650);
+  q.tier=0;q.cooldown=0;assert.equal(q.evaluate(20),2);d.applyQuality();assert.equal(d.getState().quality,'leve');assert.equal(d.renderer.shadowMap.enabled,false);assert.equal(cam.far,650);
+  step(.3);q.tier=0;d.applyQuality();assert.equal(d.getState().quality,'normal');assert.equal(cam.far,1350);assert.equal(d.renderer.shadowMap.enabled,true);
+});
+test('gamepad moves the player, adapts prompts and pauses when unplugged',()=>{
+  const buttons=Array.from({length:17},()=>({pressed:false,value:0})),pad={index:0,id:'Test Pad (Vendor: 0000)',connected:true,axes:[0,0,0,0],buttons};
+  scope.navigator={getGamepads:()=>pad.connected?[pad]:[]};
+  d.touch.y=0;if(d.player.car){d.player.car.speed=0;tap('KeyE');}assert.ok(!d.player.car);d.teleport(-9.4,-60);d.clearPolice();
+  assert.equal(d.inputMode.mode,'keyboard');pad.axes=[0,-1,0,0];const start={x:d.player.x,z:d.player.z};step(.6);
+  assert.equal(d.inputMode.mode,'gamepad');assert.ok(Math.hypot(d.player.x-start.x,d.player.z-start.z)>1.5,'stick walks');assert.ok(element('keyHints').innerHTML.includes('RT'));
+  const yaw=d.getControls().orbitYaw;pad.axes=[0,0,1,0];step(.3);assert.notEqual(d.getControls().orbitYaw,yaw,'right stick turns the camera');pad.axes=[0,0,0,0];
+  pad.axes=[.1,.1,0,0];const rest={x:d.player.x,z:d.player.z};step(.3);assert.ok(Math.hypot(d.player.x-rest.x,d.player.z-rest.z)<.2,'drift inside the dead zone is ignored');pad.axes=[0,0,0,0];
+  buttons[9]={pressed:true,value:1};step(.05);buttons[9]={pressed:false,value:0};assert.equal(d.getState().mode,'pause','START pauses');step(.05);buttons[9]={pressed:true,value:1};step(.05);buttons[9]={pressed:false,value:0};step(.05);assert.equal(d.getState().mode,'play','START resumes');
+  tap('KeyA');assert.equal(d.inputMode.mode,'keyboard');pad.axes=[0,-1,0,0];step(.05);assert.equal(d.inputMode.mode,'gamepad');pad.axes=[0,0,0,0];
+  pad.connected=false;step(.05);assert.equal(d.getState().mode,'pause','unplugging pauses a gamepad session');element('resume').onclick();step(.05);
+  assert.equal(d.getState().mode,'play');scope.navigator=undefined;
+});
+test('gamepad can navigate and activate menu buttons',()=>{
+  let focused=-1,clicked=-1;const buttons=[0,1,2].map(i=>({focus(){focused=i;},click(){clicked=i;}}));element('garage').querySelectorAll=()=>buttons;
+  assert.equal(d.padMenu('garage',1,false),true);assert.equal(focused,1);assert.equal(d.padMenu('garage',0,true),true);assert.equal(clicked,1);
+});
+test('arsenal: three weapons switch by key, wheel, gamepad bumpers and touch, and persist in the save',()=>{
+  if(d.player.car){d.player.car.speed=0;tap('KeyE');}assert.ok(!d.player.car);d.teleport(-9.4,-60);d.clearPolice();
+  assert.equal(d.getState().player.weapon,'pistol');tap('KeyQ');assert.equal(d.getState().player.weapon,'pistol','nothing to switch to yet');
+  d.loadout.unlock('smg');d.loadout.unlock('shotgun');
+  tap('KeyQ');assert.equal(d.getState().player.weapon,'smg');step(.4);listeners.wheel({deltaY:100});assert.equal(d.getState().player.weapon,'shotgun');step(.4);
+  listeners.wheel({deltaY:-100});assert.equal(d.getState().player.weapon,'smg');step(.4);tap('Digit4');assert.equal(d.getState().player.weapon,'pistol');step(.4);
+  const buttons=Array.from({length:17},()=>({pressed:false,value:0})),pad={index:0,id:'Arsenal Pad',connected:true,axes:[0,0,0,0],buttons};scope.navigator={getGamepads:()=>[pad]};
+  buttons[5]={pressed:true,value:1};step(.05);buttons[5]={pressed:false,value:0};step(.3);assert.equal(d.getState().player.weapon,'smg','RB next');
+  buttons[4]={pressed:true,value:1};step(.05);buttons[4]={pressed:false,value:0};step(.3);assert.equal(d.getState().player.weapon,'pistol','LB previous');
+  scope.navigator=undefined;step(.05);if(d.getState().mode==='pause'){element('resume').onclick();step(.05);}assert.equal(d.getState().mode,'play');
+  listeners['touchWeapon:pointerdown']({preventDefault(){}});assert.equal(d.getState().player.weapon,'smg','touch button');step(.4);
+  assert.ok(element('touchWeapon').textContent.includes('SUBME'));assert.ok(element('arsenal').textContent.includes('SUBMETRALHADORA'));
+  const saved=d.progressData();assert.equal(JSON.stringify(saved.arsenal.owned),'["pistol","smg","shotgun"]');assert.equal(saved.arsenal.current,'smg');assert.equal(saved.schemaVersion,2);assert.equal(typeof saved.ammo,'number');
+});
+test('arsenal: the smg sprays while the button is held, the shotgun fires several tracers per shot',()=>{
+  d.teleport(-9.4,-60);d.loadout.select('smg');step(.4);const before=d.player.ammo;
+  listeners['game:pointerdown']({button:0});step(.5);listeners['game:pointerup']({button:0});const used=before-d.player.ammo;assert.ok(used>=4&&used<=7,'held smg uses several rounds in half a second: '+used);
+  const after=d.player.ammo;step(.5);assert.equal(d.player.ammo,after,'releasing the button stops the spray');
+  d.loadout.select('shotgun');step(.4);const sg=d.player.ammo;listeners['game:pointerdown']({button:0});listeners['game:pointerup']({button:0});step(.05);assert.equal(d.player.ammo,sg-1,'one shell per pull');
+  const visible=d.scene.children.filter(o=>o.isLine&&o.material&&o.material.opacity>0).length;assert.ok(visible>=5,'pellet tracers: '+visible);
+  d.loadout.select('pistol');step(.4);d.player.ammo=0;tap('KeyR');assert.ok(d.player.reload>0,'empty magazine reloads');step(1.5);assert.equal(d.player.ammo,12);
+});
+test('arsenal: shooting from inside the car follows the reticle and damages the target zone',()=>{
+  d.loadout.select('pistol');step(.4);const car=d.cars.find(o=>o.owned&&!o.wreck);d.teleport(car.x+1.5,car.z);tap('KeyE');assert.ok(d.player.car,'inside the car');
+  const c=d.player.car;d.teleport(0,-230);c.heading=0;c.speed=0;c.lat=0;d.clearPolice();d.resetZones(c);
+  const target=d.cars.find(o=>o!==c&&!o.wreck);target.traffic=false;target.speed=0;target.x=c.x;target.z=c.z+14;target.heading=Math.PI/2;target.mesh.position.set(target.x,0,target.z);target.mesh.rotation.y=target.heading;target.damage=0;target.zones=scope.BN.newZones();target.mesh.visible=true;
+  d.setYaw(Math.PI);step(.8);d.teleport(0,-230);c.speed=0;target.x=c.x;target.z=c.z+14;target.mesh.position.set(target.x,0,target.z);
+  let aimed=null;for(let pitch=.1;pitch<=1.1&&!aimed;pitch+=.05){d.setPitch(pitch);step(.3);d.teleport(0,-230);c.speed=0;target.x=c.x;target.z=c.z+14;target.mesh.position.set(target.x,0,target.z);const probe=d.resolveAim();if(probe.best&&probe.best.o===target)aimed=pitch;}
+  assert.ok(aimed!==null,'the player can put the reticle on the car ahead');
+  const ammo=d.player.ammo;d.fire();assert.equal(d.player.ammo,ammo-1,'the pistol works from the car');assert.ok(d.player.aimTime>0);
+  assert.ok(target.damage>0,'the car ahead is hit: '+target.damage);const hit=Object.values(target.zones).reduce((a,b)=>a+b,0);assert.ok(hit>0,'a zone records the hit');assert.equal(target.zones.rear+target.zones.front,0,'shot from the side of a crossing car');
+  step(.1);assert.ok(element('arsenal').textContent.includes('CARRO'));assert.ok(element('arsenal').textContent.includes('PISTOLA'));
+  target.damage=0;target.x=-200;target.z=-200;target.mesh.position.set(-200,0,-200);
+});
+test('arsenal: localized damage dents the car and changes its handling',()=>{
+  const c=d.player.car;assert.ok(c);d.teleport(0,-230);c.heading=0;c.lat=0;d.resetZones(c);c.damage=0;const kids=c.mesh.children.length;
+  const topSpeed=()=>{d.teleport(0,-230);c.heading=0;c.lat=0;c.speed=60;down('KeyW');step(.05);up('KeyW');const v=c.speed;c.speed=0;return v;};
+  const top=topSpeed();d.resetZones(c);d.damageZone(c,'front',70);assert.equal(c.mesh.children.length,kids+1,'a dent mesh appears');assert.equal(d.getState().player.zones.front,70);
+  d.damageZone(c,'front',10);assert.equal(c.mesh.children.length,kids+1,'same level, same mesh');d.damageZone(c,'right',30);assert.equal(c.mesh.children.length,kids+2);
+  const damaged=topSpeed();assert.ok(damaged<top*.8,'front damage lowers top speed: '+damaged+' vs '+top);
+  d.resetZones(c);assert.equal(c.mesh.children.length,kids);assert.equal(d.getState().player.zones.front,0);c.speed=0;c.lat=0;
+});
+test('arsenal: the car rolls over on a sustained slide, locks the controls and recovers',()=>{
+  const c=d.player.car;d.teleport(0,-230);c.heading=0;c.speed=0;c.lat=0;c.roll.reset();c.damage=0;
+  d.resetZones(c);let rolled=false;for(let i=0;i<60&&!rolled;i++){c.speed=26;c.lat=18;step(1/60);rolled=c.roll.active;}
+  assert.ok(rolled,'slide over the limit starts a rollover');assert.equal(d.getState().player.roll,'rolling');
+  const before=c.speed;down('KeyW');step(.3);up('KeyW');assert.ok(c.speed<=before,'throttle is ignored while rolling');assert.ok(Math.abs(c.mesh.rotation.z)>.1,'the body is tilted');
+  const zones=d.getState().player.zones;assert.ok(zones.left+zones.right>=18,'side takes the damage');assert.ok(c.damage>0);
+  tap('KeyE');assert.ok(d.player.car,'cannot leave the car while it is overturned');
+  step(4);assert.equal(c.roll.active,false);assert.equal(c.mesh.rotation.z,0);assert.equal(c.mesh.position.y,0);
+  down('KeyW');c.speed=0;step(1);up('KeyW');assert.ok(c.speed>3,'driving again after recovery');c.speed=0;c.lat=0;
+  d.resetZones(c);c.damage=0;
+});
+test('arsenal: garage sells weapons and ammo for the weapon in hand, and old saves load',()=>{
+  const c=d.player.car;if(c){c.speed=0;d.teleport(12,14);tap('KeyE');}
+  const fresh=scope.BN.Save.normalize({balance:50,ammo:7,reserve:20},{vehicles:['compact','sedan','sport'],upgrades:['brakes','tires','cargo'],campaignIds:[],weapons:['pistol','smg','shotgun']});
+  assert.equal(fresh.schemaVersion,2);assert.equal(JSON.stringify(fresh.arsenal.owned),'["pistol"]');
+  d.loadout.select('smg');d.setBalance(5000);d.teleport(scope.BN.CONFIG.garage.x,scope.BN.CONFIG.garage.z);step(.2);d.openGarage();assert.equal(d.getState().mode,'garage');
+  const labels=d.garageItems().map(i=>i.label);assert.ok(labels.some(l=>l.startsWith('Munição · SUBMETRALHADORA')),labels.join('|'));assert.ok(!labels.some(l=>l.startsWith('Comprar ESPINGARDA')),'owned weapons are not for sale');
+  element('closeGarage').onclick();step(.1);
+});
+test('interiors: doors open on free ground outside and every exit spawn is walkable',()=>{
+  const I=scope.BN.Interiors;assert.equal(d.interiorDoorMarkers.length,I.ORDER.length,'every interior has a visible door marker');for(const id of I.ORDER){const def=I.DEFS[id];assert.ok(!d.world.isBlocked(def.outside.x,def.outside.z,.42),id+' exit spawn blocked');assert.ok(!d.world.isBlocked(def.door.x,def.door.z,.42),id+' door blocked');}
+});
+test('interiors: E at the door enters on foot, collides inside, and E at the exit goes back',()=>{
+  const I=scope.BN.Interiors,def=I.DEFS.radio;d.teleport(def.door.x,def.door.z);step(.1);assert.ok(d.getState().player.driving===false);
+  tap('KeyE');step(.7);const s=d.getState();assert.equal(s.interior,'radio');assert.ok(d.interiorRooms.radio&&d.interiorRooms.radio.visible);assert.equal(element('district').textContent,'Rádio Caju');assert.doesNotMatch(element('missionDistance').textContent,/Infinity/);assert.ok(element('minimapWrap').classList.contains('hidden'),'city minimap hidden indoors');
+  const local=I.toLocal(def,d.player);assert.ok(Math.abs(local.x)<def.hx&&Math.abs(local.z)<def.hz);
+  down('KeyW');step(4);up('KeyW');const after=I.toLocal(def,d.player);assert.ok(Math.abs(after.x)<=def.hx-.4&&Math.abs(after.z)<=def.hz-.4,'walls hold');assert.ok(!I.blocked(def,d.player.x,d.player.z,.4));
+  assert.ok(Number.isFinite(d.camera?d.camera.position.x:0));
+  const ex=I.exitDoor(def),at=I.toWorld(def,{x:ex.x,z:ex.z-.6});d.teleport(at.x,at.z);step(.1);tap('KeyE');step(.7);
+  assert.equal(d.getState().interior,null);assert.ok(Math.hypot(d.player.x-def.outside.x,d.player.z-def.outside.z)<.5);assert.ok(!d.interiorRooms.radio.visible);
+});
+test('interiors: a task inside pays, advances the campaign and persists in the save',()=>{
+  const I=scope.BN.Interiors,def=I.DEFS.radio;d.campaign.state.active='portas-abertas';d.campaign.state.step=0;d.campaign.state.status='active';
+  d.teleport(def.door.x,def.door.z);step(.1);tap('KeyE');step(.7);assert.equal(d.campaign.state.step,1,'entering completes the first step');
+  const before=d.getState().balance,at=I.toWorld(def,I.find(def,'mic'));d.teleport(at.x,at.z);step(.1);tap('KeyE');step(6.6);
+  assert.ok(d.getState().balance>=before+90,'task paid');assert.ok(d.campaign.state.completed.includes('portas-abertas'));
+  const saved=d.progressData();assert.equal(saved.schemaVersion,2);assert.ok(saved.interiors.visited.includes('radio'));assert.equal(saved.interiors.done['radio:mic'],1);
+  const out=I.toWorld(def,{x:I.exitDoor(def).x,z:I.exitDoor(def).z-.6});d.teleport(out.x,out.z);step(.1);tap('KeyE');step(.7);assert.equal(d.getState().interior,null);
+});
+test('interiors: the market sells a medical kit only when needed and weapons are holstered inside',()=>{
+  const I=scope.BN.Interiors,def=I.DEFS.market;d.teleport(def.door.x,def.door.z);step(.1);tap('KeyE');step(.7);assert.equal(d.getState().interior,'market');
+  const before=d.player.ammo;d.fire();assert.equal(d.player.ammo,before,'no shooting indoors');
+  d.setBalance(500);d.player.health=100;const at=I.toWorld(def,I.find(def,'shop-kit'));d.teleport(at.x,at.z);step(.1);tap('KeyE');step(.1);assert.equal(d.getState().balance,500,'full health: no charge');
+  d.player.health=40;tap('KeyE');step(.1);assert.equal(d.getState().balance,440);assert.equal(d.player.health,100);
+  d.leaveInterior();step(.1);
+});
 console.log(passed+' integration checks passed with a stub renderer. No visual or FPS claim.');

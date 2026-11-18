@@ -20,7 +20,7 @@ function test(name,fn) {
 function fixture(options={}) {
   const messages=[];
   let caught=0;
-  const world={roads,buildings:options.buildings||[],isBlocked:()=>!!options.freeze};
+  const world={roads,buildings:options.buildings||[],isBlocked:()=>!!options.freeze,streets:options.streets};
   const create=()=>({position:{set(){}},rotation:{y:0},userData:{lights:[]}});
   const police=new BN.Police(world,create,()=>caught++,m=>messages.push(m));
   return {police,world,messages,caught:()=>caught};
@@ -132,6 +132,11 @@ test('road routes stay axis aligned and cross the canal only on bridges',()=>{
       prev=next;
     }
   }
+});
+
+test('police cruisers use the directed street graph when available',()=>{
+  let calls=0;const streets={route(from,to){calls++;return [{x:from.x+80,z:from.z},{x:to.x,z:to.z}];}}, {police}=fixture({streets,freeze:true});
+  police.units[0].path=[];police.update(.1,{x:0,z:0},0);assert.ok(calls>0);
 });
 
 test('refreshing a chase route keeps moving toward a same-street target',()=>{
