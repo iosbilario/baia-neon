@@ -159,7 +159,7 @@
   };
   BN.createWorld = function(T, scene) {
     const k=kit(T), roads=[-240,-160,-80,0,80,160,240];
-    const buildings=[], batches=new Map(), signs=[], animals=[], parks=[], alleys=[], lots=[], solidProps=[],tunnels=[],hills=[];
+    const buildings=[], batches=new Map(), signs=[], animals=[], parks=[], alleys=[], lots=[], solidProps=[],tunnels=[],hills=[],beachProps=[],shoreProps=[];
     // Small solid objects (trunks, benches, fountains) live in a coarse grid so the check stays cheap.
     const props=new Map();
     function prop(x,z,r,kind='prop'){const item={x,z,r,kind};solidProps.push(item);const key=Math.floor(x/16)*1000+Math.floor(z/16);if(!props.has(key))props.set(key,[]);props.get(key).push(item);}
@@ -186,7 +186,7 @@
     }
     function box(mat,x,y,z,sx,sy,sz,ry=0){inst(k.box,mat,x,y,z,sx,sy,sz,0,ry,0);}
     function palm(x,z,h=7,base=0){
-      const roadMargin=8;if(!island.containsCircle(x,z,2)||roads.some(road=>Math.abs(x-road)<roadMargin||Math.abs(z-road)<roadMargin))return false;
+      const roadMargin=8;if(!island.containsCircle(x,z,2)||roads.some(road=>Math.abs(x-road)<roadMargin||Math.abs(z-road)<roadMargin)||island.distanceToCoastRoad(x,z)<6)return false;
       prop(x,z,.35,'tree');
       inst(k.cylinder,trunk,x,base+h*.48,z,.24,h,.24,0,0,.04);
       for(let a=0;a<7;a++) {
@@ -381,20 +381,28 @@
         for(const s of [-1,1]){box(material(0xe7b53c),cx-1.55,.5,cz+s*(cellD/2-.7),.35,1,.35);box(material(0xe7b53c),cx+1.55,.5,cz+s*(cellD/2-.7),.35,1,.35);}
       }
     }
-    for(let z=-280;z<300;z+=22){palm(264,z,7+rand()*3);if(z%44===-16&&island.containsCircle(272,z,2))bench(272,z,Math.PI/2);}
-    for(let z=-250;z<300;z+=65){
-      if(!island.containsPoint(283,z))continue;
-      inst(k.cylinder,trunk,283,1.3,z,.06,2.6,.06);
-      inst(k.cone,material(z%2===0?0xe99383:0xa6d1bc),283,2.8,z,2.4,.7,2.4);
-      box(white,283,.3,z+3,2,.15,3);
-    }
-    for(let z=-270;z<300;z+=80){
-      if(!island.containsPoint(291,z))continue;
-      prop(291,z,2.6);
-      box(material(0xefb3a1),291,2,z,3.6,2.5,4.4);
-      box(cream,291,3.45,z,4.6,.25,5.0);
-      box(windowDark,289.15,2.5,z,.04,.8,2.4);
-      for(const x of [289.7,292.3])for(const zz of [-1.5,1.5])box(trunk,x,.7,z+zz,.18,1.5,.18);
+    const clearOfGridRoad=(x,z,margin)=>roads.every(road=>Math.abs(x-road)>=margin&&Math.abs(z-road)>=margin);
+    // Coastal furniture is generated from the real polygon instead of a fixed x coordinate.
+    // Every recorded footprint is checked against its intended surface before geometry is emitted.
+    for(const segment of island.beachSegments){
+      for(const t of [.2,.5,.8]){
+        const point=island.coastPoint(segment,t,.952);
+        if(!island.containsCircle(point.x,point.z,2)||island.distanceToCoastRoad(point.x,point.z)<7||!clearOfGridRoad(point.x,point.z,9))continue;
+        if(palm(point.x,point.z,7+rand()*3))shoreProps.push({kind:'palm',x:point.x,z:point.z,r:2,surface:'land'});
+      }
+      const seat=island.coastPoint(segment,.5,.948);
+      if(island.containsCircle(seat.x,seat.z,1.5)&&island.distanceToCoastRoad(seat.x,seat.z)>7&&!roads.some(road=>Math.abs(seat.x-road)<9||Math.abs(seat.z-road)<9)){
+        bench(seat.x,seat.z,seat.angle+Math.PI/2);shoreProps.push({kind:'bench',x:seat.x,z:seat.z,r:1.5,surface:'land'});
+      }
+      for(const t of [.28,.72]){
+        const point=island.coastPoint(segment,t,.99),radius=4;
+        if(!island.containsBeachCircle(point.x,point.z,radius)||island.distanceToCoastRoad(point.x,point.z)<radius+6)continue;
+        const tx=Math.sin(point.angle),tz=Math.cos(point.angle),chairX=point.x+tx*2.2,chairZ=point.z+tz*2.2;
+        beachProps.push({kind:'umbrella-set',x:point.x,z:point.z,r:radius,surface:'sand',segment});
+        inst(k.cylinder,trunk,point.x,1.3,point.z,.06,2.6,.06);
+        inst(k.cone,material((segment+Math.round(t*10))%2?0xe99383:0xa6d1bc),point.x,2.8,point.z,2.4,.7,2.4);
+        box(white,chairX,.3,chairZ,2,.15,3,point.angle);
+      }
     }
     facadeSign('CAFÉ ONDA',-198,5.5,-172.8,11,'#425956');
     facadeSign('HOTEL MARÉ',-53,8.0,-91.6,11,'#ad6671');
@@ -426,9 +434,10 @@
     sign('PÍER FAROL',pier.x-3,3.8,pier.z+4.2,10,0,'#3f6d79');
     const finale=new T.Group();finale.position.set(pier.x,0,pier.z);finale.visible=false;scene.add(finale);
     for(let i=0;i<8;i++){const a=i*Math.PI/4,r=5+i%2*1.5;part(T,k.sphere,new T.MeshStandardMaterial({color:i%2?0xff805b:0x8de3cf,emissive:i%2?0xff805b:0x8de3cf,emissiveIntensity:2}),Math.sin(a)*r,4+Math.sin(a*2),Math.cos(a)*r,.22,.22,.22,finale);}
-    const beachSign=sign('PRAIA AURORA',266,4.1,10,13,Math.PI/2,'#386d6d');
+    const beachSign=sign('PRAIA AURORA',224,4.1,30,13,Math.PI/2,'#386d6d');
     beachSign.userData.mount='posts';
-    for(const z of [5,15])box(trunk,265.9,2.1,z,.20,4.2,.20);
+    for(const z of [25,35])box(trunk,223.9,2.1,z,.20,4.2,.20);
+    shoreProps.push({kind:'beach-sign',x:224,z:30,r:6.5,surface:'land'});
     facadeSign('ALUGA SOL',-212,6,65.4,10,'#a77465');
     facadeSign('CALOR & CAOS',200,7,145.5,14,'#755a71');
     const puddleMaterial=new T.MeshStandardMaterial({color:0x6caab0,roughness:.18,metalness:.35,transparent:true,opacity:0,depthWrite:false});
@@ -437,10 +446,10 @@
       const mesh=new T.Mesh(new T.CircleGeometry(1,20),puddleMaterial);mesh.rotation.x=-Math.PI/2;mesh.position.set(x,.205,z);mesh.scale.set(sx,sz,1);scene.add(mesh);puddles.push(mesh);
     });
     // Bus shelters and planters create recognizable corners without blocking the roadway.
-    [[-230,-149],[91,171],[170,-69],[251,91]].filter(([x,z])=>island.containsCircle(x,z,3)).forEach(([x,z],i)=>{
+    [[-230,-149],[91,171],[170,-69],[251,91]].filter(([x,z])=>island.containsCircle(x,z,3)&&island.distanceToCoastRoad(x,z)>=6.2).forEach(([x,z],i)=>{
       prop(x,z,1.2);box(material(0x34515b),x,1.5,z,4,.18,2.2,i%2?Math.PI/2:0);box(windowDark,x,2.3,z,4,2.2,.10,i%2?Math.PI/2:0);box(cream,x,3.5,z,4.5,.25,2.6,i%2?Math.PI/2:0);
     });
-    [[-229,-110],[91,110],[171,30],[253,-227]].filter(([x,z])=>island.containsCircle(x,z,2)).forEach(([x,z])=>{prop(x,z,.7);inst(k.cylinder,material(0xc9896b),x,.55,z,.75,1.1,.75);bush(x,z,1.05);});
+    [[-229,-110],[91,110],[171,30],[253,-227]].filter(([x,z])=>island.containsCircle(x,z,2)&&island.distanceToCoastRoad(x,z)>=5.7).forEach(([x,z])=>{prop(x,z,.7);inst(k.cylinder,material(0xc9896b),x,.55,z,.75,1.1,.75);bush(x,z,1.05);});
     for(const b of batches.values()){
       const mesh=new T.InstancedMesh(b.geo,b.mat,b.items.length),tmp=new T.Object3D();
       b.items.forEach((o,i)=>{tmp.position.set(o.x,o.y,o.z);tmp.rotation.set(o.rx,o.ry,o.rz);tmp.scale.set(o.sx,o.sy,o.sz);tmp.updateMatrix();mesh.setMatrixAt(i,tmp.matrix);});
@@ -516,6 +525,6 @@
       }
     }
     function getDistrict(x,z){return x>250?'Praia Aurora':x>85&&x<150?'Canal das Garças':x<70&&z<0?'Centro Solar':z>60&&x<0?'Jardim Maré':'Costa Coral';}
-    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,getElevation,island,parks,alleys,lots,tunnels,hills,solidProps,counts:{buildings:buildings.length,skyscrapers:buildings.filter(b=>b.tower).length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
+    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,getElevation,island,parks,alleys,lots,tunnels,hills,solidProps,beachProps,shoreProps,counts:{buildings:buildings.length,skyscrapers:buildings.filter(b=>b.tower).length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length,beachProps:beachProps.length,shoreProps:shoreProps.length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
   };
 })();
