@@ -8,10 +8,10 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img alt="Licença MIT" src="https://img.shields.io/github/license/iosbilario/baia-neon?style=flat-square"></a>
+  <a href="LICENSE"><img alt="Licença MIT" src="https://img.shields.io/badge/license-MIT-97ca00?style=flat-square"></a>
   <a href="https://github.com/iosbilario/baia-neon/actions/workflows/ci.yml"><img alt="Validação" src="https://github.com/iosbilario/baia-neon/actions/workflows/ci.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/iosbilario/baia-neon/releases/latest"><img alt="Última versão" src="https://img.shields.io/github/v/release/iosbilario/baia-neon?style=flat-square&label=release"></a>
-  <a href="https://github.com/iosbilario/baia-neon/commits/main"><img alt="Último commit" src="https://img.shields.io/github/last-commit/iosbilario/baia-neon?style=flat-square&label=último%20commit"></a>
+  <a href="https://github.com/iosbilario/baia-neon/commits/main"><img alt="Último commit" src="https://img.shields.io/github/last-commit/iosbilario/baia-neon?style=flat-square&label=last%20commit"></a>
   <a href="https://github.com/iosbilario/baia-neon/stargazers"><img alt="Estrelas" src="https://img.shields.io/github/stars/iosbilario/baia-neon?style=flat-square"></a>
 </p>
 
