@@ -169,7 +169,7 @@
     const matCache={};
     function material(color,roughness=.88) {const key=color+'_'+roughness;return matCache[key]||(matCache[key]=new T.MeshStandardMaterial({color,roughness,flatShading:true}));}
     function getElevation(x,z){
-      let result=0;for(const hill of hills){const nx=(x-hill.x)/hill.rx,nz=(z-hill.z)/hill.rz,r2=nx*nx+nz*nz;if(r2<1)result=Math.max(result,hill.height*(1-r2)*(1-r2));}return result;
+      let result=0;for(const hill of hills){const nx=(x-hill.x)/hill.rx,nz=(z-hill.z)/hill.rz,r2=nx*nx+nz*nz;if(r2<1)result=Math.max(result,hill.height*Math.sqrt(1-r2));}return result;
     }
     const asphalt=new T.MeshStandardMaterial({color:0x3c5158,roughness:.96});
     const lightMat=new T.MeshStandardMaterial({color:0xe8dab1,emissive:0xffdc83,emissiveIntensity:.1});

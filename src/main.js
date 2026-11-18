@@ -753,19 +753,19 @@
         const t=elapsed*.035;cameraGoal.set(365+Math.sin(t)*30,145,150+Math.cos(t)*45);lookGoal.set(0,20,0);camera.position.lerp(cameraGoal,1-Math.exp(-dt*.8));camera.lookAt(lookGoal);
       }else if(mode==='dead'){
         // Slow orbit that rises around the body.
-        const a=orbitYaw+deathTime*.3,rad=4.5+deathTime*.55;cameraGoal.set(player.x+Math.sin(a)*rad,1.4+deathTime*.5,player.z+Math.cos(a)*rad);lookGoal.set(player.x,.4,player.z);camera.position.lerp(cameraGoal,.07);camera.lookAt(lookGoal);
+        const groundY=world.getElevation(player.x,player.z),a=orbitYaw+deathTime*.3,rad=4.5+deathTime*.55;cameraGoal.set(player.x+Math.sin(a)*rad,groundY+1.4+deathTime*.5,player.z+Math.cos(a)*rad);lookGoal.set(player.x,groundY+.4,player.z);camera.position.lerp(cameraGoal,.07);camera.position.y=Math.max(camera.position.y,world.getElevation(camera.position.x,camera.position.z)+.65);camera.lookAt(lookGoal);
       }else{
         const shoulder=aiming&&!player.car,radius=player.car?10.8+player.speed*.12:shoulder?5.4:7.2,height=player.car?4.8:shoulder?3.15:3.7;
         cameraOffset.set(Math.sin(orbitYaw)*radius,Math.max(2,height+(orbitPitch-.48)*8),Math.cos(orbitYaw)*radius);
         if(shoulder){cameraOffset.x+=Math.cos(orbitYaw)*.82;cameraOffset.z-=Math.sin(orbitYaw)*.82;}
-        lookGoal.set(player.x,player.car?1.2:shoulder?1.48:1.25,player.z);
+        const groundY=world.getElevation(player.x,player.z);lookGoal.set(player.x,groundY+(player.car?1.2:shoulder?1.48:1.25),player.z);
         // Look a little ahead of the travel direction and open the view with speed.
         if(player.car){const c=player.car,k=Math.min(7,player.speed*.22),hs=Math.sin(c.heading),hc=Math.cos(c.heading),vx=hs*c.speed+hc*c.lat,vz=hc*c.speed-hs*c.lat,m=Math.hypot(vx,vz)||1;lookAhead.x+=(vx/m*k-lookAhead.x)*Math.min(1,dt*3);lookAhead.z+=(vz/m*k-lookAhead.z)*Math.min(1,dt*3);}else{lookAhead.x*=Math.exp(-dt*4);lookAhead.z*=Math.exp(-dt*4);}
         lookGoal.x+=lookAhead.x;lookGoal.z+=lookAhead.z;
         const fov=55+(player.car?Math.min(13,player.speed*.4):0);if(Math.abs(camera.fov-fov)>.05){camera.fov+=(fov-camera.fov)*Math.min(1,dt*2.5);camera.updateProjectionMatrix();}
         let fraction=1;
         for(let i=1;i<=12;i++){const f=i/12,px=player.x+cameraOffset.x*f,pz=player.z+cameraOffset.z*f,py=lookGoal.y+cameraOffset.y*f;if(world.buildings.some(b=>px>b.minX-.5&&px<b.maxX+.5&&pz>b.minZ-.5&&pz<b.maxZ+.5&&py<b.height+.5)){fraction=Math.max(.15,(i-1)/12);break;}}
-        cameraGoal.copy(lookGoal).addScaledVector(cameraOffset,fraction);camera.position.lerp(cameraGoal,1-Math.exp(-dt*8));camera.lookAt(lookGoal);
+        cameraGoal.copy(lookGoal).addScaledVector(cameraOffset,fraction);cameraGoal.y=Math.max(cameraGoal.y,world.getElevation(cameraGoal.x,cameraGoal.z)+.65);camera.position.lerp(cameraGoal,1-Math.exp(-dt*8));camera.position.y=Math.max(camera.position.y,world.getElevation(camera.position.x,camera.position.z)+.65);camera.lookAt(lookGoal);
         if(shake>0&&cameraMotion){camera.position.x+=(rnd()-.5)*shake;camera.position.y+=(rnd()-.5)*shake*.6;}
       }
     }
@@ -927,10 +927,11 @@
       setHour:h=>hour=h,setRain:r=>{rain=rainTarget=r;weatherTimer=100;},crime:()=>crime('test',true),witnessCrime:()=>crime('test'),clearPolice:()=>{police.reset();peds.concat(cars).forEach(w=>w.call=null);},
       fire,resolveAim,setAimPointer,throwGrenade,explode,hurt,touch,getControls:()=>({aimPointer:{...aimPointer},orbitYaw,orbitPitch,aiming}),requestPointer,contextAction,tryCompanionRide,updateCompanionRide,getCompanionRide:()=>adultRide,setYaw:a=>orbitYaw=a,acceptJob,getJob:()=>job,getResult:()=>lastResult,openGarage,garageBuy,garageItems:()=>garageList,upgrades,VEHICLES,setCarType,setBalance:v=>{balance=v;},setReputation:v=>{reputation=v;},reload,campaign,updateCampaign,startRace,updateRace,getRoute:()=>routePoints,chooseRoute,save,progressData,
       putPedestrianAhead:()=>{const p=peds[0],c=player.car||player;p.frozen=true;p.dead=false;p.health=100;p.panic=0;p.mesh.rotation.set(0,0,0);p.x=c.x+Math.sin(c.heading)*9;p.z=c.z+Math.cos(c.heading)*9;p.speed=0;p.down=0;p.hitCooldown=0;p.mesh.position.set(p.x,world.getElevation(p.x,p.z),p.z);return {x:p.x,z:p.z};},
-      keepFocus:false,step:(seconds,dt=1/60)=>{for(let t=0;t<seconds;t+=dt)tick(dt);},press:(code,down=true)=>{if(down)keys.add(code);else keys.delete(code);},enterExit,getMode:()=>mode,skipIntro:endIntro,world,cityLife,police,player,cars,peds,renderer,scene,camera
+      keepFocus:false,step:(seconds,dt=1/60)=>{for(let t=0;t<seconds;t+=dt)tick(dt);},press:(code,down=true)=>{if(down)keys.add(code);else keys.delete(code);},enterExit,getMode:()=>mode,skipIntro:endIntro,world,cityLife,police,player,human,cars,peds,renderer,scene,camera
     };
     const params=new URLSearchParams(location.search),captureScene=params.get('capture'),acceptanceScene=params.get('acceptance');
     if(params.get('touch')==='1'&&document.body)document.body.classList.add('touch-preview');
+    if(params.get('hill')==='1'&&BN.debug){tutorialSeen=true;endIntro();play();const hill=world.hills[0];BN.debug.teleport(hill.x+hill.rx*.55,hill.z+6);BN.debug.setYaw(0);$('toast').classList.remove('show');toastTime=0;for(let i=0;i<180;i++)tick(1/60);}
     if(captureScene&&BN.debug){tutorialSeen=true;endIntro();play();if(params.get('vehicle')==='1'){BN.debug.teleport(starterCar.x,starterCar.z+3);enterExit();}$('toast').classList.remove('show');toastTime=0;const cityShot=captureScene.startsWith('city-'),islandShot=captureScene.startsWith('island-'),modelShot=captureScene.startsWith('model-'),nightShot=captureScene.includes('night');hour=nightShot?22:17.5;rain=rainTarget=(captureScene==='night'||captureScene==='island-horizon')?1:0;if(!modelShot)BN.debug.teleport(captureScene==='city-life'?-160:captureScene==='city-hill'?-275:captureScene==='city-cyclist'?-157:cityShot||islandShot?0:nightShot?280:240,captureScene==='city-life'?128:captureScene==='city-hill'?275:captureScene==='city-cyclist'?-225:cityShot||islandShot?0:nightShot?-110:80);if(cityShot||islandShot||modelShot)show('hud',false);if(captureScene==='city-cyclist')human.visible=false;for(let i=0;i<180;i++)tick(1/60);}
     if(acceptanceScene&&BN.debug){
       tutorialSeen=true;endIntro();play();BN.debug.teleport(starterCar.x,starterCar.z+3);enterExit();
