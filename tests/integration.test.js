@@ -20,7 +20,7 @@ const scope={console:{log:console.log,warn(){},error(e){fatalError=e;}},document
 scope.window=scope;vm.createContext(scope);
 vm.runInContext(fs.readFileSync(path.join(root,'vendor/three.min.js'),'utf8'),scope);
 scope.THREE.WebGLRenderer=class{constructor(){this.shadowMap={};this.info={render:{calls:0,triangles:0}};}setPixelRatio(){}setSize(){}render(scene,camera){assert.ok(Number.isFinite(camera.position.x));scene.updateMatrixWorld();}};
-for(const file of ['config','build-info','save','navigation','campaign','island','world','audio','police','city-life','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
+for(const file of ['config','build-info','save','navigation','city-systems','campaign','island','world','audio','police','city-life','main'])vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),scope,{filename:file+'.js'});
 assert.equal(fatalError,null,'initialization error');
 assert.ok(scope.BN.debug,'test helpers available');
 const d=scope.BN.debug;
@@ -128,4 +128,53 @@ test('alleys take only the narrow car, parks take only people, props are solid',
 test('losing desktop pointer lock pauses and resume captures it again',()=>{scope.document.pointerLockElement=null;listeners['document:pointerlockchange']();assert.equal(d.getState().mode,'pause');element('resume').onclick();assert.equal(d.getState().mode,'play');assert.equal(scope.document.pointerLockElement,element('game'));});
 test('focus loss pauses motion and resume restores input',()=>{down('KeyW');listeners.blur();const state=d.getState();step(.5);assert.equal(d.getState().mode,'pause');assert.equal(d.player.x,state.player.x);assert.equal(d.player.z,state.player.z);element('resume').onclick();assert.equal(d.getState().mode,'play');});
 test('world coordinates remain finite after integrated updates',()=>{d.scene.traverse(o=>{for(const v of [...o.position.toArray(),...o.scale.toArray()])assert.ok(Number.isFinite(v));});assert.equal(fatalError,null);});
+test('traffic follows the one-way graph and every street sign of the island exists',()=>{
+  const streets=d.world.streets;assert.ok(streets.stronglyConnected());d.clearPolice();step(25);
+  const traffic=d.cars.filter(c=>c.traffic&&c.nav);assert.ok(traffic.length>=10,'traffic cars on the graph: '+traffic.length);
+  for(const c of traffic){assert.ok(streets.allowed(c.nav.prev,c.nav.cur),'illegal move '+JSON.stringify([c.nav.prev,c.nav.cur]));assert.ok(Number.isFinite(c.x)&&Number.isFinite(c.z));assert.ok(!d.world.isBlocked(c.x,c.z,.5)||c.speed<1,'traffic car inside a building');}
+});
+test('lamp posts and traffic lights are solid, break at speed and the car pays for it',()=>{
+  const w=d.world;assert.ok(w.fixtures.items.length>=60,'fixtures: '+w.fixtures.items.length);
+  const lamp=w.fixtures.items.find(f=>f.kind==='lamp'&&f.state==='up'&&Math.abs(f.x)<150&&Math.abs(f.z)<150);assert.ok(lamp);
+  assert.ok(w.isBlocked(lamp.x,lamp.z,.4),'an upright post blocks');
+  if(!d.player.car){d.teleport(d.cars[0].x,d.cars[0].z+3);tap('KeyE');}
+  const car=d.player.car;assert.ok(car);const before=car.damage;
+  d.teleport(lamp.x-5,lamp.z);car.heading=Math.PI/2;car.lat=0;car.speed=16;down('KeyW');step(.55);up('KeyW');
+  assert.notEqual(lamp.state,'up','the post fell');assert.ok(car.damage>before,'minor damage');assert.ok(!w.isBlocked(lamp.x,lamp.z,.4),'a fallen post no longer blocks');
+  step(1);assert.equal(lamp.state,'down');
+});
+test('pedestrians give way without pinning the player on foot',()=>{
+  if(d.player.car){d.player.car.speed=0;tap('KeyE');}assert.ok(!d.player.car);d.clearPolice();
+  d.teleport(-9.4,-60);d.setYaw(0);const start={x:d.player.x,z:d.player.z};
+  const crowd=d.peds.slice(0,6);crowd.forEach((p,i)=>{p.dead=false;p.down=0;p.frozen=true;p.speed=0;p.x=start.x+(i%3-1)*.6;p.z=start.z-1.2-Math.floor(i/3)*.5;});
+  d.touch.y=-1;step(1.4);d.touch.y=0;
+  assert.ok(Math.hypot(d.player.x-start.x,d.player.z-start.z)>3,'moved through the crowd: '+Math.hypot(d.player.x-start.x,d.player.z-start.z));
+  assert.ok(crowd.some(p=>p.shoved>0));crowd.forEach(p=>{p.frozen=false;p.shoved=0;});
+});
+test('police roadblocks are built on free asphalt, stay passable and are dismantled',()=>{
+  const info={level:3,state:'chase',driving:true,target:{x:0,z:-100},dir:{x:0,z:1}};
+  d.roadblocks.update(.1,info);const w=d.world;assert.equal(d.roadblocks.blocks.length,1);const block=d.roadblocks.blocks[0];
+  assert.equal(w.dynamicSolids.length,4);assert.ok(w.isBlocked(block.cars[0].x,block.cars[0].z,.4));
+  assert.ok(!w.isBlocked(block.x,block.z,1.5),'the gap lets a car through');assert.ok(!w.buildings.some(b=>block.x>b.minX-2&&block.x<b.maxX+2&&block.z>b.minZ-2&&block.z<b.maxZ+2));
+  d.roadblocks.update(.1,Object.assign({},info,{level:0,state:'patrol'}));assert.equal(d.roadblocks.blocks.length,0);assert.equal(w.dynamicSolids.length,0);assert.ok(!w.isBlocked(block.cars[0].x,block.cars[0].z,.4));
+});
+test('adaptive quality steps down gradually and keeps the 28 FPS fallback',()=>{
+  const q=d.qualityCtl,cam=d.camera;assert.equal(d.getState().quality,'normal');
+  assert.equal(q.evaluate(40),1);d.applyQuality();assert.equal(d.getState().quality,'medio');assert.equal(d.renderer.shadowMap.enabled,true);assert.ok(cam.far<1350&&cam.far>650);
+  q.tier=0;q.cooldown=0;assert.equal(q.evaluate(20),2);d.applyQuality();assert.equal(d.getState().quality,'leve');assert.equal(d.renderer.shadowMap.enabled,false);assert.equal(cam.far,650);
+  step(.3);q.tier=0;d.applyQuality();assert.equal(d.getState().quality,'normal');assert.equal(cam.far,1350);assert.equal(d.renderer.shadowMap.enabled,true);
+});
+test('gamepad moves the player, adapts prompts and pauses when unplugged',()=>{
+  const buttons=Array.from({length:17},()=>({pressed:false,value:0})),pad={index:0,id:'Test Pad (Vendor: 0000)',connected:true,axes:[0,0,0,0],buttons};
+  scope.navigator={getGamepads:()=>pad.connected?[pad]:[]};
+  d.touch.y=0;if(d.player.car){d.player.car.speed=0;tap('KeyE');}assert.ok(!d.player.car);d.teleport(-9.4,-60);d.clearPolice();
+  assert.equal(d.inputMode.mode,'keyboard');pad.axes=[0,-1,0,0];const start={x:d.player.x,z:d.player.z};step(.6);
+  assert.equal(d.inputMode.mode,'gamepad');assert.ok(Math.hypot(d.player.x-start.x,d.player.z-start.z)>1.5,'stick walks');assert.ok(element('keyHints').innerHTML.includes('RT'));
+  const yaw=d.getControls().orbitYaw;pad.axes=[0,0,1,0];step(.3);assert.notEqual(d.getControls().orbitYaw,yaw,'right stick turns the camera');pad.axes=[0,0,0,0];
+  pad.axes=[.1,.1,0,0];const rest={x:d.player.x,z:d.player.z};step(.3);assert.ok(Math.hypot(d.player.x-rest.x,d.player.z-rest.z)<.2,'drift inside the dead zone is ignored');pad.axes=[0,0,0,0];
+  buttons[9]={pressed:true,value:1};step(.05);buttons[9]={pressed:false,value:0};assert.equal(d.getState().mode,'pause','START pauses');step(.05);buttons[9]={pressed:true,value:1};step(.05);buttons[9]={pressed:false,value:0};step(.05);assert.equal(d.getState().mode,'play','START resumes');
+  tap('KeyA');assert.equal(d.inputMode.mode,'keyboard');pad.axes=[0,-1,0,0];step(.05);assert.equal(d.inputMode.mode,'gamepad');pad.axes=[0,0,0,0];
+  pad.connected=false;step(.05);assert.equal(d.getState().mode,'pause','unplugging pauses a gamepad session');element('resume').onclick();step(.05);
+  assert.equal(d.getState().mode,'play');scope.navigator=undefined;
+});
 console.log(passed+' integration checks passed with a stub renderer. No visual or FPS claim.');

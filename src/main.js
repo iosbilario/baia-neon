@@ -32,7 +32,9 @@
     const cars=[],peds=[],keys=new Set();
     let mode='intro',helpReturn='menu',introTime=0,elapsed=0,hour=cfg.startHour,night=0,rain=0,rainTarget=0,weatherTimer=55;
     let orbitYaw=Math.PI,orbitPitch=.48,dragging=false,lastPointer={x:0,y:0},toastTime=0,missionIndex=0,hudTimer=0,collisionCooldown=0,footstep=0,missionCooldown=0;
-    let frameCount=0,fpsAccum=0,measuredFPS=60,quality='normal';
+    let frameCount=0,fpsAccum=0,measuredFPS=60,quality='normal',carCull=175,pedCull=110;
+    // v1.0 city systems: quality tiers, input devices, roadblocks.
+    const qualityCtl=new BN.AdaptiveQuality(),streets=world.streets;let wrongWayTime=0,missionRoute=[],missionRouteStamp=-9,missionRouteKey='';
     let deathTime=0,lastShotCrime=-99,lastHitCrime=-99,chatTimer=0,shake=0,boomTime=0,hitFlash=0,downPointer={x:0,y:0};const rnd=Math.random;
     let aiming=false,pointerPauseSuppressed=false;const mouseSensitivity=.0026,touch={x:0,y:0,primary:false,secondary:false,third:false,lookId:null,padId:null};
     const cameraGoal=new THREE.Vector3(),lookGoal=new THREE.Vector3(),cameraOffset=new THREE.Vector3(),lookAhead={x:0,z:0};
@@ -44,6 +46,18 @@
     function requestPointer(){if(mode==='play'&&!touchDevice()&&canvas.requestPointerLock&&document.pointerLockElement!==canvas){try{const result=canvas.requestPointerLock();if(result&&result.catch)result.catch(()=>{});}catch(_){}}}
     function releasePointer(){if(document.exitPointerLock&&document.pointerLockElement===canvas){pointerPauseSuppressed=true;document.exitPointerLock();}}
     function clearTouch(){touch.x=touch.y=0;touch.primary=touch.secondary=touch.third=false;touch.lookId=touch.padId=null;$('touchStick').style.transform='translate(-50%,-50%)';}
+    // ---- v1.0 input devices: keyboard, touch and gamepad share one set of adaptive prompts ----
+    let padSettings={};try{padSettings=JSON.parse(localStorage.getItem('baia-neon-gamepad')||'{}')||{};}catch(_){padSettings={};}
+    function applyPrompts(kind){if(document.body&&document.body.classList){['keyboard','touch','gamepad'].forEach(k=>document.body.classList.toggle('input-'+k,k===kind));}$('keyHints').innerHTML=BN.Prompts.hintsHtml(kind);}
+    const inputMode=new BN.InputMode(applyPrompts);
+    const gamepad=new BN.GamepadInput({getGamepads:()=>window.navigator&&window.navigator.getGamepads?window.navigator.getGamepads():[],settings:padSettings,onChange:(kind,id)=>{
+      if(kind==='connected')toast('Controle conectado · '+String(id||'gamepad').slice(0,34));
+      else{toast('Controle desconectado');if(mode==='play'&&inputMode.mode==='gamepad')setMode('pause');inputMode.note('keyboard');}
+    }});
+    gamepad.attach(window);
+    function savePadSettings(){try{localStorage.setItem('baia-neon-gamepad',JSON.stringify(gamepad.settings));}catch(_){}}
+    function padLabels(){$('toggleVibration').textContent='VIBRAÇÃO DO CONTROLE: '+(gamepad.settings.vibration?'LIGADA':'DESLIGADA');$('cycleDeadzone').textContent='ZONA MORTA DO ANALÓGICO: '+Math.round(gamepad.settings.stickDead*100)+'%';}
+    function rumble(strong,weak,ms){return gamepad.rumble(strong,weak,ms);}
     // Three cars that answer the first corner differently: grip, steering, brakes and toughness.
     const VEHICLES={
       compact:{radius:1.1,name:'MARÉ COMPACTO',accel:14,top:30,grip:9,steer:1.75,brake:5,tough:.75,scale:[1,1,1],price:0,note:'Curva rápido, cabe nas vielas, amassa fácil'},
@@ -76,17 +90,17 @@
     $('menuVersion').textContent=versionLabel;$('pauseVersion').textContent=versionLabel;$('play').innerHTML=(hasProgress?'CONTINUAR':'JOGAR')+' <span>↗</span>';
     function endIntro(){menuStats();setMode('menu');introTime=cfg.introDuration;}
     function play(){setMode('play');centerAim();requestPointer();audio.beep(587,.16);if(!tutorialSeen){tutorialSeen=true;dialogue('DORA DENDÊ · APRESENTADORA DA RÁDIO CAJU','Eu falo, você dirige. Entre no carro coral com E e me busque na Praia Aurora. M abre o mapa.');toast('O progresso é salvo automaticamente neste navegador.');save();}else toast('Progresso retomado · M abre o mapa.');updateMission();}
+    function primaryAction(){if(player.car){if(!tryCompanionRide()){audio.horn();peds.forEach(p=>{if(!p.dead&&!p.frozen&&dist(p,player)<18){p.panic=3;p.fear=null;p.cower=false;}});}}else fire();}
     function togglePause(){if(mode==='play')setMode('pause');else if(mode==='pause'){setMode('play');centerAim();requestPointer();}}
     function help(){helpReturn=mode;setMode('help');}
     function createCar(x,z,color,isTraffic=false,heading=0,owned=false,type='compact'){const mesh=BN.createCar(THREE,color,false),sc=VEHICLES[type].scale;mesh.scale.set(sc[0],sc[1],sc[2]);scene.add(mesh);mesh.position.set(x,0,z);mesh.rotation.y=heading;const c={x,z,heading,speed:0,lat:0,type,color,baseY:sc[1],mesh,traffic:isTraffic,owned,path:[],waypoint:0,damage:0,hitCooldown:0,home:{x,z,heading},wreck:false,wreckTime:0,scared:0,stuck:0,byPlayer:false};cars.push(c);return c;}
     function setCarType(c,type,color){const sc=VEHICLES[type].scale;scene.remove(c.mesh);if(color!==undefined)c.color=color;c.mesh=BN.createCar(THREE,c.color,false);c.type=type;c.baseY=sc[1];c.mesh.scale.set(sc[0],sc[1],sc[2]);c.mesh.position.set(c.x,0,c.z);c.mesh.rotation.y=c.heading;scene.add(c.mesh);}
     const starterCar=createCar(5.7,14,0xe98668,false,0,true,VEHICLES[saved.car]&&garageOwned.has(saved.car)?saved.car:'compact');
     createCar(-9,84,0x9bc5b1,false,Math.PI/2,false,'sedan');createCar(244,14,0xf1cc78,false,0,false,'sport');createCar(-154,-10,0xa9b7cf,false,0);
+    // Traffic follows the directed street graph: one-way streets are respected and turns are picked at every crossing.
     for(let i=0;i<cfg.traffic;i++){
-      const r=world.roads,ix=Math.floor(rand()*5),iz=Math.floor(rand()*5),ax=r[ix],bx=r[ix+1+Math.floor(rand()*Math.min(2,6-ix))],az=r[iz],bz=r[iz+1+Math.floor(rand()*Math.min(2,6-iz))];
-      const route=[{x:ax+2.6,z:az+2.6},{x:bx-2.6,z:az+2.6},{x:bx-2.6,z:bz-2.6},{x:ax+2.6,z:bz-2.6}];
-      const start=route[i%4],c=createCar(start.x,start.z,[0xf1d3a0,0x5d8d8a,0xb27d81,0xdedbc5,0x5d6d89][i%5],true,0,false,i%3===1?'sedan':'compact');
-      c.path=route;c.waypoint=(i+1)%4;c.speed=8+rand()*4;c.heading=Math.atan2(route[c.waypoint].x-c.x,route[c.waypoint].z-c.z);
+      const nav=streets.spawnNav(i,rand),c=createCar(nav.start.x,nav.start.z,[0xf1d3a0,0x5d8d8a,0xb27d81,0xdedbc5,0x5d6d89][i%5],true,0,false,i%3===1?'sedan':'compact');
+      c.nav=nav;c.path=[nav.waypoint];c.waypoint=0;c.speed=8+rand()*4;c.heading=Math.atan2(nav.waypoint.x-c.x,nav.waypoint.z-c.z);
     }
     // Parked cars line the curbs mid-block, away from crossings and the canal.
     for(let i=0,made=0;i<120&&made<28;i++){
@@ -114,6 +128,7 @@
     }
     let ending='dead';
     function endScene(kind,title,cause){
+      roadblocks.clear('ended');
       // Nothing from the lost run may follow the player to the respawn.
       peds.concat(cars).forEach(w=>w.call=null);callers=[];grenades.forEach(g=>{g.t=0;g.m.visible=false;});
       police.units.forEach(u=>{u.foot=false;u.back=false;if(u.officer)u.officer.visible=false;});
@@ -127,6 +142,20 @@
     }
     const police=new BN.Police(world,()=>{const mesh=BN.createCar(THREE,0xe7eee7,true);scene.add(mesh);return mesh;},caught,toast);
     const cityLife=BN.createCityLife(THREE,scene,world,toast);
+    // Roadblocks: two cruisers laid across a street ahead of a hot chase, with a gap a car can pass through.
+    const roadblockMeshes=new Map();
+    const roadblocks=new BN.RoadblockManager(world,{
+      build:b=>{
+        const meshes=b.cars.map(car=>{const mesh=BN.createCar(THREE,0xe7eee7,true);mesh.position.set(car.x,0,car.z);mesh.rotation.y=car.heading+(car.side>0?Math.PI:0);scene.add(mesh);return mesh;});
+        roadblockMeshes.set(b.id,meshes);toast('Bloqueio policial à frente · há espaço para desviar');
+      },
+      remove:b=>{(roadblockMeshes.get(b.id)||[]).forEach(m=>scene.remove(m));roadblockMeshes.delete(b.id);}
+    });
+    function updateRoadblocks(dt){
+      const car=player.car,dir=car?{x:Math.sin(car.heading),z:Math.cos(car.heading)}:(police.lastDir||{x:0,z:1});
+      roadblocks.update(dt,{level:police.level,state:police.state,driving:Boolean(car),target:player,dir});
+      for(const [id,meshes] of roadblockMeshes)meshes.forEach((m,i)=>{m.visible=dist(m.position,player)<carCull;(m.userData.lights||[]).forEach((l,j)=>{if(l.material)l.material.emissiveIntensity=Math.sin(elapsed*16+j*Math.PI+i)>0?4:.1;});});
+    }
     function contextAction(){if(nearGarage()){openGarage();return;}if(!player.car&&cityLife.interact(player))return;enterExit();}
     function tryCompanionRide(){
       if(!player.car||adultRide)return false;
@@ -213,6 +242,12 @@
         if(Math.abs(dx*cs-dz*sn)<1.03+r&&Math.abs(dx*sn+dz*cs)<2.15+r)return c;
       }
       return null;
+    }
+    // Pedestrians give way: they are shoved aside and the player only gets a light nudge, so a crowd never pins anyone.
+    const crowd=[];
+    function softCrowd(){
+      crowd.length=0;for(const p of peds)if(!p.dead&&p.down<=0&&Math.abs(p.x-player.x)<1.4&&Math.abs(p.z-player.z)<1.4)crowd.push(p);
+      return crowd.length?BN.softPush(player,crowd,{actorRadius:.42,otherRadius:.4,canMove:(x,z,r)=>!world.isBlocked(x,z,r)&&!carAt(x,z,r,null)}):0;
     }
     function walkPlayer(nx,nz){
       const r=.42,inside=carAt(player.x,player.z,r);
@@ -393,11 +428,11 @@
       world.update(dt,{time:elapsed,night,rain,focus:player});
     }
     function updatePlayer(dt){
-      collisionCooldown=Math.max(0,collisionCooldown-dt);player.invincible=Math.max(0,player.invincible-dt);if(touchDevice())aiming=!player.car&&touch.third;
+      collisionCooldown=Math.max(0,collisionCooldown-dt);player.invincible=Math.max(0,player.invincible-dt);if(touchDevice())aiming=!player.car&&touch.third;else if(inputMode.mode==='gamepad')aiming=!player.car&&gamepad.state.brake>.4;
       const keyboardF=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0),keyboardSide=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0);
-      const f=clamp(keyboardF+(player.car?(touch.primary?1:0)-(touch.secondary?1:0):-touch.y),-1,1),side=clamp(keyboardSide+touch.x,-1,1);
+      const g=gamepad.state,f=clamp(keyboardF+(player.car?(touch.primary?1:0)-(touch.secondary?1:0)+g.throttle-g.brake:-touch.y-g.move.y),-1,1),side=clamp(keyboardSide+touch.x+g.move.x,-1,1);
       if(player.car){
-        const c=player.car,v=VEHICLES[c.type],brake=keys.has('Space')||touch.third;
+        const c=player.car,v=VEHICLES[c.type],brake=keys.has('Space')||touch.third||Boolean(g.down.handbrake);
         // Wet asphalt costs traction, braking and grip. Rain tires recover most of it.
         const wet=rain*(upgrades.tires?.15:.5);
         c.speed+=f*v.accel*(upgrades.cargo?.92:1)*(1-wet*.45)*dt;
@@ -415,7 +450,14 @@
         c.speed=fwd;c.lat=lat*Math.exp(-v.grip*(1-wet)*(brake?.2:1)*dt);
         c.speed*=Math.exp(-Math.abs(c.lat)*.035*dt);
         const hs=Math.sin(c.heading),hc=Math.cos(c.heading),ox=c.x,oz=c.z;
-        const hit=attemptMove(c,c.x+(hs*c.speed+hc*c.lat)*dt,c.z+(hc*c.speed-hs*c.lat)*dt,v.radius);
+        const vx=hs*c.speed+hc*c.lat,vz=hc*c.speed-hs*c.lat;
+        // Lamp posts and traffic lights fall over when hit fast enough. Slow contact still stops the car.
+        for(const post of world.fixtures.impact(c.x+vx*dt,c.z+vz*dt,v.radius,Math.hypot(c.speed,c.lat),vx,vz)){
+          c.damage+=post.damage/v.tough;c.speed*=post.drag;sparks(post.x,post.z,6);audio.impact();rumble(.45,.7,110);cargoLoss(post.damage);
+        }
+        if(streets.isWrongWay(c.x,c.z,c.heading)&&c.speed>5){wrongWayTime+=dt;if(wrongWayTime>2){wrongWayTime=-12;toast('Contramão · esta rua é de sentido único');}}
+        else wrongWayTime=wrongWayTime>0?0:Math.min(0,wrongWayTime+dt);
+        const hit=attemptMove(c,c.x+vx*dt,c.z+vz*dt,v.radius);
         if(hit&&v.radius>1.2&&elapsed-alleyHint>12&&world.alleys.some(a=>Math.abs(c.x-a.x)<6&&Math.abs(Math.abs(c.z-a.z)-18)<5)){alleyHint=elapsed;toast('Largo demais para a viela. Só o compacto passa.');}
         if(Math.abs(c.lat)>5){
           // Tire smoke and a shaken cargo while the car is sideways.
@@ -434,10 +476,11 @@
         (c.mesh.userData.wheels||[]).forEach(w=>w.rotation.x+=c.speed*dt*2);
       }else{
         const stunned=player.stun>0;player.stun=Math.max(0,player.stun-dt);
-        const input=stunned?0:Math.hypot(side,f),speed=keys.has('ShiftLeft')||keys.has('ShiftRight')||touch.secondary?cfg.runSpeed:cfg.walkSpeed;
+        const input=stunned?0:Math.hypot(side,f),speed=keys.has('ShiftLeft')||keys.has('ShiftRight')||touch.secondary||g.down.handbrake?cfg.runSpeed:cfg.walkSpeed;
         const previousX=player.x,previousZ=player.z;let dx=0,dz=0;
         if(input){dx=(-Math.sin(orbitYaw)*f+Math.cos(orbitYaw)*side)/input;dz=(-Math.cos(orbitYaw)*f-Math.sin(orbitYaw)*side)/input;walkPlayer(player.x+dx*speed*dt,player.z+dz*speed*dt);if(player.aimTime<=0)player.heading=Math.atan2(dx,dz);}
         if(!input&&carAt(player.x,player.z,.42))walkPlayer(player.x,player.z);
+        softCrowd();
         player.speed=dt>0?Math.hypot(player.x-previousX,player.z-previousZ)/dt:0;const groundY=world.getElevation(player.x,player.z);human.position.set(player.x,groundY,player.z);human.rotation.y=player.heading;
         animateHuman(human,elapsed*speed*1.7,input?.45:0);footstep-=dt;
         player.fireCooldown=Math.max(0,player.fireCooldown-dt);player.aimTime=Math.max(0,player.aimTime-dt);
@@ -483,7 +526,7 @@
     const burnt=new THREE.MeshStandardMaterial({color:0x151617,roughness:1}),wrecks=[];
     const gun=new THREE.Mesh(new THREE.BoxGeometry(.08,.15,.34),new THREE.MeshStandardMaterial({color:0x1b1d22,roughness:.5}));gun.position.set(0,-.58,.12);human.userData.arms[1].add(gun);
     const grenades=Array.from({length:3},()=>{const m=new THREE.Mesh(new THREE.SphereGeometry(.17,8,6),new THREE.MeshStandardMaterial({color:0x2c3a2a}));m.visible=false;scene.add(m);return {m,t:0};});
-    function hurt(amount,cause){if(mode!=='play'||amount<=0)return;player.health-=amount;player.cause=cause;hitFlash=.35;}
+    function hurt(amount,cause){if(mode!=='play'||amount<=0)return;player.health-=amount;player.cause=cause;hitFlash=.35;rumble(clamp(amount/18,.25,1),clamp(amount/28,.15,.8),clamp(amount*14,90,380));}
     // Gunfire and blasts scare people and drivers around the source.
     function alarm(at,radius){
       for(const p of peds){if(p.dead||p.frozen||dist(p,at)>radius)continue;p.panic=6+rnd()*5;p.fear={x:at.x,z:at.z};p.cower=rnd()<.2;p.chat=0;p.wait=0;}
@@ -633,11 +676,11 @@
           c.speed+=clamp(target-c.speed,-13*dt,5*dt);
           const step=Math.min(Math.max(0,c.speed)*dt,length);
           if(length>.1){c.x+=hx*step;c.z+=hz*step;c.heading=Math.atan2(dx,dz);}
-          if(length<2)c.waypoint=(c.waypoint+1)%c.path.length;
+          if(length<2&&c.nav){streets.advance(c.nav,rand);c.path=[c.nav.waypoint];c.waypoint=0;}
           c.mesh.position.set(c.x,0,c.z);c.mesh.rotation.y=c.heading;
           (c.mesh.userData.wheels||[]).forEach(w=>w.rotation.x+=c.speed*dt*2);
         }
-        c.mesh.visible=mode==='intro'||mode==='menu'||dist(c,player)<175||c===player.car;
+        c.mesh.visible=mode==='intro'||mode==='menu'||dist(c,player)<carCull||c===player.car;
         if(interactive&&c!==player.car&&dist(c,player)<(player.car?2.8:2.1)&&c.hitCooldown===0){
           if(player.car){
             const v=Math.abs(player.car.speed);
@@ -657,7 +700,7 @@
       for(const p of peds){
         p.hitCooldown=Math.max(0,p.hitCooldown-dt);p.panic=Math.max(0,p.panic-dt);p.chatCd-=dt;p.turnCd-=dt;
         const far=dist(p,player);
-        p.mesh.visible=mode==='intro'||mode==='menu'||far<110;
+        p.mesh.visible=mode==='intro'||mode==='menu'||far<pedCull;
         if(p.dead){p.deadTime-=dt;if(p.deadTime<=0&&far>70){p.dead=false;p.health=100;p.mesh.rotation.set(0,0,0);placePed(p,true);}continue;}
         if(p.down>0){p.down-=dt;p.mesh.rotation.z=Math.PI/2;p.mesh.position.set(p.x,world.getElevation(p.x,p.z)+.4,p.z);if(p.down<=0){p.mesh.rotation.z=0;p.mesh.position.y=world.getElevation(p.x,p.z);p.panic=Math.max(p.panic,5);p.fear=null;p.cower=false;}}
         else{
@@ -779,6 +822,9 @@
       ctx.fillStyle='#3f7a5a';world.parks.forEach(p=>ctx.fillRect(px(p.x-26),pz(p.z-27),52*sx,54*sz));
       ctx.fillStyle='#405957';world.buildings.forEach(b=>ctx.fillRect(px(b.minX),pz(b.minZ),(b.maxX-b.minX)*sx,(b.maxZ-b.minZ)*sz));
       ctx.strokeStyle='#e7b53c';ctx.lineWidth=large?3:1.4;world.alleys.forEach(a=>{ctx.beginPath();ctx.moveTo(px(a.x),pz(a.z-a.half));ctx.lineTo(px(a.x),pz(a.z+a.half));ctx.stroke();});
+      // Arrows on one-way streets, then the mission GPS under the player-chosen route.
+      ctx.fillStyle='#c9d6cf';world.roads.forEach((r,i)=>{[['x',streets.dirX(i)],['z',streets.dirZ(i)]].forEach(([axis,d])=>{if(!d)return;for(let j=0;j<world.roads.length-1;j++){const mid=(world.roads[j]+world.roads[j+1])/2,x=axis==='x'?r:mid,z=axis==='x'?mid:r,k=large?7:3.2,ax=axis==='x'?0:d,az=axis==='x'?d:0;ctx.beginPath();ctx.moveTo(px(x)+ax*k,pz(z)+az*k);ctx.lineTo(px(x)-ax*k-az*k*.8,pz(z)-az*k-ax*k*.8);ctx.lineTo(px(x)-ax*k+az*k*.8,pz(z)-az*k+ax*k*.8);ctx.closePath();ctx.fill();}});});
+      if(missionRoute.length>1&&!routePoints.length){ctx.strokeStyle='#8de3cf99';ctx.lineWidth=large?5:2.4;ctx.lineJoin='round';ctx.setLineDash&&ctx.setLineDash([large?10:5,large?7:4]);ctx.beginPath();missionRoute.forEach((p,i)=>i?ctx.lineTo(px(p.x),pz(p.z)):ctx.moveTo(px(p.x),pz(p.z)));ctx.stroke();ctx.setLineDash&&ctx.setLineDash([]);}
       if(routePoints.length>1){ctx.strokeStyle='#8de3cf';ctx.lineWidth=large?7:3;ctx.lineJoin='round';ctx.beginPath();routePoints.forEach((p,i)=>i?ctx.lineTo(px(p.x),pz(p.z)):ctx.moveTo(px(p.x),pz(p.z)));ctx.stroke();}
       if(police.level>0){ctx.fillStyle='#e1876c22';ctx.beginPath();ctx.arc(px(police.lastSeen.x),pz(police.lastSeen.z),40*Math.min(sx,sz),0,Math.PI*2);ctx.fill();}
       if(police.state==='search')police.units.forEach(p=>{if(!p.respond)return;const x=p.foot?p.fx:p.x,z=p.foot?p.fz:p.z,a=Math.PI/2-(p.foot?p.fh:p.heading);ctx.fillStyle='#6fb6ff55';ctx.beginPath();ctx.moveTo(px(x),pz(z));ctx.arc(px(x),pz(z),45*Math.min(sx,sz),a-1.05,a+1.05);ctx.closePath();ctx.fill();});
@@ -789,10 +835,17 @@
       ctx.save();ctx.translate(px(player.x),pz(player.z));ctx.rotate(-player.heading);ctx.fillStyle='#fff1cf';ctx.beginPath();ctx.moveTo(0,large?10:5);ctx.lineTo(large?-7:-3.5,large?-7:-3.5);ctx.lineTo(large?7:3.5,large?-7:-3.5);ctx.closePath();ctx.fill();ctx.restore();
       if(large){ctx.fillStyle='#fff1cf';ctx.font='bold 15px sans-serif';ctx.fillText('CENTRO SOLAR',px(-190),pz(-245));ctx.fillText('CANAL DAS GARÇAS',px(92),pz(270));ctx.fillText('PRAIA AURORA',px(205),pz(-250));}ctx.restore();
     }
+    // GPS for the current mission follows the one-way graph. It refreshes only when the target moves or every two seconds.
+    function updateMissionRoute(){
+      const m=target();if(!m||mode!=='play'){missionRoute=[];missionRouteKey='';return;}
+      const key=Math.round(m.x)+':'+Math.round(m.z);
+      if(key===missionRouteKey&&elapsed-missionRouteStamp<2)return;
+      missionRouteKey=key;missionRouteStamp=elapsed;missionRoute=BN.Navigation.route(player,m,world.roads,streets);
+    }
     function drawMap(){paintMap(map,false);}
     function drawLargeMap(){paintMap(largeMap,true);}
     function openMap(){if(!['play','pause'].includes(mode))return;mapReturn=mode==='pause'?'pause':'play';setMode('map');drawLargeMap();}
-    function chooseRoute(x,z){const safe=world.island.clampPoint(clamp(x,-295,295),clamp(z,-295,295),4);routeDestination=safe;routePoints=BN.Navigation.route(player,routeDestination,world.roads);toast('Destino marcado · rota pelas ruas e pontes');drawLargeMap();}
+    function chooseRoute(x,z){const safe=world.island.clampPoint(clamp(x,-295,295),clamp(z,-295,295),4);routeDestination=safe;routePoints=BN.Navigation.route(player,routeDestination,world.roads,streets);toast('Destino marcado · rota pelas ruas e pontes');drawLargeMap();}
     function updateHud(){
       $('district').textContent=world.getDistrict?world.getDistrict(player.x,player.z):'Baía Neon';
       $('clock').textContent=String(Math.floor(hour)).padStart(2,'0')+'h'+String(Math.floor(hour%1*60)).padStart(2,'0')+' · '+(rain>.35?'Chuva tropical':night>.5?'Noite na baía':'Céu aberto');
@@ -815,7 +868,7 @@
       if(!player.car&&(cityLife.cyclists.some(c=>c.down<=0&&c.group.visible&&dist(c,player)<3.2)||cityLife.actors.some(a=>a.mesh.visible&&a.state==='idle'&&dist(a,player)<2.8)))interaction='E para conversar';
       if(adultRide)interaction=player.car&&player.speed<1?'Procure um estacionamento ou a praia':'Companhia a bordo';
       if(nearGarage())interaction='ENTER para abrir a oficina';
-      show('interaction',Boolean(interaction));$('interaction').textContent=interaction;drawMap();
+      show('interaction',Boolean(interaction));$('interaction').textContent=BN.Prompts.localize(interaction,inputMode.mode);updateMissionRoute();drawMap();
     }
     function download(name,blob){const link=document.createElement('a'),url=URL.createObjectURL(blob);link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
     function exportSave(){download('baia-neon-progresso-v'+cfg.version+'.json',new Blob([BN.Save.exportProgress(progressData(),build)],{type:'application/json'}));toast('Progresso exportado. Guarde o arquivo em local seguro.');}
@@ -833,6 +886,7 @@
     $('closeHelp').onclick=()=>{setMode(helpReturn);if(helpReturn==='play'){centerAim();requestPointer();}};$('sound').onclick=()=>{$('sound').textContent=audio.toggle()?'SOM LIGADO':'SOM DESLIGADO';};
     window.addEventListener('keydown',e=>{
       if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
+      inputMode.note('keyboard');
       if(e.repeat){if(mode==='play')keys.add(e.code);return;}
       if(e.code==='Escape'){if(mode==='intro')endIntro();else if(mode==='help'){setMode(helpReturn);if(helpReturn==='play'){centerAim();requestPointer();}}else if(mode==='garage'){setMode('play');centerAim();requestPointer();}else if(mode==='map'){setMode(mapReturn);if(mapReturn==='play'){centerAim();requestPointer();}}else if(mode==='photo')closePhoto();else togglePause();return;}
       if(mode==='photo'){if(e.code==='KeyP')closePhoto();if(e.code==='ArrowLeft')orbitYaw+=.12;if(e.code==='ArrowRight')orbitYaw-=.12;if(e.code==='ArrowUp')orbitPitch=clamp(orbitPitch-.08,.1,1.1);if(e.code==='ArrowDown')orbitPitch=clamp(orbitPitch+.08,.1,1.1);return;}
@@ -849,10 +903,14 @@
       if(/^Digit[1-3]$/.test(e.code))acceptJob(Number(e.code.slice(5))-1);
       if(e.code==='KeyT'){rainTarget=rainTarget>.5?0:1;weatherTimer=90;toast(rainTarget?'Chuva a caminho · Aderência reduzida':'O céu começa a abrir');}
       if(e.code==='KeyN'){hour=night>.5?12:22;toast(hour===22?'A noite chegou à baía':'Manhã aberta na cidade');}
-      if(e.code==='KeyF'){if(player.car){if(!tryCompanionRide()){audio.horn();peds.forEach(p=>{if(!p.dead&&!p.frozen&&dist(p,player)<18){p.panic=3;p.fear=null;p.cower=false;}});}}else fire();}
+      if(e.code==='KeyF')primaryAction();
       if(e.code==='KeyG')throwGrenade();
     });
+    $('toggleVibration').onclick=()=>{gamepad.configure({vibration:!gamepad.settings.vibration});savePadSettings();padLabels();rumble(.5,.5,150);};
+    $('cycleDeadzone').onclick=()=>{const steps=[.1,.15,.2,.25,.3],next=steps.find(v=>v>gamepad.settings.stickDead+.001)||steps[0];gamepad.configure({stickDead:next,lookDead:next});savePadSettings();padLabels();};
+    applyPrompts('keyboard');padLabels();applyQuality();
     window.addEventListener('keyup',e=>keys.delete(e.code));
+    window.addEventListener('pointerdown',e=>inputMode.note(e&&e.pointerType==='touch'?'touch':'keyboard'),true);
     window.addEventListener('blur',()=>{if(BN.debug&&BN.debug.keepFocus)return;keys.clear();clearTouch();dragging=false;if(mode==='play')setMode('pause');});
     document.addEventListener('visibilitychange',()=>{if(BN.debug&&BN.debug.keepFocus)return;if(document.hidden&&mode==='play')setMode('pause');});
     document.addEventListener('pointerlockchange',()=>{if(pointerPauseSuppressed){pointerPauseSuppressed=false;return;}if(!touchDevice()&&mode==='play'&&document.pointerLockElement!==canvas)setMode('pause');});
@@ -876,10 +934,44 @@
     window.addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();centerAim();});
     centerAim();
     let previous=performance.now();camera.position.set(390,110,230);show('loading',false);setMode('intro');
+    // Gamepad: sticks and triggers are read inside updatePlayer; buttons and the camera stick are handled here.
+    function pollGamepad(dt){
+      const g=gamepad.poll();if(!g.connected)return;
+      if(g.active)inputMode.note('gamepad');
+      const p=g.pressed;
+      if(mode==='intro'){if(p.interact||p.pause)endIntro();}
+      else if(mode==='menu'){if(p.interact||p.pause)play();}
+      else if(mode==='play'){
+        if(p.pause){togglePause();return;}
+        const speed=gamepad.settings.lookSpeed;
+        if(g.look.x||g.look.y){orbitYaw-=g.look.x*speed*dt;orbitPitch=clamp(orbitPitch+g.look.y*speed*.72*dt,.1,1.1);dragging=false;}
+        if(p.interact)contextAction();
+        if(p.map)openMap();
+        if(p.retry)applyCampaignEvent(campaign.retry());
+        if(p.fire||(p.rt&&!player.car))primaryAction();
+        if(p.reload)reload();
+        if(p.grenade)throwGrenade();
+        if(p.left)acceptJob(0);if(p.up)acceptJob(1);if(p.right)acceptJob(2);
+        if(p.down)startRace();
+      }
+      else if(mode==='pause'){if(p.pause||p.handbrake)togglePause();}
+      else if(mode==='map'){if(p.handbrake||p.map||p.pause)$('closeMap').onclick();}
+      else if(mode==='garage'){if(p.handbrake||p.pause)$('closeGarage').onclick();}
+      else if(mode==='help'){if(p.handbrake||p.interact||p.pause)$('closeHelp').onclick();}
+      else if(mode==='photo'){if(p.handbrake||p.pause)closePhoto();}
+    }
+    function applyQuality(){
+      const t=qualityCtl.current,shadowsChanged=renderer.shadowMap.enabled!==t.shadows;
+      quality=t.id;renderer.setPixelRatio(Math.min(devicePixelRatio||1,t.pixelRatio,cfg.pixelRatioCap));renderer.shadowMap.enabled=t.shadows;
+      if(sun.shadow.mapSize.x!==t.shadowSize){sun.shadow.mapSize.set(t.shadowSize,t.shadowSize);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}}
+      if(shadowsChanged)scene.traverse(o=>{const m=o.material;if(m)(Array.isArray(m)?m:[m]).forEach(x=>{x.needsUpdate=true;});});
+      camera.far=t.far;camera.updateProjectionMatrix();scene.fog.far=t.fogFar;carCull=t.carCull;pedCull=t.pedCull;world.setDetail(t);
+    }
     function frame(now){
       const dt=clamp((now-previous)/1000,0,.05);previous=now;tick(dt);requestAnimationFrame(frame);
     }
     function tick(dt){
+      pollGamepad(dt);
       // Death plays in slow motion before the hospital respawn.
       if(mode==='dead'){
         deathTime+=dt;dt*=.3;const g=smooth(0,1.3,deathTime),k=smooth(.9,1.7,deathTime);
@@ -898,7 +990,7 @@
           updatePlayer(dt);
           // Description of the suspect: swapping or leaving the car unseen leaves the police looking for the old one.
           if(police.level>0){if(police.visible)knownCar=player.car;else if(player.car!==knownCar&&!police.disguise){police.disguise=true;toast(knownCar?'Ninguém viu a troca. A polícia ainda procura o veículo anterior.':'Ninguém viu você entrar no carro. A polícia procura alguém a pé.');}}
-          police.update(dt,player,player.speed);updateTraffic(dt,true);updatePeds(dt,true);cityLife.update(dt,{time:elapsed,focus:player,night,rain});
+          police.update(dt,player,player.speed);updateRoadblocks(dt);updateTraffic(dt,true);updatePeds(dt,true);cityLife.update(dt,{time:elapsed,focus:player,night,rain});
           const urbanHit=cityLife.checkVehicleHit(player.car,player.speed);if(urbanHit&&collisionCooldown===0){player.car.damage+=6;player.car.speed*=.55;collisionCooldown=1.5;audio.impact();crime('hit_and_run');toast(urbanHit.kind==='cyclist'?'Ciclista atropelado · uma testemunha pediu socorro':'Pessoa atingida perto do parque');}
           policeFire(dt);updateCalls(dt);updateOfficers();updateCash(dt);
           for(const p of police.units.slice()){
@@ -917,7 +1009,7 @@
       if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('toast').classList.remove('show');}
       if(dialogueTime>0){dialogueTime-=dt;if(dialogueTime<=0)show('dialogue',false);}
       renderer.render(scene,camera);
-      frameCount++;fpsAccum+=dt;if(fpsAccum>3){measuredFPS=frameCount/fpsAccum;frameCount=0;fpsAccum=0;if(measuredFPS<28&&quality==='normal'){renderer.setPixelRatio(1);renderer.shadowMap.enabled=false;quality='leve';}}
+      frameCount++;fpsAccum+=dt;if(fpsAccum>3){measuredFPS=frameCount/fpsAccum;frameCount=0;fpsAccum=0;const changed=qualityCtl.evaluate(measuredFPS);if(changed!==null)applyQuality();}
     }
     requestAnimationFrame(frame);
     // Development helpers are exposed only for local acceptance runs.
@@ -927,7 +1019,7 @@
       setHour:h=>hour=h,setRain:r=>{rain=rainTarget=r;weatherTimer=100;},crime:()=>crime('test',true),witnessCrime:()=>crime('test'),clearPolice:()=>{police.reset();peds.concat(cars).forEach(w=>w.call=null);},
       fire,resolveAim,setAimPointer,throwGrenade,explode,hurt,touch,getControls:()=>({aimPointer:{...aimPointer},orbitYaw,orbitPitch,aiming}),requestPointer,contextAction,tryCompanionRide,updateCompanionRide,getCompanionRide:()=>adultRide,setYaw:a=>orbitYaw=a,acceptJob,getJob:()=>job,getResult:()=>lastResult,openGarage,garageBuy,garageItems:()=>garageList,upgrades,VEHICLES,setCarType,setBalance:v=>{balance=v;},setReputation:v=>{reputation=v;},reload,campaign,updateCampaign,startRace,updateRace,getRoute:()=>routePoints,chooseRoute,save,progressData,
       putPedestrianAhead:()=>{const p=peds[0],c=player.car||player;p.frozen=true;p.dead=false;p.health=100;p.panic=0;p.mesh.rotation.set(0,0,0);p.x=c.x+Math.sin(c.heading)*9;p.z=c.z+Math.cos(c.heading)*9;p.speed=0;p.down=0;p.hitCooldown=0;p.mesh.position.set(p.x,world.getElevation(p.x,p.z),p.z);return {x:p.x,z:p.z};},
-      keepFocus:false,step:(seconds,dt=1/60)=>{for(let t=0;t<seconds;t+=dt)tick(dt);},press:(code,down=true)=>{if(down)keys.add(code);else keys.delete(code);},enterExit,getMode:()=>mode,skipIntro:endIntro,world,cityLife,police,player,human,cars,peds,renderer,scene,camera
+      gamepad,inputMode,qualityCtl,roadblocks,streets,applyQuality,pollGamepad,softCrowd,keepFocus:false,step:(seconds,dt=1/60)=>{for(let t=0;t<seconds;t+=dt)tick(dt);},press:(code,down=true)=>{if(down)keys.add(code);else keys.delete(code);},enterExit,getMode:()=>mode,skipIntro:endIntro,world,cityLife,police,player,human,cars,peds,renderer,scene,camera
     };
     const params=new URLSearchParams(location.search),captureScene=params.get('capture'),acceptanceScene=params.get('acceptance');
     if(params.get('touch')==='1'&&document.body)document.body.classList.add('touch-preview');

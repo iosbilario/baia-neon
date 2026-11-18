@@ -163,6 +163,29 @@
     // Small solid objects (trunks, benches, fountains) live in a coarse grid so the check stays cheap.
     const props=new Map();
     function prop(x,z,r,kind='prop'){const item={x,z,r,kind};solidProps.push(item);const key=Math.floor(x/16)*1000+Math.floor(z/16);if(!props.has(key))props.set(key,[]);props.get(key).push(item);}
+    // v1.0: breakable street furniture lives in its own tiny instanced meshes so a post can fall without rebuilding the city batches.
+    const fixtures=new BN.FixtureRegistry(),fixtureDefs=new Map(),dynamicSolids=[],streets=new BN.Streets(roads,(BN.CONFIG&&BN.CONFIG.oneWay)||{});
+    function addFixture(kind,x,z,parts){
+      const f=fixtures.add(x,z,kind);
+      f.parts=parts.map(p=>{
+        if(!fixtureDefs.has(p.id))fixtureDefs.set(p.id,{geo:p.geo,mat:p.mat,count:0,mesh:null});
+        const def=fixtureDefs.get(p.id),index=def.count++,o=new T.Object3D();
+        o.position.set(p.x,p.y,p.z);o.rotation.set(0,p.ry||0,0);o.scale.set(p.sx,p.sy,p.sz);o.updateMatrix();
+        return {def,index,local:o.matrix.clone()};
+      });
+      return f;
+    }
+    const fxBase=new T.Matrix4(),fxRot=new T.Matrix4(),fxQuat=new T.Quaternion(),fxAxis=new T.Vector3(),fxOut=new T.Matrix4();
+    function syncFixture(f){
+      const angle=fixtures.angle(f);
+      fxBase.makeTranslation(f.x,0,f.z);
+      if(angle>0){fxAxis.set(f.dirZ,0,-f.dirX);fxQuat.setFromAxisAngle(fxAxis,angle);fxRot.makeRotationFromQuaternion(fxQuat);}else fxRot.identity();
+      for(const part of f.parts){fxOut.copy(fxBase).multiply(fxRot).multiply(part.local);if(part.def.mesh){part.def.mesh.setMatrixAt(part.index,fxOut);part.def.mesh.instanceMatrix.needsUpdate=true;}}
+    }
+    function buildFixtureMeshes(){
+      for(const def of fixtureDefs.values()){const mesh=new T.InstancedMesh(def.geo,def.mat,def.count);mesh.frustumCulled=false;mesh.castShadow=true;mesh.receiveShadow=true;def.mesh=mesh;scene.add(mesh);}
+      fixtures.items.forEach(syncFixture);
+    }
     let seed=631842;
     function rand(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;}
     const bounds={minX:-300,maxX:300,minZ:-300,maxZ:300};
@@ -203,10 +226,23 @@
       box(trunk,x-dx,base+1.1,z-dz,2.7,.70,.14,angle);
       for(const s of [-1,1])box(material(0x314b52),x+Math.cos(angle)*s,base+.30,z-Math.sin(angle)*s,.14,.6,.6,angle);
     }
-    function lamp(x,z,ang=0){
-      inst(k.cylinder,material(0x34515b),x,3.7,z,.09,7.4,.09);
-      box(material(0x34515b),x+Math.sin(ang)*.7,7.35,z+Math.cos(ang)*.7,.12,.12,1.5,ang);
-      box(lightMat,x+Math.sin(ang)*1.3,7.25,z+Math.cos(ang)*1.3,.8,.15,.7,ang);
+    const poleMat=material(0x34515b),sigPoleMat=material(0x36565a),sigBodyMat=material(0x203d45);
+    function fixtureLamp(x,z,ang=0){
+      const sn=Math.sin(ang),cs=Math.cos(ang);
+      addFixture('lamp',x,z,[
+        {id:'lamp-pole',geo:k.cylinder,mat:poleMat,x:0,y:3.7,z:0,sx:.09,sy:7.4,sz:.09},
+        {id:'lamp-arm',geo:k.box,mat:poleMat,x:sn*.7,y:7.35,z:cs*.7,sx:.12,sy:.12,sz:1.5,ry:ang},
+        {id:'lamp-head',geo:k.box,mat:lightMat,x:sn*1.3,y:7.25,z:cs*1.3,sx:.8,sy:.15,sz:.7,ry:ang}
+      ]);
+    }
+    function fixtureSignal(x,z,s){
+      addFixture('signal',x,z,[
+        {id:'sig-pole',geo:k.box,mat:sigPoleMat,x:0,y:2.1,z:0,sx:.18,sy:4.2,sz:.18},
+        {id:'sig-body-a',geo:k.box,mat:sigBodyMat,x:0,y:4.3,z:0,sx:.45,sy:.8,sz:.36},
+        {id:'sig-lamp-v',geo:k.box,mat:trafficVertical,x:0,y:4.3,z:s*.19,sx:.24,sy:.24,sz:.035},
+        {id:'sig-body-b',geo:k.box,mat:sigBodyMat,x:-s*.31,y:4.3,z:0,sx:.36,sy:.8,sz:.45},
+        {id:'sig-lamp-h',geo:k.box,mat:trafficHorizontal,x:-s*.31+s*.19,y:4.3,z:0,sx:.035,sy:.24,sz:.24}
+      ]);
     }
     function sign(text,x,y,z,w,angle,bg){
       const c=document.createElement('canvas');c.width=512;c.height=128;
@@ -278,9 +314,11 @@
     // Canal and streets are clipped by the island instead of exposing a square slab.
     for(let z=-285;z<286;z+=10)if(island.containsCircle(119,z,13))box(material(0x348f9a),119,.065,z,26,.05,10.5);
     for(const r of roads){
+      // One-way streets get a white lane divider instead of the yellow two-way centre line.
+      const lineX=streets.isOneWayLine('x',r)?white:material(0xe7cf80),lineZ=streets.isOneWayLine('z',r)?white:material(0xe7cf80);
       for(let t=-285;t<286;t+=10){
-        if(island.containsCircle(r,t,13)){box(material(0xb5c4b3),r,.065,t,24,.10,10.5);box(asphalt,r,.13,t,14,.07,10.5);if(!roads.some(v=>Math.abs(t-v)<13))box(material(0xe7cf80),r,.185,t,.18,.02,5);}
-        if(island.containsCircle(t,r,13)){box(material(0xb5c4b3),t,.072,r,10.5,.11,24);box(asphalt,t,.14,r,10.5,.07,14);if(!roads.some(v=>Math.abs(t-v)<13))box(material(0xe7cf80),t,.19,r,5,.02,.18);}
+        if(island.containsCircle(r,t,13)){box(material(0xb5c4b3),r,.065,t,24,.10,10.5);box(asphalt,r,.13,t,14,.07,10.5);if(!roads.some(v=>Math.abs(t-v)<13))box(lineX,r,.185,t,.18,.02,5);}
+        if(island.containsCircle(t,r,13)){box(material(0xb5c4b3),t,.072,r,10.5,.11,24);box(asphalt,t,.14,r,10.5,.07,14);if(!roads.some(v=>Math.abs(t-v)<13))box(lineZ,t,.19,r,5,.02,.18);}
       }
       if(island.containsCircle(119,r,15)){
         box(material(0x9db8b6),119,.22,r,29,.22,20);box(asphalt,119,.35,r,29,.03,14);
@@ -300,16 +338,49 @@
       for(const sign of [-1,1]) {
         for(let s=-5;s<=5;s+=1.5){box(white,x+s,.195,z+sign*9.2,.7,.025,2.8);box(white,x+sign*9.2,.20,z+s,2.8,.025,.7);}
       }
-      lamp(x+10.5,z+11.0,Math.PI);
-      if((x+z)%160===0)lamp(x-10.5,z-11.0,0);
-      for(const s of [-1,1]){
-        box(material(0x36565a),x+s*9.8,2.1,z-s*9.5,.18,4.2,.18);
-        box(material(0x203d45),x+s*9.8,4.3,z-s*9.5,.45,.80,.36);
-        box(trafficVertical,x+s*9.8,4.3,z-s*9.5+s*.19,.24,.24,.035);
-        box(material(0x203d45),x+s*9.49,4.3,z-s*9.5,.36,.80,.45);
-        box(trafficHorizontal,x+s*9.49+s*.19,4.3,z-s*9.5,.035,.24,.24);
+      fixtureLamp(x+10.5,z+11.0,Math.PI);
+      if((x+z)%160===0)fixtureLamp(x-10.5,z-11.0,0);
+      for(const s of [-1,1])fixtureSignal(x+s*9.8,z-s*9.5,s);
+    }
+    // One-way paint and signs. Arrows sit in both lanes at mid-block; blue signs face the cross traffic, red wrong-way signs face the exit.
+    const signBlue=material(0x1f6fb8),signRed=material(0xc8352f),signPost=material(0x5a6a6e);
+    function arrowPaint(x,z,axis,d){
+      const tip=1.6,sx=axis==='z'?.35:3.2,sz=axis==='z'?3.2:.35;
+      box(white,x,.205,z,sx,.02,sz);
+      for(const side of [-1,1]){
+        if(axis==='z')box(white,x+side*.57,.205,z+d*(tip-.57),.3,.02,1.6,Math.atan2(-side,d));
+        else box(white,x+d*(tip-.57),.205,z+side*.57,1.6,.02,.3,Math.atan2(side,d));
       }
     }
+    function signArrow(x,y,z,axis,d){
+      // Board arrow from thin boxes in the plane of the board. The shaft is thicker than the board so it shows on both faces.
+      if(axis==='z'){box(white,x,y,z,.12,.1,.8);for(const side of [-1,1])inst(k.box,white,x,y+side*.12,z+d*.26,.12,.1,.4,side*d*Math.PI/4,0,0);}
+      else{box(white,x,y,z,.8,.1,.12);for(const side of [-1,1])inst(k.box,white,x+d*.26,y+side*.12,z,.4,.1,.12,0,0,-side*d*Math.PI/4);}
+    }
+    roads.forEach((r,i)=>{
+      for(const axis of ['x','z']){
+        const d=axis==='x'?streets.dirX(i):streets.dirZ(i);if(!d)continue;
+        for(const cross of roads){
+          const nx=axis==='x'?r:cross,nz=axis==='x'?cross:r;
+          if(!island.containsCircle(nx,nz,14))continue;
+          if(axis==='x'){
+            const px=r-d*8.4,pz=cross-d*13,wx=r+d*8.4,wz=cross+d*13;
+            box(signPost,px,1.5,pz,.1,3,.1);box(signBlue,px,3.1,pz,.08,.9,1.3);signArrow(px,3.1,pz,'z',d);
+            box(signPost,wx,1.5,wz,.1,3,.1);box(signRed,wx,3.1,wz,.9,.9,.08);box(white,wx,3.1,wz,.7,.14,.12);
+          }else{
+            const px=cross-d*13,pz=r+d*8.4,wx=cross+d*13,wz=r-d*8.4;
+            box(signPost,px,1.5,pz,.1,3,.1);box(signBlue,px,3.1,pz,1.3,.9,.08);signArrow(px,3.1,pz,'x',d);
+            box(signPost,wx,1.5,wz,.1,3,.1);box(signRed,wx,3.1,wz,.08,.9,.9);box(white,wx,3.1,wz,.12,.14,.7);
+          }
+        }
+        for(let j=0;j<roads.length-1;j++){
+          const mid=(roads[j]+roads[j+1])/2,ax=axis==='x'?r:mid,az=axis==='x'?mid:r;
+          if(!island.containsCircle(ax,az,13))continue;
+          for(const lane of [-3.5,3.5])axis==='x'?arrowPaint(r+lane,mid,'z',d):arrowPaint(mid,r+lane,'x',d);
+        }
+      }
+    });
+    buildFixtureMeshes();
     const colors=[0xebad98,0x9fcac1,0xe9cf9b,0xe6c3b5,0x91bbc8,0xc0b5cc,0xe9ded0,0xc5cbb9];
     const towerSlots=new Set(['2:1:1','2:1:7','2:2:4','2:3:2','2:3:8','3:1:4','3:1:7','3:3:4','3:3:8','3:4:4','4:1:1','4:2:4','4:2:7','4:3:1','6:1:4','6:3:1','6:5:4']);
     const reservedSlots=new Set(['1:5:5','4:3:2','4:3:5','3:4:1','4:4:0']);
@@ -475,6 +546,8 @@
       if(tunnels.some(t=>x+r>t.minX&&x-r<t.maxX&&((z-r<t.minZ+1.6&&z+r>t.minZ)||(z-r<t.maxZ&&z+r>t.maxZ-1.6))))return true;
       // Anything as wide as a car stops at the park bollards.
       if(r>=1&&parks.some(p=>Math.abs(x-p.x)<p.halfX-1&&Math.abs(z-p.z)<p.halfZ-1))return true;
+      for(const q of dynamicSolids){const dx=x-q.x,dz=z-q.z,rr=r+q.r;if(dx*dx+dz*dz<rr*rr)return true;}
+      if(fixtures.blocked(x,z,r))return true;
       const gx=Math.floor(x/16),gz=Math.floor(z/16);
       for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){
         const list=props.get((gx+i)*1000+gz+j);if(!list)continue;
@@ -483,6 +556,9 @@
       return false;
     }
     let frame=0;
+    const detail={range:1e9,waterEvery:3,fireflies:true};
+    // Quality tiers call this: far animals sleep, fireflies and water animation get cheaper.
+    function setDetail(tier){detail.range=tier.detailRange;detail.waterEvery=tier.waterEvery;fireflies.visible=tier.detail>.5;}
     function update(dt,opts){
       const time=opts.time||0,night=Math.max(0,Math.min(1,opts.night||0)),rain=opts.rain||0;
       windowLit.emissiveIntensity=night*1.35;
@@ -500,7 +576,12 @@
       puddles.forEach((mesh,i)=>{mesh.visible=rain>.06;mesh.scale.z=1+Math.sin(time*.8+i)*.03;});
       signs.forEach(m=>m.emissiveIntensity=.32+night*1.6);
       waterMat.color.setHex(night>.65?0x153f59:0x2ba7af);island.update(time,night,rain);
+      fixtures.update(dt,opts.focus);
+      if(fixtures.dirty){fixtures.dirty=false;fixtures.items.forEach(syncFixture);}
       for(const a of animals){
+        // Far animals sleep: they are hidden and skip their animation until the camera comes near.
+        if(opts.focus&&detail.range<1e8&&Math.hypot(a.x-opts.focus.x,a.z-opts.focus.z)>detail.range){a.g.visible=false;continue;}
+        if(a.type!=='butterfly')a.g.visible=true;
         const t=time*a.speed+a.phase;
         if(a.type==='dog'){
           a.g.position.set(a.x+Math.sin(t)*11,getElevation(a.x+Math.sin(t)*11,a.z+Math.cos(t)*11)+.30,a.z+Math.cos(t)*11);a.g.rotation.y=t+Math.PI/2;
@@ -516,7 +597,7 @@
       }
       fireMat.opacity=Math.max(0,night-.35)*1.3*(1-rain*.8);
       if(finale.visible)finale.rotation.y=time*.28;
-      if((frame++%3)===0){
+      if((frame++%detail.waterEvery)===0){
         fireBase.forEach((p,i)=>{firePos[i*3]=p.x+Math.sin(time+p.phase)*.6;firePos[i*3+1]=p.y+Math.sin(time*1.7+p.phase)*.4;firePos[i*3+2]=p.z+Math.cos(time*.8+p.phase)*.6;});
         fireGeo.attributes.position.needsUpdate=true;
         const v=island.water.geometry.attributes.position;
@@ -525,6 +606,6 @@
       }
     }
     function getDistrict(x,z){return x>250?'Praia Aurora':x>85&&x<150?'Canal das Garças':x<70&&z<0?'Centro Solar':z>60&&x<0?'Jardim Maré':'Costa Coral';}
-    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,getDistrict,getElevation,island,parks,alleys,lots,tunnels,hills,solidProps,beachProps,shoreProps,counts:{buildings:buildings.length,skyscrapers:buildings.filter(b=>b.tower).length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length,beachProps:beachProps.length,shoreProps:shoreProps.length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
+    return {roads,buildings,bounds,spawn:{x:12,z:14},isBlocked,update,setDetail,fixtures,dynamicSolids,streets,getDistrict,getElevation,island,parks,alleys,lots,tunnels,hills,solidProps,beachProps,shoreProps,counts:{buildings:buildings.length,skyscrapers:buildings.filter(b=>b.tower).length,animals:animals.length,insects:fireCount+animals.filter(a=>a.type==='butterfly').length,beachProps:beachProps.length,shoreProps:shoreProps.length},water,setFinale:visible=>{finale.visible=Boolean(visible);},materials:{windowLit,asphalt,trafficVertical,trafficHorizontal,headlights:k.head}};
   };
 })();

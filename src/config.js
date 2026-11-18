@@ -8,6 +8,9 @@ BN.CONFIG = Object.freeze({
   population: 64, traffic: 14, maxPolice: 5,
   policeSight: 60, policeLoseSight: 3, policeSearchTime: 16,
   targetFPS: 60, pixelRatioCap: 1.5,
+  // One-way streets: oneWay.x[v] is the direction along +z of the road at x=v, oneWay.z[v] along +x of the road at z=v.
+  // The outer ring and the central cross stay two-way, so the directed graph remains strongly connected.
+  oneWay: Object.freeze({x: Object.freeze({'-160': 1, '-80': -1, '80': 1, '160': -1}), z: Object.freeze({'-160': 1, '-80': -1, '80': 1, '160': -1})}),
   landmarks: Object.freeze({
     radio: {id:'radio', name:'Rádio Caju', x:40, z:0},
     market: {id:'market', name:'Mercado Maré Alta', x:240, z:145},
