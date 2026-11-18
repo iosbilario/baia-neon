@@ -32,13 +32,13 @@ foge da polícia quando o atalho dá errado. Sem instalação, cadastro, anúnci
 ou telemetria.
 
 **Jogue em [iosbilario.github.io/baia-neon](https://iosbilario.github.io/baia-neon/).**
-Funciona no computador com teclado e mouse e no celular em modo paisagem. O
+Funciona no computador com teclado e mouse, com controle (gamepad) e no celular em modo paisagem. O
 navegador precisa oferecer WebGL.
 
 <p align="center">
   <a href="https://iosbilario.github.io/baia-neon/"><img src="assets/readme/ilha-v061.png" width="100%" alt="Vista aérea da Ilha Ferradura com centro urbano, avenida costeira, praias e oceano."></a>
 </p>
-<p align="center"><sub>Ilha Ferradura na v0.6.1. A imagem vem do jogo real.</sub></p>
+<p align="center"><sub>Ilha Ferradura (captura da v0.6.1). A imagem vem do jogo real.</sub></p>
 
 ## Como se joga
 
@@ -107,12 +107,17 @@ Fica no marcador laranja do mapa e abre com `Enter`.
 | Movimento do mouse | Girar a câmera com o ponteiro preso ao jogo |
 | Segurar botão direito | Mirar sobre o ombro |
 | Clique esquerdo ou `F` | Atirar pela mira central; no carro, `F` buzina |
-| `R` | Recarregar a pistola |
+| `Q`, roda do mouse, `4` `5` `6` | Trocar de arma: pistola, submetralhadora, espingarda |
+| `R` | Recarregar a arma atual |
 | `G` | Arremessar granada |
 | `H` | Consultar controles |
 | `Esc` | Pausar ou pular a abertura |
 
 `Esc` também libera o ponteiro. Em celulares, use o aparelho na horizontal: analógico esquerdo para movimento ou direção, deslize do lado direito para olhar e use os botões contextuais de ação, corrida, mira, aceleração, freio e freio de mão.
+
+**Controle (gamepad).** Analógico esquerdo move ou dirige, direito olha, `RT` acelera ou atira, `LT` freia, `A` interage, `B` freio de mão, `X` atira de dentro do carro, `Y` recarrega, `LB` e `RB` trocam de arma, `SELECT` abre o mapa e `START` pausa. Os prompts da tela mudam conforme o último dispositivo usado.
+
+**Interiores.** Entre a pé pelas portas da Rádio Caju, da Oficina do Canal, do Mercado Maré Alta e do Píer Farol. **Ruas de sentido único** têm setas no asfalto e o GPS respeita a mão.
 
 `T` alterna a chuva e `N` alterna dia e noite, para experimentar.
 

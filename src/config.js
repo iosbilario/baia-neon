@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: MIT */
 window.BN = window.BN || {};
 BN.CONFIG = Object.freeze({
-  title: 'Baía Neon', seed: 5216, version: '0.6.2',
+  title: 'Baía Neon', seed: 5216, version: '1.0.0',
   citySize: 600, dayLength: 720, introDuration: 18,
   startHour: 17.4, walkSpeed: 5.2, runSpeed: 8.7,
   carSpeed: 32, carReverse: 10, carAcceleration: 14,

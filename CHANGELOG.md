@@ -1,5 +1,20 @@
 # Histórico de versões
 
+## [1.0.0] — Cidade Completa
+
+### Para quem joga
+
+- Controle: Gamepad API com zona morta radial, vibração opcional e dicas de tela por dispositivo.
+- Ruas de sentido único com setas no asfalto; trânsito e GPS seguem a mão.
+- Postes e semáforos quebráveis, contato suave com pedestres e bloqueios policiais.
+- Três armas (pistola, submetralhadora, espingarda), tiro de dentro do carro, dano por zona e capotamento arcade.
+- Quatro interiores a pé: Rádio Caju, Oficina do Canal, Mercado Maré Alta e Píer Farol, com atividades internas e três capítulos novos.
+- Qualidade gradual em três níveis, mantendo o recuo por FPS baixo.
+
+### Saves
+
+Schema 2 preservado. Campos novos (arsenal, interiores, campanha ampliada) são aditivos; saves anteriores continuam válidos.
+
 ## [0.6.2] — Pé no Chão
 
 ### Correções
